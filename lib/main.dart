@@ -9,6 +9,7 @@ import 'package:tricycleappdriver/binding/getxbinding.dart';
 import 'package:tricycleappdriver/config/firebaseconfig.dart';
 import 'package:tricycleappdriver/controller/mapcontroller.dart';
 import 'package:tricycleappdriver/geotest.dart';
+import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/home_screen_manager.dart';
 import 'package:tricycleappdriver/screens/earnings_screen.dart';
 import 'package:tricycleappdriver/screens/home_screen.dart';
@@ -52,12 +53,20 @@ class TricycleappDriver extends StatefulWidget {
 }
 
 class _TricycleappDriverState extends State<TricycleappDriver> {
+String? token;
+
+
 
     late StreamSubscription<User?> user;
 
     @override
   void initState() {
     super.initState();
+
+    // FirebaseMessaging.instance.onTokenRefresh.listen((refreshtoken) { 
+    //   token = refreshtoken;
+    // });
+
     user = FirebaseAuth.instance.authStateChanges().listen((user) { 
        if (user == null) {
         print('User is currently signed out!');
@@ -96,9 +105,34 @@ class _TricycleappDriverState extends State<TricycleappDriver> {
         
       });    
 
+      if(authinstance.currentUser!=null){
+
+      _saveDeviceToken();
+      }
+
+
 
   }
 
+
+  _saveDeviceToken() async{
+
+     token  = await messaginginstance.getToken() as String;
+    
+
+    if(token !=null){
+      print('_________token');
+      print(token);
+    }
+
+    
+driversusers.doc(authinstance.currentUser!.uid).update({
+  "token": token,
+});
+    messaginginstance.subscribeToTopic("alldrivers");
+    messaginginstance.subscribeToTopic("allusers");
+
+  }
   @override
   void dispose() {
     user.cancel();

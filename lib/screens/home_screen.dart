@@ -21,6 +21,11 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isMapReady = false;
   bool isOnline = false;
 
+
+
+  
+
+
   void setIsOnline(bool value) {
     setState(() {
       isOnline = value;

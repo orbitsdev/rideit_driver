@@ -13,7 +13,8 @@ User? firebaseuser;
 //cloudfirestore
 FirebaseFirestore firestore = FirebaseFirestore.instance;
 CollectionReference requestcollecctionrefference = firestore.collection('request');
-CollectionReference availabledriverrefference = firestore.collection('availableDrivers');
+CollectionReference driversusers = firestore.collection('drivers');
+CollectionReference availabledriverrefference = firestore.collection('availabledrivers');
 
 
 //realtimedatabase
@@ -23,5 +24,4 @@ StreamSubscription<Position>? driverslocationstream;
 
 //clound messaging
 FirebaseMessaging messaginginstance = FirebaseMessaging.instance;
-
 
