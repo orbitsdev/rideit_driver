@@ -37,6 +37,8 @@ void progressDialog(String message) async {
   );
 }
 
+
+
 void notificationDialog(BuildContext context, String  message) {
  AwesomeDialog(
         context: context,
@@ -46,4 +48,7 @@ void notificationDialog(BuildContext context, String  message) {
         desc:message ,
         btnOkOnPress: () {},
       )..show();
+
+
+
 }

@@ -193,9 +193,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         zoomGesturesEnabled: true,
                         initialCameraPosition: cameraposition as CameraPosition,
                         onMapCreated: (GoogleMapController mapcontroller) {
+
+                          if (!_googlemapcontroller.isCompleted) {
+                      _googlemapcontroller.complete(mapcontroller);
+                      _newgooglemapcontroller = mapcontroller;
+                        _determinePosition();
+                     
+                    }
                           // _googlemapcontroller.complete(mapcontroller);
-                          _newgooglemapcontroller = mapcontroller;
-                          _determinePosition();
+                          
+                        
                         }),
                     Positioned(
                       top: 0,

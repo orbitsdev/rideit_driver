@@ -47,6 +47,12 @@ dependencies:
   geo_firestore_flutter: ^0.1.4
   firebase_messaging: ^11.2.5
   flutter_local_notifications: ^9.2.0
+  lottie: ^1.2.1
+  http: ^0.13.4
+  flutter_svg: ^1.0.3
+  assets_audio_player: ^3.0.3+9
+  flutter_polyline_points: ^1.0.0
+  maps_toolkit: ^2.0.0
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
@@ -75,8 +81,11 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    - assets/images/13520-blue-bird-waiting.json
+    - assets/images/43664-flappy-bird-delivering-a-message.json
+    - assets/images/052car-android.png
+    - assets/sounds/alert.mp3
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

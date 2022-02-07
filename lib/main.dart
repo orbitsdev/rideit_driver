@@ -14,18 +14,22 @@ import 'package:tricycleappdriver/home_screen_manager.dart';
 import 'package:tricycleappdriver/screens/earnings_screen.dart';
 import 'package:tricycleappdriver/screens/home_screen.dart';
 import 'package:tricycleappdriver/screens/me_screen.dart';
+import 'package:tricycleappdriver/screens/ongoingtrip.dart';
 import 'package:tricycleappdriver/screens/trips_screen.dart';
 import 'package:tricycleappdriver/services/localnotificationservice.dart';
+import 'package:tricycleappdriver/services/notificationserves.dart';
 import 'package:tricycleappdriver/signin_screen.dart';
 import 'package:tricycleappdriver/sigup_screen.dart';
+import 'package:tricycleappdriver/testwidgets/testdialog.dart';
 
 //recieve mesage when app backgound
 Future<void> backgroundHandler(RemoteMessage message) async {
   
 
-  print('_______backgroundhandler');
-  print(message.data.toString());
-  print(message.notification!.title);
+  // print('_______backgroundhandler');
+  // print(message.data.toString());
+  // print(message.notification!.title);
+ 
 }
 Future<void> main() async {
 
@@ -67,6 +71,8 @@ String? token;
     //   token = refreshtoken;
     // });
 
+   
+
     user = FirebaseAuth.instance.authStateChanges().listen((user) { 
        if (user == null) {
         print('User is currently signed out!');
@@ -75,35 +81,7 @@ String? token;
       }
     });
 
-    FirebaseMessaging.instance.getInitialMessage().then((message) {
-
-
-      if(message != null){
-          print('______from terminated push notification');
-          print(message.data["mydata"]);
-        }
-      
-    });
-    //forground
-    FirebaseMessaging.onMessage.listen((message) {
-        if(message.notification != null){
-      print('_____from puish notification');
-      print(message.notification!.title);
-      print(message.notification!.body);
-
-
-        }
-      Localnotificationservice.display(message);
-     });
-      //when at the backgroudn and user tap the notfication 
-      FirebaseMessaging.onMessageOpenedApp.listen((message)  {
-          
-        if(message != null){
-          print('______from push notificaion backround ');
-          print(message.data["mydata"]);
-        }
-        
-      });    
+  
 
       if(authinstance.currentUser!=null){
 
@@ -115,14 +93,16 @@ String? token;
   }
 
 
+  
+
   _saveDeviceToken() async{
 
      token  = await messaginginstance.getToken() as String;
     
 
     if(token !=null){
-      print('_________token');
-      print(token);
+      // print('_________token');
+      // print(token);
     }
 
     
@@ -145,16 +125,24 @@ driversusers.doc(authinstance.currentUser!.uid).update({
     return GetMaterialApp(
       initialBinding: Getxbinding(),
       smartManagement: SmartManagement.keepFactory,
-      home:FirebaseAuth.instance.currentUser == null ? SigninScreen() : HomeScreenManager(),
+      home: 
+      
+      //Testdialog(),
+     // Ongoingtrip(),
+      
+      FirebaseAuth.instance.currentUser == null ? SigninScreen() : HomeScreenManager(),
       getPages: [
 
          GetPage(name: SigninScreen.screenName, page: () => SigninScreen() ,binding: Getxbinding() ),
          GetPage(name: SigupScreen.screenName, page: () => SigupScreen(), binding: Getxbinding()),
-         GetPage(name: HomeScreenManager.screenName, page: () => HomeScreenManager()),
+         GetPage(name: HomeScreenManager.screenName, page: () => HomeScreenManager(), binding: Getxbinding()),
          GetPage(name: HomeScreen.screenName, page: () => HomeScreen(), binding: Getxbinding()),
          GetPage(name: EarningsScreen.screenName, page: () => EarningsScreen()),
          GetPage(name: TripsScreen.screenName, page: () => TripsScreen()),
          GetPage(name: MeScreen.screenName, page: () => MeScreen()),
+         GetPage(name: Ongoingtrip.screenName, page: () => Ongoingtrip()),
+
+
          
          
       ],

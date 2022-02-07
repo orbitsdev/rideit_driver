@@ -2,7 +2,8 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:tricycleappdriver/dialog/authenticating.dart';
+import 'package:tricycleappdriver/config/twilioconfig.dart';
+import 'package:tricycleappdriver/dialog/authdialog/authenticating.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/home_screen_manager.dart';
 import 'package:twilio_phone_verify/twilio_phone_verify.dart';
@@ -26,9 +27,10 @@ class Authcontroller  extends GetxController{
     super.onInit();
 
     _twilioPhoneVerify = TwilioPhoneVerify(
-        accountSid: 'ACfa5afa56e26142d2b2e3b35d64a460bf',
-        serviceSid: 'VAd4e02437ddd341cbae2fcbe9ebd96ca8',
-        authToken: '1230f6d2f548075045f6eaebd5dc6f7e');
+        accountSid: Twilioconfig.ACCOUNT_SID,
+        serviceSid:  Twilioconfig.SERVICE_SID,
+        authToken: Twilioconfig.AUTH_TOKEN);
+;
   }
 
   void createUser(String name, String phone, String email, String password, BuildContext context) async {
@@ -55,8 +57,15 @@ class Authcontroller  extends GetxController{
           "phone": gphone as String,
         }).then((_) async {
           // Get.back();
-          verifyPhone(context);
+          //verifyPhone(context);
           // Get.offAllNamed(HomeScreenManager.screenName);
+
+          progressDialog('Authenticating...');
+        Future.delayed(Duration(seconds: 1), () {
+          Get.back();
+         
+          Get.offAndToNamed(HomeScreenManager.screenName);
+        });
         });
       });
     } on FirebaseAuthException catch (e) {

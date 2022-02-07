@@ -40,7 +40,12 @@ class Mapcontroller extends GetxController {
       }
     });
   }
-
+@override
+  void dispose() {
+    // TODO: implement dispose
+      driverslocationstream!.cancel();
+    super.dispose();
+  }
   void makeDriverOnline() async {
     try {
       isOnlineLoading(true);
@@ -90,6 +95,7 @@ class Mapcontroller extends GetxController {
   }
 
   void makeDriverOffline() async {
+    Geofire.initialize("availableDrivers");
     //availabledriverrefference.doc(authinstance.currentUser!.uid).delete();
     //for realtimedatabse
     await availablereference.child(authinstance.currentUser!.uid).remove();
@@ -103,4 +109,10 @@ class Mapcontroller extends GetxController {
     isOnlineLoading(false);
     isOnline(false);
   }
+
+
+
+  
+
+  
 }
