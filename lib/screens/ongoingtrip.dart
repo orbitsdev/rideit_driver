@@ -8,7 +8,9 @@ import 'package:maps_toolkit/maps_toolkit.dart' as toolkit;
 import 'package:tricycleappdriver/assistant/mapkitassistant.dart';
 import 'package:tricycleappdriver/controller/drivercontroller.dart';
 import 'package:tricycleappdriver/controller/requestcontroller.dart';
+import 'package:tricycleappdriver/dialog/requestdialog/completetripdialog.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
+import 'package:tricycleappdriver/home_screen_manager.dart';
 
 class Ongoingtrip extends StatefulWidget {
   static const screenName = "/ongoingtrip";
@@ -50,6 +52,14 @@ class _OngoingtripState extends State<Ongoingtrip> {
     super.initState();
   }
 
+  @override
+  void setState(VoidCallback fn) {
+    if(mounted){
+       super.setState(fn);
+
+    }
+    // TODO: implement setState
+  }
   void createCustomDriverMarker() {
     ImageConfiguration imageconfiguation =
         createLocalImageConfiguration(context, size: Size(2, 2));
@@ -282,25 +292,33 @@ class _OngoingtripState extends State<Ongoingtrip> {
                                       .triprequestid as String);
                                       if(ischange){
                                         print('___buton clcik|||||||||||');
-                                        print(ischange);
+                                        print(requestxconroller.tripdetails.value.tripstatus);
+                                    
                                             if(requestxconroller.tripdetails.value.tripstatus =="arrived"){
                                                 getLiveLocationUpdate();
+                                                print('getliveupdate was called');
                                             }
                                             if(requestxconroller.tripdetails.value.tripstatus =="complete"){
-                                              requestxconroller.endTrip();
+                                              print(requestxconroller.tripdetails.value.tripstatus);
+                                              showEarningDialog();
+                                            
+                                            
+                                             setState(() {
                                               polylineSet.clear();
                                               markerSet.clear();
                                               circleSet.clear();
+                                            
+                                             });
+                                             
                                             }
-
-                                               if(requestxconroller.tripdetails.value.tripstatus !="complete"){
-                                                  setState(() {
+                                            if(requestxconroller.tripdetails.value.tripstatus !="complete"){
+                                            
+                                                 setState(() {
                                                  setPolylines();
                                           
                                         });
-
-                                               }
-                                       
+                                            }
+                                             
                                       }
 
                                       }

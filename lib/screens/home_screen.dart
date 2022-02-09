@@ -22,7 +22,14 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isOnline = false;
 
 
+@override
+  void setState(VoidCallback fn) {
+    if(mounted){
 
+    super.setState(fn);
+    }
+    // TODO: implement setState
+  }
   
 
 

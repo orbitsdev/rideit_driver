@@ -1,9 +1,11 @@
+
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tricycleappdriver/config/mapconfig.dart';
 import 'package:tricycleappdriver/controller/drivercontroller.dart';
+import 'package:tricycleappdriver/controller/mapcontroller.dart';
 import 'package:tricycleappdriver/controller/pageindexcontroller.dart';
 import 'package:tricycleappdriver/dialog/authdialog/authenticating.dart';
 import 'package:tricycleappdriver/dialog/collectionofdialog.dart';
@@ -17,6 +19,7 @@ import 'package:tricycleappdriver/services/mapservices.dart';
 
 class Requestcontroller extends GetxController {
   var driverxcontroller = Get.find<Drivercontroller>();
+  var mapxcontroller = Get.find<Mapcontroller>();
   var tripdetails = Tripdetails().obs;
   var directiondetails = Directiondetails().obs;
   var livedirectiondetails = Directiondetails().obs;
@@ -24,7 +27,7 @@ class Requestcontroller extends GetxController {
   var isDirectiionReady = false.obs;
   var isTripDetailsReady = false.obs;
   var testpositiono = "".obs;
-  var buttontext= "GO";
+  var buttontext = "GO";
   var tripTextIsloading = false.obs;
   Position? currentpostion;
   void confirmRequest(String? requestid) async {
@@ -38,7 +41,7 @@ class Requestcontroller extends GetxController {
           .then((documentsnapshot) async {
         if (documentsnapshot.data() != null) {
           driverxcontroller.disableLiveLocationUpdate();
-         currentpostion = await Geolocator.getCurrentPosition(
+          currentpostion = await Geolocator.getCurrentPosition(
               desiredAccuracy: LocationAccuracy.high);
           Map<String, dynamic> currentlocation = {
             'latitude': currentpostion!.latitude.toString(),
@@ -73,6 +76,8 @@ class Requestcontroller extends GetxController {
               var isTripDetailsReady = await getRouteDirection(requestid);
 
               if (isTripDetailsReady) {
+                mapxcontroller.makeDriverOffline();
+                
                 Get.back();
                 pageindexcontroller.updateIndex(2);
                 Future.delayed(Duration(milliseconds: 300), () {
@@ -131,8 +136,6 @@ class Requestcontroller extends GetxController {
             isTripDetailsReady(false);
           }
         }
-
-      
       }
     });
 
@@ -150,8 +153,7 @@ class Requestcontroller extends GetxController {
       var response = await Mapservices.mapRequest(url);
 
       if (response != 'failed') {
-       
-        var newdirectiondetails =  Directiondetails.fromJason(response);
+        var newdirectiondetails = Directiondetails.fromJason(response);
 
         directiondetails(newdirectiondetails);
         livedirectiondetails(newdirectiondetails);
@@ -189,13 +191,13 @@ class Requestcontroller extends GetxController {
       var response = await Mapservices.mapRequest(url);
 
       if (response != 'failed') {
- 
-        Directiondetails newdliveirectiondetails = Directiondetails.fromJason(response);
+        Directiondetails newdliveirectiondetails =
+            Directiondetails.fromJason(response);
         livedirectiondetails(newdliveirectiondetails);
         testpositiono(drivercurrentpostion.latitude.toString());
 
         //testpositiono = drivercurrentpostion.latitude.toString();
-    
+
       }
     } catch (e) {
       print(e.toString());
@@ -206,64 +208,85 @@ class Requestcontroller extends GetxController {
     bool isChange = false;
 
     tripTextIsloading(true);
-    await requestcollecctionrefference.doc(requestid).get().then((documentsnapshot) async {    
-      if (documentsnapshot.data() != null)  {
+    await requestcollecctionrefference
+        .doc(requestid)
+        .get()
+        .then((documentsnapshot) async {
+      if (documentsnapshot.data() != null) {
         var data = documentsnapshot.data() as Map<String, dynamic>;
-         if(data['tripstatus'] == "prepairing"){
+        if (data['tripstatus'] == "prepairing") {
           await requestcollecctionrefference.doc(requestid).update({
-              'tripstatus': 'arrived',
-             // from pickup to distination 
-           });
-          var isupdated =  await updatePolylines(LatLng(currentpostion!.latitude, currentpostion!.longitude), tripdetails.value.picklocation as LatLng);
-              print('________________updated to arrive');
-             isChange = isupdated;
-             print(isChange);
+            'tripstatus': 'arrived',
+            // from pickup to distination
+          });
+          var isupdated = await updatePolylines(
+              LatLng(currentpostion!.latitude, currentpostion!.longitude),
+              tripdetails.value.picklocation as LatLng);
+
+          isChange =
+              await updateTripStatusDetails(requestid, isChange, isupdated);
+        } else if (data['tripstatus'] == "arrived") {
+          await requestcollecctionrefference.doc(requestid).update({
+            'tripstatus': 'ongoing',
+            // from pickup to distination
+          });
+
+          var isupdated = await updatePolylines(
+              tripdetails.value.picklocation as LatLng,
+              tripdetails.value.droplocation as LatLng);
+
+          isChange =
+              await updateTripStatusDetails(requestid, isChange, isupdated);
+        } else {
+          await requestcollecctionrefference.doc(requestid).update({
+            'tripstatus': 'complete',
+            // from pickup to distination
+          });
+
+          isChange = await updateTripStatusDetails(requestid, isChange, null);
          
-             
-            buttontext ="Arrived";
-             tripdetails.value.tripstatus = "arrived";
-             tripTextIsloading(false);
-           
-        }else if(data['tripstatus'] == "arrived"){
-          await requestcollecctionrefference.doc(requestid).update({
-              'tripstatus': 'travelling',
-             // from pickup to distination 
-           });
-          var isupdated =  await updatePolylines( tripdetails.value.picklocation as LatLng, tripdetails.value.droplocation as LatLng);
-              print('________________updated');
-             isChange = isupdated;
-             print(isChange);
-             
-            buttontext ="Start";
-             tripdetails.value.tripstatus = "travelling";
-             tripTextIsloading(false);
-
-        }else{
-          await requestcollecctionrefference.doc(requestid).update({
-              'tripstatus': 'complete',
-             // from pickup to distination 
-           });
-
-             isChange = true;
-             print(isChange);
-             
-            buttontext ="End Trip";
-             tripdetails.value.tripstatus = "complete";
-             tripTextIsloading(false);
-
         }
-      }else{
+      } else {
         isChange = false;
       }
     });
-  print('before returning_____||||||||||||||');
-  print(isChange);
-            
-  return isChange;
+    print('before returning_____||||||||||||||');
+    print(isChange);
+
+    return isChange;
   }
 
+  Future<bool> updateTripStatusDetails( String requestid, bool isChange, bool? isupdated) async {
+     var statusdata;
+    await requestcollecctionrefference.doc(requestid).get().then((value) {
+        statusdata = value.data() as Map<String, dynamic>;
+      if (isupdated != null) {
+        isChange = isupdated;
+        switch (statusdata['tripstatus']) {
+          case 'arrived':
+            buttontext = 'Start';
+            break;
+          case 'ongoing':
+            buttontext = 'End Trip';
+            break;
+          case 'complete':
+            buttontext = 'Confirm';
+            break;
+        }
+      } else {
+        isChange = true;
+      }
 
-  Future<bool> updatePolylines(LatLng from, LatLng to) async{
+       tripdetails.value.tripstatus = statusdata['tripstatus'];
+        tripTextIsloading(false);
+      
+    });
+
+   
+    return isChange;
+  }
+
+  Future<bool> updatePolylines(LatLng from, LatLng to) async {
     bool isReady = false;
     String url =
         "https://maps.googleapis.com/maps/api/directions/json?origin=${from.latitude},${from.longitude}&destination=${to.latitude},${to.longitude}&mode=walking&key=${Mapconfig.GOOGLEMAP_API_KEY}";
@@ -272,32 +295,66 @@ class Requestcontroller extends GetxController {
       var response = await Mapservices.mapRequest(url);
 
       if (response != 'failed') {
-
-        Directiondetails updatedirectiondetails = Directiondetails.fromJason(response);
+        Directiondetails updatedirectiondetails =
+            Directiondetails.fromJason(response);
 
         directiondetails(updatedirectiondetails);
-            isReady = true;
+        isReady = true;
         print('____________update response');
         print(response);
-
       }
+    } catch (e) {
+      isReady = true;
+      print(e);
+    }
 
-  }catch (e){
-    isReady = true;
-    print(e);
+    return isReady;
   }
 
-  return isReady;
-  }
+  void endTrip(String requestid)  async {
 
+      Map<String, dynamic> pickuplocation = {
+        "latitude": tripdetails.value.picklocation!.latitude.toString(),
+        "longitude": tripdetails.value.picklocation!.longitude.toString(),
+      };    
 
-  void endTrip(){
+       Map<String, dynamic> destionation = {
+        "latitude": tripdetails.value.droplocation!.latitude.toString(),
+        "longitude": tripdetails.value.droplocation!.longitude.toString(),
+      };  
+
+      await triphistoryreferrence.add({
+        "driver_id": tripdetails.value.driverid,
+        "passenger_id": requestid,
+        "pickuplocation": pickuplocation,
+        "pickuplocation_name": tripdetails.value.pickaddressname,
+        "dropplocation_name": tripdetails.value.dropddressname,
+        "destination": destionation,
+        "earn": 100,
+        "fees": 100,
+        "tripstatus": "complete",
+        "date": DateTime.now().toString(),
+      }).then((_) {
+    
+    requestcollecctionrefference.doc(requestid).delete().then((_)
+    {
+    mapxcontroller.makeDriverOnline();
     driverlocationstream!.cancel();
-    tripdetails =  Tripdetails().obs;
+    tripdetails = Tripdetails().obs;
     tripdetails.value.tripstatus = "prepairing";
     directiondetails = Directiondetails().obs;
-    livedirectiondetails =  Directiondetails().obs;
+    livedirectiondetails = Directiondetails().obs;
+    pageindexcontroller.updateIndex(2);
+    driverxcontroller.enableLibeLocationUpdate();
+    Get.back();
+    Future.delayed(Duration(milliseconds: 300),(){
+    Get.offNamed(HomeScreenManager.screenName);
+
+    });
+    });
+   
+      });
+
+   
   }
-
-
 }

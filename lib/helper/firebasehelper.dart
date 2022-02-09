@@ -15,6 +15,11 @@ FirebaseFirestore firestore = FirebaseFirestore.instance;
 CollectionReference driversusers = firestore.collection('drivers');
 CollectionReference availabledriverrefference = firestore.collection('availabledrivers');
 CollectionReference requestcollecctionrefference = firestore.collection('request');
+CollectionReference triphistoryreferrence = firestore.collection('trip');
+
+
+//streams
+
 
 
 //realtimedatabase
