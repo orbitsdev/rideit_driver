@@ -15,7 +15,8 @@ void showEarningDialog(){
       );
 }
 class Completetripdialog extends StatelessWidget {
-  var requestxcontroller = Get.find<Requestcontroller>();
+  static const screenName = '/completedialog';
+  var requestxcontroller = Get.put(Requestcontroller());
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -35,6 +36,7 @@ class Completetripdialog extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('₱ 50'),
+                      Text('To Be Collected'),
                       ElevatedButton(onPressed: () {
                         requestxcontroller.endTrip(requestxcontroller.tripdetails.value.triprequestid as String);
                         

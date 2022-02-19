@@ -21,7 +21,7 @@ class Ongoingtrip extends StatefulWidget {
 
 class _OngoingtripState extends State<Ongoingtrip> {
   var requestxconroller = Get.find<Requestcontroller>();
-  var driverxcontroller = Get.find<Drivercontroller>();
+  var driverxcontroller = Get.put(Drivercontroller());
 
   double mappadding = 0;
   Completer<GoogleMapController> googlemapcontrollercompleter = Completer();
@@ -39,6 +39,8 @@ class _OngoingtripState extends State<Ongoingtrip> {
   LatLng? driverlatlingposition;
   String durationText = "";
   String testpostion = "";
+  
+
 
   var isTripReady = false;
 
@@ -49,17 +51,37 @@ class _OngoingtripState extends State<Ongoingtrip> {
 
   @override
   void initState() {
+
+    isTripDetailsReady();
     super.initState();
+  }
+
+
+  void isTripDetailsReady() async {
+
+
+      var istripready =  await  requestxconroller.checkIsTripReady();
+      if(istripready){
+          setTripMapIsready(istripready);
+          print('inside intistae');
+
+      }
   }
 
   @override
   void setState(VoidCallback fn) {
-    if(mounted){
-       super.setState(fn);
-
+    if (mounted) {
+      super.setState(fn);
     }
     // TODO: implement setState
   }
+
+  void setTripMapIsready(bool value){
+    setState(() {
+      isTripReady = value;
+    });
+  }
+
   void createCustomDriverMarker() {
     ImageConfiguration imageconfiguation =
         createLocalImageConfiguration(context, size: Size(2, 2));
@@ -97,7 +119,6 @@ class _OngoingtripState extends State<Ongoingtrip> {
         strokeColor: Colors.white,
         circleId: CircleId("dropcircle"));
 
-   
     setState(() {
       markerSet.add(pickupmarker as Marker);
       markerSet.add(dropmarker as Marker);
@@ -112,8 +133,6 @@ class _OngoingtripState extends State<Ongoingtrip> {
     print(requestxconroller.tripdetails.value.picklocation);
     print(requestxconroller.tripdetails.value.droplocationid);
     print(requestxconroller.tripdetails.value.droplocation);
-
-   
   }
 
   void _caneraBoundRoute(LatLng bound_sw, LatLng bound_ne) {
@@ -121,11 +140,11 @@ class _OngoingtripState extends State<Ongoingtrip> {
         LatLngBounds(southwest: bound_sw, northeast: bound_ne), 50));
   }
 
-  void setPolylines(){
-      if(requestxconroller.directiondetails.value.polylines_encoded != null){
-          String polylineIdVal = "polyline_id${_polylincecounter}";
-    polylineSet.clear();
- polylineSet.add(
+  void setPolylines() {
+    if (requestxconroller.directiondetails.value.polylines_encoded != null) {
+      String polylineIdVal = "polyline_id${_polylincecounter}";
+      polylineSet.clear();
+      polylineSet.add(
         Polyline(
             polylineId: PolylineId(polylineIdVal),
             width: 6,
@@ -138,11 +157,10 @@ class _OngoingtripState extends State<Ongoingtrip> {
                 .toList()),
       );
 
-      _caneraBoundRoute(requestxconroller.directiondetails.value.bound_sw as LatLng, requestxconroller.directiondetails.value.bound_ne as LatLng);
-
-      }
-    
-   
+      _caneraBoundRoute(
+          requestxconroller.directiondetails.value.bound_sw as LatLng,
+          requestxconroller.directiondetails.value.bound_ne as LatLng);
+    }
   }
 
   setisTripReady(bool value) {
@@ -177,7 +195,7 @@ class _OngoingtripState extends State<Ongoingtrip> {
         CameraPosition camerapostion =
             CameraPosition(target: latlingpostion, zoom: 17);
         newgooglemapcontroller!
-            .animateCamera(CameraUpdate.newCameraPosition(camerapostion));
+            .moveCamera(CameraUpdate.newCameraPosition(camerapostion));
         markerSet
             .removeWhere((marker) => marker.markerId.value == "drivermarker");
         markerSet.add(movingDriverMarker);
@@ -191,6 +209,7 @@ class _OngoingtripState extends State<Ongoingtrip> {
         durationText =
             requestxconroller.directiondetails.value.durationText as String;
       });
+
       oldpostion = latlingpostion;
       requestxconroller.updateDriverTripPosition(latlingpostion,
           requestxconroller.tripdetails.value.triprequestid as String);
@@ -211,18 +230,18 @@ class _OngoingtripState extends State<Ongoingtrip> {
     createCustomDriverMarker();
     return Scaffold(
       body:
-          // isTripReady == false  ? Container(
+          // isTripReady == false ? Container(
           //   child: Center(
           //     child: CircularProgressIndicator(),
           //   ),
-          // ):
+          // ) :
 
           Stack(
         children: [
           GoogleMap(
             padding: EdgeInsets.only(bottom: mappadding),
             initialCameraPosition: _kGooglePlex,
-            mapType: MapType.hybrid,
+            mapType: MapType.normal,
             polylines: polylineSet,
             myLocationEnabled: true,
             myLocationButtonEnabled: true,
@@ -232,8 +251,8 @@ class _OngoingtripState extends State<Ongoingtrip> {
               if (!googlemapcontrollercompleter.isCompleted) {
                 googlemapcontrollercompleter.complete(mapcontroller);
                 newgooglemapcontroller = mapcontroller;
-                   setTripMarkers();
-                   setPolylines();
+                setTripMarkers();
+                setPolylines();
                 // getallDetails();
 
                 // getLiveLocationUpdate();
@@ -285,51 +304,63 @@ class _OngoingtripState extends State<Ongoingtrip> {
                         children: [
                           TextButton(
                             onPressed: () async {
-                              if( requestxconroller.tripdetails.value
-                                      .triprequestid != null){
-                                        var ischange = await requestxconroller.updateTripStatus(
-                                 requestxconroller.tripdetails.value
-                                      .triprequestid as String);
-                                      if(ischange){
-                                        print('___buton clcik|||||||||||');
-                                        print(requestxconroller.tripdetails.value.tripstatus);
-                                    
-                                            if(requestxconroller.tripdetails.value.tripstatus =="arrived"){
-                                                getLiveLocationUpdate();
-                                                print('getliveupdate was called');
-                                            }
-                                            if(requestxconroller.tripdetails.value.tripstatus =="complete"){
-                                              print(requestxconroller.tripdetails.value.tripstatus);
-                                              showEarningDialog();
-                                            
-                                            
-                                             setState(() {
-                                              polylineSet.clear();
-                                              markerSet.clear();
-                                              circleSet.clear();
-                                            
-                                             });
-                                             
-                                            }
-                                            if(requestxconroller.tripdetails.value.tripstatus !="complete"){
-                                            
-                                                 setState(() {
-                                                 setPolylines();
-                                          
-                                        });
-                                            }
-                                             
-                                      }
+                              if (requestxconroller
+                                      .tripdetails.value.triprequestid !=
+                                  null) {
+                                var ischange = await requestxconroller
+                                    .updateTripStatus(requestxconroller
+                                        .tripdetails
+                                        .value
+                                        .triprequestid as String);
+                                if (ischange) {
+                                  if (requestxconroller
+                                          .tripdetails.value.tripstatus ==
+                                      "coming") {
+                                    getLiveLocationUpdate();
+                                  }
 
-                                      }
-                              
-                                     
+                                  if (requestxconroller
+                                          .tripdetails.value.tripstatus ==
+                                      "picked") {
+                                    getLiveLocationUpdate();
+                                  }
+
+                                  if (requestxconroller
+                                          .tripdetails.value.tripstatus ==
+                                      "complete") {
+                                    print(requestxconroller
+                                        .tripdetails.value.tripstatus);
+                                    if (driverlocationstream != null) {
+                                      driverlocationstream!.cancel();
+                                    }
+
+                                    showEarningDialog();
+                                    setState(() {
+                                      polylineSet.clear();
+                                      markerSet.clear();
+                                      circleSet.clear();
+                                    });
+                                  }
+                                  if (requestxconroller
+                                          .tripdetails.value.tripstatus !=
+                                      "complete") {
+                                    setState(() {
+                                      setPolylines();
+                                    });
+                                  }
+                                }
+                              }
                             },
-                            child: requestxconroller.tripTextIsloading.value ? SizedBox(
-                              height: 15,
-                              width: 15,
-                              child: Center(child: CircularProgressIndicator()),
-                            ): Text(requestxconroller.buttontext,),
+                            child: requestxconroller.tripTextIsloading.value
+                                ? SizedBox(
+                                    height: 15,
+                                    width: 15,
+                                    child: Center(
+                                        child: CircularProgressIndicator()),
+                                  )
+                                : Text(requestxconroller.buttontext != ""
+                                    ? requestxconroller.buttontext
+                                    : "Start"),
                             style: ButtonStyle(
                                 shape: MaterialStateProperty.all<
                                         RoundedRectangleBorder>(

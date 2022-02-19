@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:tricycleappdriver/binding/getxbinding.dart';
 import 'package:tricycleappdriver/config/firebaseconfig.dart';
 import 'package:tricycleappdriver/controller/mapcontroller.dart';
+import 'package:tricycleappdriver/dialog/requestdialog/completetripdialog.dart';
 import 'package:tricycleappdriver/geotest.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/home_screen_manager.dart';
@@ -138,9 +139,10 @@ driversusers.doc(authinstance.currentUser!.uid).update({
          GetPage(name: HomeScreenManager.screenName, page: () => HomeScreenManager(), binding: Getxbinding()),
          GetPage(name: HomeScreen.screenName, page: () => HomeScreen(), binding: Getxbinding()),
          GetPage(name: EarningsScreen.screenName, page: () => EarningsScreen()),
-         GetPage(name: TripsScreen.screenName, page: () => TripsScreen()),
-         GetPage(name: MeScreen.screenName, page: () => MeScreen()),
-         GetPage(name: Ongoingtrip.screenName, page: () => Ongoingtrip()),
+         GetPage(name: TripsScreen.screenName, page: () => TripsScreen() , binding: Getxbinding()),
+         GetPage(name: MeScreen.screenName, page: () => MeScreen(), binding: Getxbinding()),
+         GetPage(name: Ongoingtrip.screenName, page: () => Ongoingtrip(), binding: Getxbinding()),
+         GetPage(name: Completetripdialog.screenName, page: () => Completetripdialog(), binding: Getxbinding()),
 
 
          

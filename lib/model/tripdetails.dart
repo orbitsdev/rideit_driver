@@ -15,7 +15,9 @@ class Tripdetails {
       String? status;
       String? tripstatus;
       String? driverid;
-      
+      bool? payed;
+      bool? read;
+
   Tripdetails({
     this.triprequestid,
     this.picklocationid,
@@ -23,14 +25,19 @@ class Tripdetails {
     this.picklocation,
     this.droplocation,
     this.actualmarkerposition,
-    this.pickaddressname="",
-    this.dropddressname="",
+    this.pickaddressname,
+    this.dropddressname,
     this.passengername,
     this.passengerphone,
     this.status,
     this.tripstatus,
     this.driverid,
+    this.payed,
+    this.read,
   });
+
+      
+  
 
 factory Tripdetails.fromJson(Map<String,dynamic> json){
 
@@ -52,8 +59,8 @@ factory Tripdetails.fromJson(Map<String,dynamic> json){
         newtripdetails.passengerphone = json["passenger_phone"];
         newtripdetails.status = json["status"];
         newtripdetails.tripstatus = json["tripstatus"];
-
-
+        newtripdetails.payed = json["payed"];
+        newtripdetails.read = json["read"];
         return newtripdetails;
 }
   

@@ -13,7 +13,7 @@ class TripsScreen extends StatefulWidget {
 
 class _TripsScreenState extends State<TripsScreen> {
 
-
+Stream<QuerySnapshot> _tripsstream = firestore.collection('driverstriphistory').doc(authinstance.currentUser!.uid).collection('trips').snapshots();
 
 @override
   void dispose() {
@@ -21,12 +21,16 @@ class _TripsScreenState extends State<TripsScreen> {
     
     super.dispose();
   }
+  
 
-Stream<QuerySnapshot> _tripsstream = firestore.collection('trip').snapshots();
+
+
+
+
 
   @override
   Widget build(BuildContext context){
-    return  StreamBuilder<QuerySnapshot>(
+    return StreamBuilder<QuerySnapshot>(
       stream: _tripsstream,
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
@@ -51,5 +55,6 @@ Stream<QuerySnapshot> _tripsstream = firestore.collection('trip').snapshots();
         
       },
     );
+    
   }
 }
