@@ -36,15 +36,23 @@ class Requestcontroller extends GetxController {
     progressDialog("Loading...");
 
     if (requestid != null) {
-      requestcollecctionrefference
+     await requestcollecctionrefference
           .doc(requestid)
           .get()
           .then((documentsnapshot) async {
+
         if (documentsnapshot.data() != null) {
-          driverxcontroller.disableLiveLocationUpdate();
-          currentpostion = await Geolocator.getCurrentPosition(
-              desiredAccuracy: LocationAccuracy.high);
-          Map<String, dynamic> currentlocation = {
+          
+            var data = documentsnapshot.data() as Map<String, dynamic>;
+            print('__________________________________confriem');
+            print(data);
+            String request_status = data['status'];
+          if(request_status == "pending"){
+
+            currentpostion = mapxcontroller.currentposition;
+          //     currentpostion = await Geolocator.getCurrentPosition(
+          //     desiredAccuracy: LocationAccuracy.high);
+               Map<String, dynamic> currentlocation = {
             'latitude': currentpostion!.latitude.toString(),
             'longitude': currentpostion!.longitude.toString(),
           };
@@ -59,12 +67,7 @@ class Requestcontroller extends GetxController {
             driverdata = driverinformation.data() as Map<String, dynamic>;
           });
 
-          var data = documentsnapshot.data() as Map<String, dynamic>;
-
-          String request_status = data['status'];
-
-          if (request_status == "pending") {
-            requestcollecctionrefference.doc(requestid).update({
+             requestcollecctionrefference.doc(requestid).update({
               'driver_id': authinstance.currentUser!.uid,
               'driver_name': driverdata['name'],
               'driver_phone': driverdata['phone'],
@@ -73,7 +76,7 @@ class Requestcontroller extends GetxController {
               
  
             }).then((_) async {
-
+                driverxcontroller.disableLiveLocationUpdate();
               var isTripDetailsReady = await getRouteDirection(requestid);
 
               if (isTripDetailsReady) {
@@ -87,6 +90,7 @@ class Requestcontroller extends GetxController {
                 mapxcontroller.makeDriverOffline();
 
                 Get.back();
+                
                 pageindexcontroller.updateIndex(2);
                 Future.delayed(Duration(milliseconds: 300), () {
                   
@@ -101,10 +105,14 @@ class Requestcontroller extends GetxController {
                 infoDialog('Route Direction');
               }
             });
-          } else if (request_status == "accepted") {
-            Get.back();
+          }else{
+             Get.back();
             infoDialog('Request already accepted by other driver');
           }
+
+
+        
+          
         } else {
           Get.back();
           infoDialog('Request Has been canceled');
