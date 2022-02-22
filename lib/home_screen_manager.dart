@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:tricycleappdriver/controller/authcontroller.dart';
 import 'package:tricycleappdriver/controller/mapcontroller.dart';
 import 'package:tricycleappdriver/controller/pageindexcontroller.dart';
 import 'package:tricycleappdriver/screens/earnings_screen.dart';
@@ -19,6 +20,7 @@ static const screenName = '/homescreencontroller';
 
 class _HomeScreenManagerState extends State<HomeScreenManager> {
 
+    var authxcontroller = Get.find<Authcontroller>();
     var mapxcontroller = Get.find<Mapcontroller>();
     var pageindexcontroller = Get.find<Pageindexcontroller>();
 
@@ -37,7 +39,10 @@ class _HomeScreenManagerState extends State<HomeScreenManager> {
   void initState() {
     
      cloudMessagingSetup();
+    authxcontroller.checkIfAcountDetailsIsNull(); 
     super.initState();
+    
+  
   }
 
   void cloudMessagingSetup() async{

@@ -6,11 +6,11 @@ import 'package:tricycleappdriver/config/twilioconfig.dart';
 import 'package:tricycleappdriver/dialog/authdialog/authenticating.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/home_screen_manager.dart';
+import 'package:tricycleappdriver/model/users.dart';
 import 'package:twilio_phone_verify/twilio_phone_verify.dart';
 
-class Authcontroller  extends GetxController{
-
-
+class Authcontroller extends GetxController {
+  var useracountdetails = Users().obs;
   late TwilioPhoneVerify _twilioPhoneVerify;
   var isSignUpLoading = false.obs;
   var isCodeSent = false.obs;
@@ -20,7 +20,7 @@ class Authcontroller  extends GetxController{
   String? gphone;
   String? gemail;
   String? gpassword;
-@override
+  @override
   void onInit() {
     // TODO: implement onInit
 
@@ -28,12 +28,13 @@ class Authcontroller  extends GetxController{
 
     _twilioPhoneVerify = TwilioPhoneVerify(
         accountSid: Twilioconfig.ACCOUNT_SID,
-        serviceSid:  Twilioconfig.SERVICE_SID,
+        serviceSid: Twilioconfig.SERVICE_SID,
         authToken: Twilioconfig.AUTH_TOKEN);
-;
+    ;
   }
 
-  void createUser(String name, String phone, String email, String password, BuildContext context) async {
+  void createUser(String name, String phone, String email, String password,
+      BuildContext context) async {
     gname = name.trim();
     gphone = "+63" + phone.trim();
     gemail = email.trim();
@@ -61,11 +62,11 @@ class Authcontroller  extends GetxController{
           // Get.offAllNamed(HomeScreenManager.screenName);
 
           progressDialog('Authenticating...');
-        Future.delayed(Duration(seconds: 1), () {
-          Get.back();
-         
-          Get.offAndToNamed(HomeScreenManager.screenName);
-        });
+          Future.delayed(Duration(seconds: 1), () {
+            Get.back();
+
+            Get.offAndToNamed(HomeScreenManager.screenName);
+          });
         });
       });
     } on FirebaseAuthException catch (e) {
@@ -99,7 +100,6 @@ class Authcontroller  extends GetxController{
     }
   }
 
-
   void verifyCode(String smsCode, BuildContext context) async {
     isVerifying(true);
     var twilioResponse = await _twilioPhoneVerify.verifySmsCode(
@@ -112,7 +112,7 @@ class Authcontroller  extends GetxController{
         progressDialog('Authenticating...');
         Future.delayed(Duration(seconds: 1), () {
           Get.back();
-         
+
           Get.offAndToNamed(HomeScreenManager.screenName);
         });
       } else {
@@ -125,10 +125,9 @@ class Authcontroller  extends GetxController{
       notificationDialog(context, twilioResponse.errorMessage.toString());
       //print(twilioResponse.errorMessage);
     }
-
   }
 
-   void logInUser(String email, String password, BuildContext context) async {
+  void logInUser(String email, String password, BuildContext context) async {
     try {
       progressDialog("Loading...");
       var authuser = await authinstance.signInWithEmailAndPassword(
@@ -142,7 +141,10 @@ class Authcontroller  extends GetxController{
           .get()
           .then((querySnapshot) {
         if (querySnapshot.data() != null) {
-          print(querySnapshot.data());
+          var data = querySnapshot.data() as Map<String, dynamic>;
+          var useracount = Users.fromJson(data);
+          useracount.id = authuser.user!.uid;
+          useracountdetails(useracount);
 
           // Users userdata = Users();
           // userdata.id = authuser.user!.uid;
@@ -150,11 +152,10 @@ class Authcontroller  extends GetxController{
           // userdata.email = querySnapshot.data()!['email'];
           // userdata.phone = querySnapshot.data()!['phone'];
 
-
-          // //make global variable    
+          // //make global variable
           // firebaseuser = authuser.user;
           // user = userdata.obs;
-          
+
           Get.back();
           Get.offAllNamed(HomeScreenManager.screenName);
         } else {
@@ -171,6 +172,28 @@ class Authcontroller  extends GetxController{
     }
   }
 
-
-
+  void checkIfAcountDetailsIsNull() async {
+    print('calleds________________acount');
+    
+    if (useracountdetails.value.id == null) {
+      await firestore
+        .collection('drivers')
+        .doc(authinstance.currentUser!.uid)
+        .get()
+        .then((querySnapshot) {
+      if (querySnapshot.data() != null) {
+        var data = querySnapshot.data() as Map<String, dynamic>;
+        var useracount = Users.fromJson(data);
+        useracount.id = authinstance.currentUser!.uid;
+        useracountdetails(useracount);
+    print('calleds________________acount');
+        print(useracountdetails.value.id);
+        print(useracountdetails.value.name);
+        print(useracountdetails.value.phone);
+      }
+    });
+      
+    }
+    
+  }
 }

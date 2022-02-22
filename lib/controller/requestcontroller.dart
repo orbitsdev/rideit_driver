@@ -3,6 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tricycleappdriver/config/mapconfig.dart';
+import 'package:tricycleappdriver/controller/authcontroller.dart';
 import 'package:tricycleappdriver/controller/drivercontroller.dart';
 import 'package:tricycleappdriver/controller/mapcontroller.dart';
 import 'package:tricycleappdriver/controller/pageindexcontroller.dart';
@@ -18,6 +19,7 @@ import 'package:tricycleappdriver/screens/trips_screen.dart';
 import 'package:tricycleappdriver/services/mapservices.dart';
 
 class Requestcontroller extends GetxController {
+  var authxcontroller =  Get.find<Authcontroller>();
   var driverxcontroller = Get.find<Drivercontroller>();
   var mapxcontroller = Get.find<Mapcontroller>();
   var tripdetails = Tripdetails().obs;
@@ -59,18 +61,18 @@ class Requestcontroller extends GetxController {
 
           print('____________________get driverdata');
         
-          var driverdata;
-          await driversusers
-              .doc(authinstance.currentUser!.uid)
-              .get()
-              .then((driverinformation) {
-            driverdata = driverinformation.data() as Map<String, dynamic>;
-          });
+
+          // await driversusers
+          //     .doc(authinstance.currentUser!.uid)
+          //     .get()
+          //     .then((driverinformation) {
+          //   driverdata = driverinformation.data() as Map<String, dynamic>;
+          // });
 
              requestcollecctionrefference.doc(requestid).update({
               'driver_id': authinstance.currentUser!.uid,
-              'driver_name': driverdata['name'],
-              'driver_phone': driverdata['phone'],
+              'driver_name': authxcontroller.useracountdetails.value.name,
+              'driver_phone': authxcontroller.useracountdetails.value.phone,
               'driver_location': currentlocation,
               "status": "accepted",
               
