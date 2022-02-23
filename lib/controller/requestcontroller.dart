@@ -17,6 +17,7 @@ import 'package:tricycleappdriver/model/tripdetails.dart';
 import 'package:tricycleappdriver/screens/ongoingtrip.dart';
 import 'package:tricycleappdriver/screens/trips_screen.dart';
 import 'package:tricycleappdriver/services/mapservices.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Requestcontroller extends GetxController {
   var authxcontroller =  Get.find<Authcontroller>();
@@ -94,8 +95,10 @@ class Requestcontroller extends GetxController {
                 Get.back();
                 
                 pageindexcontroller.updateIndex(2);
-                Future.delayed(Duration(milliseconds: 300), () {
-                  
+                Future.delayed(Duration(milliseconds: 300), () {  
+
+                  //openMap(tripdetails.value.droplocation!.latitude,tripdetails.value.droplocation!.latitude);
+                 //launchMapsUrl(tripdetails.value.picklocationid as String,tripdetails.value.droplocationid as String,tripdetails.value.droplocation as LatLng, directiondetails.value.polylines_encoded as List<PointLatLng>);
                 //  Get.offNamedUntil(Ongoingtrip.screenName, (route) => false);
                   Get.toNamed(
                     Ongoingtrip.screenName,
@@ -123,6 +126,32 @@ class Requestcontroller extends GetxController {
     }
   }
 
+Future<void> launchMapsUrl(String originPlaceId, String destionationplaceid, LatLng destinationposition )   async {
+
+  print('___________________ luncher');
+  print(originPlaceId);
+  print(destionationplaceid);
+  print(destinationposition);
+   String googleUrl = 'https://www.google.com/maps/search/?api=1&query=${destinationposition.latitude},${destinationposition.longitude}&dir_action=navigate}';
+  // // print('${tripdetails.value.actualmarkerposition!.latitude},${tripdetails.value.actualmarkerposition!.longitude}');
+  //   String googleUrl = 'https://www.google.com/maps/search/?api=1&origin=${originPlaceId}&origin_place_id=${originPlaceId}&destination_place_id=${destionationplaceid}&destination=${destionationplaceid}&dir_action=navigate';
+  // String googleUrl = 'https://www.google.com/maps/search/?api=1&origin_place_id=${originPlaceId}&destination=${destinationposition.latitude},${destinationposition.longitude}&travelmode=driving&dir_action=navigate';
+  if(await canLaunch(googleUrl) != null) {
+    await launch(googleUrl);
+  } else {
+    throw 'Could not open the map.';
+  }
+  
+
+  // static Future<void> openMap(double latitude,double longitude) async {
+
+  // String googleUrl = 'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
+  // if(await canLaunch(googleUrl) != null) {
+  //   await launch(googleUrl);
+  // } else {
+  //   throw 'Could not open the map.';
+  // }
+}
   Future<bool> getRouteDirection(String requestid) async {
     bool tripDetailsReady = false;
 
@@ -133,6 +162,8 @@ class Requestcontroller extends GetxController {
         .get()
         .then((snapshot) async {
       if (snapshot.data() != null) {
+
+
         ongoingtripdata.clear();
         data = snapshot.data() as Map<String, dynamic>;
         ongoingtripdata = data;
@@ -140,6 +171,7 @@ class Requestcontroller extends GetxController {
         ongoingtripdata["payed"]=false;
         ongoingtripdata["read"]=false;
         
+
         Tripdetails newtripdetails = Tripdetails.fromJson(data);
         newtripdetails.triprequestid = requestid;
         newtripdetails.driverid = authinstance.currentUser!.uid;

@@ -247,6 +247,9 @@ class _OngoingtripState extends State<Ongoingtrip> {
             myLocationButtonEnabled: true,
             markers: markerSet,
             circles: circleSet,
+            compassEnabled: true,
+            mapToolbarEnabled: true,
+            zoomGesturesEnabled: true,
             onMapCreated: (GoogleMapController mapcontroller) {
               if (!googlemapcontrollercompleter.isCompleted) {
                 googlemapcontrollercompleter.complete(mapcontroller);
@@ -374,10 +377,15 @@ class _OngoingtripState extends State<Ongoingtrip> {
                                     MaterialStateProperty.all<Color>(
                                         Colors.white)),
                           ),
+                          
                           TextButton(onPressed: () {}, child: Text('Info')),
                           TextButton(onPressed: () {}, child: Text('Pin')),
                         ],
                       ),
+                      if(requestxconroller.tripdetails.value.tripstatus == "coming")
+                          ElevatedButton(onPressed: () async {
+                            requestxconroller.launchMapsUrl( requestxconroller.tripdetails.value.picklocationid as String,requestxconroller.tripdetails.value.droplocationid as String,requestxconroller.tripdetails.value.droplocation as LatLng);
+                          }, child:Text('View Route Using Google Map')),
                     ],
                   );
                 }),
