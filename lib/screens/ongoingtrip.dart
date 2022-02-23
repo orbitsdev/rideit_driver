@@ -385,7 +385,7 @@ class _OngoingtripState extends State<Ongoingtrip> {
                       if(requestxconroller.tripdetails.value.tripstatus == "coming")
                           ElevatedButton(onPressed: () async {
                             requestxconroller.launchMapsUrl( requestxconroller.tripdetails.value.picklocationid as String,requestxconroller.tripdetails.value.droplocationid as String,requestxconroller.tripdetails.value.droplocation as LatLng);
-                          }, child:Text('View Route Using Google Map')),
+                          }, child:Text('Open Google Map Assistant ')),
                     ],
                   );
                 }),
