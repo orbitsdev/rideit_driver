@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:tricycleappdriver/binding/getxbinding.dart';
 import 'package:tricycleappdriver/config/firebaseconfig.dart';
 import 'package:tricycleappdriver/controller/mapcontroller.dart';
+import 'package:tricycleappdriver/controller/requestcontroller.dart';
 import 'package:tricycleappdriver/dialog/requestdialog/completetripdialog.dart';
 import 'package:tricycleappdriver/geotest.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
@@ -57,7 +58,8 @@ class TricycleappDriver extends StatefulWidget {
   _TricycleappDriverState createState() => _TricycleappDriverState();
 }
 
-class _TricycleappDriverState extends State<TricycleappDriver> {
+class _TricycleappDriverState extends State<TricycleappDriver>  {
+ 
 String? token;
 
 
@@ -67,13 +69,14 @@ String? token;
     @override
   void initState() {
     super.initState();
+  
 
     // FirebaseMessaging.instance.onTokenRefresh.listen((refreshtoken) { 
     //   token = refreshtoken;
     // });
 
    
-
+   
     user = FirebaseAuth.instance.authStateChanges().listen((user) { 
        if (user == null) {
         print('User is currently signed out!');
@@ -92,6 +95,9 @@ String? token;
 
 
   }
+
+
+
 
 
   
@@ -116,11 +122,12 @@ driversusers.doc(authinstance.currentUser!.uid).update({
   }
   @override
   void dispose() {
+   
     user.cancel();
     super.dispose();
   }
     
-
+  
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(

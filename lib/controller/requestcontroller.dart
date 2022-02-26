@@ -34,6 +34,7 @@ class Requestcontroller extends GetxController {
   var testpositiono = "".obs;
   var buttontext = "";
   var tripTextIsloading = false.obs;
+  var hasongingtrip = false.obs;
   Position? currentpostion;
   Map<String, dynamic> ongoingtripdata = {};
   void confirmRequest(String? requestid) async {
@@ -102,6 +103,7 @@ class Requestcontroller extends GetxController {
                   //openMap(tripdetails.value.droplocation!.latitude,tripdetails.value.droplocation!.latitude);
                  //launchMapsUrl(tripdetails.value.picklocationid as String,tripdetails.value.droplocationid as String,tripdetails.value.droplocation as LatLng, directiondetails.value.polylines_encoded as List<PointLatLng>);
                 //  Get.offNamedUntil(Ongoingtrip.screenName, (route) => false);
+                hasongingtrip(true);
                   Get.toNamed(
                     Ongoingtrip.screenName,
                     arguments: {"coming": "request"}
@@ -418,6 +420,7 @@ Future<void> launchMapsUrl(String originPlaceId, String destionationplaceid, Lat
           livedirectiondetails = Directiondetails().obs;
           pageindexcontroller.updateIndex(2);
          // driverxcontroller.enableLibeLocationUpdate();
+         hasongingtrip(false);
          pagexcontroller.updateIndex(2);
           Get.back();
           Future.delayed(Duration(milliseconds: 300), () {

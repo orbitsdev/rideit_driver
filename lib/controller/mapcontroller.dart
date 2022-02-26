@@ -12,9 +12,11 @@ import 'package:tricycleappdriver/helper/firebasehelper.dart';
 class Mapcontroller extends GetxController {
   var isOnline = false.obs;
   var isOnlineLoading = false.obs;
+  var isonlinelastime = false.obs;
   Position? currentposition;
   GeoFirestore geoFirestore =
   GeoFirestore(firestore.collection('availableDrivers'));
+  
 
   @override
   void onInit() {
@@ -125,6 +127,7 @@ class Mapcontroller extends GetxController {
   }
 
   void makeDriverOffline() async {
+
     //availabledriverrefference.doc(authinstance.currentUser!.uid).delete();
     //for realtimedatabse
 
@@ -141,6 +144,7 @@ class Mapcontroller extends GetxController {
 
     isOnlineLoading(false);
     isOnline(false);
+        print("make drive offline called");
   }
 
 

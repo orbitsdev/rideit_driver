@@ -24,7 +24,7 @@ static const screenName = '/homescreencontroller';
   _HomeScreenManagerState createState() => _HomeScreenManagerState();
 }
 
-class _HomeScreenManagerState extends State<HomeScreenManager>  with TickerProviderStateMixin{
+class _HomeScreenManagerState extends State<HomeScreenManager>  with TickerProviderStateMixin,  WidgetsBindingObserver{
 
     var authxcontroller = Get.find<Authcontroller>();
     var mapxcontroller = Get.find<Mapcontroller>();
@@ -52,7 +52,7 @@ class _HomeScreenManagerState extends State<HomeScreenManager>  with TickerProvi
   @override
   void initState() {
    
-
+ WidgetsBinding.instance!.addObserver(this);
   _tabController =  TabController(
     initialIndex: pageindexcontroller.pageindex.value,
     length: _pages.length,
@@ -81,9 +81,40 @@ class _HomeScreenManagerState extends State<HomeScreenManager>  with TickerProvi
    }
   }
 @override
+
   void dispose() {
+     WidgetsBinding.instance!.removeObserver(this);
     super.dispose();
     _tabController!.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // TODO: implement didChangeAppLifecycleState
+    super.didChangeAppLifecycleState(state);
+      if(state == AppLifecycleState.resumed){
+
+        if(mapxcontroller.isonlinelastime.value){
+         // mapxcontroller.makeDriverOnline();
+        }
+        print("resumed_______________ called");
+      }
+     
+      if(state == AppLifecycleState.paused){
+
+          if(mapxcontroller.isOnline.value){
+            mapxcontroller.isonlinelastime.value = true;
+         //   mapxcontroller.makeDriverOffline();
+               print("paused aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+
+          }else{
+            mapxcontroller.isonlinelastime.value =  false;
+          }
+      }
+
+      if(state == AppLifecycleState.detached)  {
+        print("ditached..........................");
+      }
   }
   @override
   Widget build(BuildContext context) {
