@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:geo_firestore_flutter/geo_firestore_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -30,7 +31,7 @@ class Mapcontroller extends GetxController {
       if (value.exists) {
         print('__________ref');
         print('exist');
-        liveUpdateLocation();
+       // liveUpdateLocation();
         isOnline(true);
       } else {
         isOnline(false);
@@ -46,35 +47,64 @@ class Mapcontroller extends GetxController {
       driverslocationstream!.cancel();
     super.dispose();
   }
-  void makeDriverOnline() async {
-    try {
-      isOnlineLoading(true);
+  // void makeDriverOnline() async {
+  //   try {
+  //     isOnlineLoading(true);
 
-      currentposition = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-      // await geoFirestore.setLocation(authinstance.currentUser!.uid, GeoPoint(currentposition!.latitude, currentposition!.longitude));
-      //for realtimedatabase
+  //     currentposition = await Geolocator.getCurrentPosition(
+  //         desiredAccuracy: LocationAccuracy.high);
+  //     // await geoFirestore.setLocation(authinstance.currentUser!.uid, GeoPoint(currentposition!.latitude, currentposition!.longitude));
+  //     //for realtimedatabase
 
-      Geofire.initialize("availableDrivers");
-      Geofire.setLocation(authinstance.currentUser!.uid,
-          currentposition!.latitude, currentposition!.longitude);
+  //     Geofire.initialize("availableDrivers");
+  //     Geofire.setLocation(authinstance.currentUser!.uid,
+  //         currentposition!.latitude, currentposition!.longitude);
 
-      //get device token
+  //     //get device token
 
-      String devicetoken = await messaginginstance.getToken() as String;
+  //     String devicetoken = await messaginginstance.getToken() as String;
 
-      await availabledriverrefference.doc(authinstance.currentUser!.uid).set(
-        {"token": devicetoken, "status": "online"},
+  //     await availabledriverrefference.doc(authinstance.currentUser!.uid).set(
+  //       {"token": devicetoken, "status": "online"},
+  //     );
+
+  //     availablereference.onValue.listen((event) {});
+
+  //     isOnlineLoading(false);
+  //     isOnline(true);
+  //   } catch (e) {
+  //     print(e.toString());
+  //     isOnlineLoading(false);
+  //     isOnline(false);
+  //   }
+  // }
+
+  void makeDriverOnline() async{
+
+    try{
+       isOnlineLoading(true);
+          
+          if(currentposition == null){
+            currentposition =  await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+            print('called');
+
+          }
+
+        String devicetoken = await messaginginstance.getToken() as String;
+        Map<String, dynamic> driverpostion = {
+          'latitude': currentposition!.latitude,
+          'longitude': currentposition!.longitude,
+        };
+        await availabledriverrefference.doc(authinstance.currentUser!.uid).set(
+        {"driver_location":driverpostion , "token": devicetoken, "status": "online"},
       );
+        isOnlineLoading(false);
+        isOnline(true);
 
-      availablereference.onValue.listen((event) {});
-
+    }catch(e){
+      print(e);
       isOnlineLoading(false);
-      isOnline(true);
-    } catch (e) {
-      print(e.toString());
-      isOnlineLoading(false);
-      isOnline(false);
+  //     isOnline(false);
     }
   }
 
@@ -95,16 +125,19 @@ class Mapcontroller extends GetxController {
   }
 
   void makeDriverOffline() async {
-    Geofire.initialize("availableDrivers");
     //availabledriverrefference.doc(authinstance.currentUser!.uid).delete();
     //for realtimedatabse
-    await availablereference.child(authinstance.currentUser!.uid).remove();
-    availabledriverrefference.doc(authinstance.currentUser!.uid).delete();
+
+    //_________________________________________________________________________
+   // Geofire.initialize("availableDrivers");
+    // await availablereference.child(authinstance.currentUser!.uid).remove();
+    await availabledriverrefference.doc(authinstance.currentUser!.uid).delete();
+    //_________________________________________________________________________
 
     // Geofire.removeLocation(authinstance.currentUser!.uid);
-    availablereference.onDisconnect();
+    //availablereference.onDisconnect();
 
-    await driverslocationstream!.cancel();
+    //await driverslocationstream!.cancel();
 
     isOnlineLoading(false);
     isOnline(false);

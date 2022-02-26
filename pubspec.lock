@@ -443,6 +443,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.7.0"
+  motion_tab_bar_v2:
+    dependency: "direct main"
+    description:
+      name: motion_tab_bar_v2
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.5"
   otp_text_field:
     dependency: "direct main"
     description:

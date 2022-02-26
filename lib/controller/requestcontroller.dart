@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -23,6 +24,7 @@ class Requestcontroller extends GetxController {
   var authxcontroller =  Get.find<Authcontroller>();
   var driverxcontroller = Get.find<Drivercontroller>();
   var mapxcontroller = Get.find<Mapcontroller>();
+  var pagexcontroller = Get.find<Pageindexcontroller>();
   var tripdetails = Tripdetails().obs;
   var directiondetails = Directiondetails().obs;
   var livedirectiondetails = Directiondetails().obs;
@@ -79,7 +81,7 @@ class Requestcontroller extends GetxController {
               
  
             }).then((_) async {
-                driverxcontroller.disableLiveLocationUpdate();
+               // driverxcontroller.disableLiveLocationUpdate();
               var isTripDetailsReady = await getRouteDirection(requestid);
 
               if (isTripDetailsReady) {
@@ -415,10 +417,12 @@ Future<void> launchMapsUrl(String originPlaceId, String destionationplaceid, Lat
           directiondetails = Directiondetails().obs;
           livedirectiondetails = Directiondetails().obs;
           pageindexcontroller.updateIndex(2);
-          driverxcontroller.enableLibeLocationUpdate();
+         // driverxcontroller.enableLibeLocationUpdate();
+         pagexcontroller.updateIndex(2);
           Get.back();
           Future.delayed(Duration(milliseconds: 300), () {
-            Get.offNamed(HomeScreenManager.screenName);
+            Get.offNamedUntil(HomeScreenManager.screenName, (route) => false);
+            //Get.offNamed(HomeScreenManager.screenName);
           });
       });
       });

@@ -6,7 +6,7 @@ import 'package:tricycleappdriver/helper/firebasehelper.dart';
 class Drivercontroller  extends GetxController{
 
 
-  void disableLiveLocationUpdate() async {
+void disableLiveLocationUpdate() async {
 
      Geofire.initialize("availableDrivers");
     driverslocationstream!.pause();
@@ -14,16 +14,16 @@ class Drivercontroller  extends GetxController{
 
   }
 
-  void enableLibeLocationUpdate() async{ 
-    var currentpositon =  await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    driverslocationstream!.resume();
-    Geofire.setLocation(authinstance.currentUser!.uid, currentpositon.latitude, currentpositon.longitude);
+  // void enableLibeLocationUpdate() async{ 
+  //   var currentpositon =  await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  //   driverslocationstream!.resume();
+  //   Geofire.setLocation(authinstance.currentUser!.uid, currentpositon.latitude, currentpositon.longitude);
 
-  }
+  // }
 
   void updateDriverTripPosition(){
 
-    
+      
 
   }
 

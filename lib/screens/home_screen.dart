@@ -20,6 +20,8 @@ class _HomeScreenState extends State<HomeScreen> {
   CameraPosition? cameraposition;
   bool isMapReady = false;
   bool isOnline = false;
+  
+
 
 
 @override
@@ -95,6 +97,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     var getcurrentposition = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
+        mapxcontroller.currentposition = getcurrentposition;
+          
     String? currentpositonvalue;
     cameraposition = CameraPosition(
         target: LatLng(
