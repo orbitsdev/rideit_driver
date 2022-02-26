@@ -21,10 +21,21 @@ void disableLiveLocationUpdate() async {
 
   // }
 
-  void updateDriverTripPosition(){
+  Future<bool> updateProfile(String imageurl) async{
+  bool isupdate = false;
+  
+  try{
 
-      
+      await driversusers.doc(authinstance.currentUser!.uid).update({
+    "profile_url": imageurl,
+  }).then((value) => isupdate = true);
 
+
+  }catch (e){
+    isupdate = false;
+  }
+
+  return isupdate;
   }
 
 }
