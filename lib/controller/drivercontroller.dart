@@ -27,7 +27,7 @@ void disableLiveLocationUpdate() async {
   try{
 
       await driversusers.doc(authinstance.currentUser!.uid).update({
-    "profile_url": imageurl,
+    "image_url": imageurl,
   }).then((value) => isupdate = true);
 
 
@@ -37,5 +37,8 @@ void disableLiveLocationUpdate() async {
 
   return isupdate;
   }
+
+
+
 
 }

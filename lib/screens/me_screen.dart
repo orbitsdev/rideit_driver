@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:tricycleappdriver/controller/drivercontroller.dart';
 import 'package:tricycleappdriver/dialog/authdialog/authenticating.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
+import 'package:tricycleappdriver/model/users.dart';
 import 'package:tricycleappdriver/services/firebase_api.dart';
 import 'package:tricycleappdriver/signin_screen.dart';
 import 'package:image_picker/image_picker.dart';
@@ -28,6 +30,17 @@ var driverxcontroller = Get.find<Drivercontroller>();
   final ImagePicker _picker = ImagePicker();
   String? filnametext;
   UploadTask? task;
+  Stream? userdetails;
+ final Stream<DocumentSnapshot<Object?>> _usersStream = driversusers.doc(authinstance.currentUser!.uid).snapshots();
+  @override
+  void initState() {
+    super.initState();
+   //userdetails = getUserdetails();
+  }
+
+   getUserdetails() async{
+    return await FirebaseApi.getUserDetails();
+  }
 
   void loadingSetter(bool value) {
     setState(() {
@@ -38,11 +51,11 @@ var driverxcontroller = Get.find<Drivercontroller>();
   Future pickImage(ImageSource imagesource) async {
     try {
      
-      final image = await ImagePicker().pickImage(source: imagesource);
+      final image = await ImagePicker().pickImage(source: imagesource, maxHeight: 480, imageQuality: 85);
       if (image == null) {
         return;
       }
- loadingSetter(true);
+       loadingSetter(true);
       progressDialog("Uploading");
       final imageTemporary = File(image.path);
       setState(() {
@@ -50,23 +63,18 @@ var driverxcontroller = Get.find<Drivercontroller>();
       });
 
       final pathDir = await pathprovider.getApplicationDocumentsDirectory();
-      final fiilename = path.basename(myimage!.path);
+      final fiilename ='${DateTime.now().millisecond}' +path.basename(myimage!.path);
       final saveimage = await myimage!.copy("${pathDir.path}/${fiilename}");
-      final destination = 'profile/${fiilename}';
+      final destination = 'userimage/${fiilename}';
 
       task = await FirebaseApi.uploadFile(destination, myimage as File);
-      setState(() {
-        
-      });
+      
       if (task == null) return;
       final snapshot = await task!.whenComplete(() {});
-      final urlDownload = await snapshot.ref.getDownloadURL();
-      if(urlDownload.isNotEmpty){
-        driverxcontroller.updateProfile(urlDownload);
-  //      FirebaseApi.updateProfile(urlDownload);
-        print("download ____________${urlDownload}");
 
-      }
+      final urlDownload = await snapshot.ref.getDownloadURL();
+      FirebaseApi.updateProfile(urlDownload, destination );
+
     
       setState(() {
         filnametext = destination;
@@ -88,17 +96,33 @@ var driverxcontroller = Get.find<Drivercontroller>();
           height: 20,
         ),
         Stack(children: [
-          ClipRRect(
+
+      StreamBuilder<DocumentSnapshot<Object?>>(
+      stream: _usersStream,
+      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Object?>> snapshot) {
+        if (snapshot.hasError) {
+          return Text('Something went wrong');
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Text("Loading");
+        }
+        if(snapshot.data!["image_url"] == null){
+          return Container();
+        }
+
+        return  ClipRRect(
             borderRadius: BorderRadius.circular(100),
             child: Container(
               width: 170,
               height: 170,
               color: Colors.pinkAccent,
-              child: myimage != null
-                  ? Image.file(myimage as File, fit: BoxFit.cover)
-                  : Center(child: Text("No image")),
+              child: Image.network(snapshot.data!["image_url"], fit: BoxFit.cover,),
+          
             ),
-          ),
+          );
+      }),
+          
           Positioned(
               bottom: 10,
               right: 10,

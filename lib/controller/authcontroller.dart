@@ -56,6 +56,7 @@ class Authcontroller extends GetxController {
           "name": gname as String,
           "email": gemail as String,
           "phone": gphone as String,
+          "image_url": null,
         }).then((_) async {
           // Get.back();
           //verifyPhone(context);
@@ -186,10 +187,11 @@ class Authcontroller extends GetxController {
         var useracount = Users.fromJson(data);
         useracount.id = authinstance.currentUser!.uid;
         useracountdetails(useracount);
-    print('calleds________________acount');
+        print('calleds________________acount');
         print(useracountdetails.value.id);
         print(useracountdetails.value.name);
         print(useracountdetails.value.phone);
+        print(useracountdetails.value.image_file);
       }
     });
       
