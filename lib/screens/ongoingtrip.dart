@@ -382,10 +382,23 @@ class _OngoingtripState extends State<Ongoingtrip> {
                           TextButton(onPressed: () {}, child: Text('Pin')),
                         ],
                       ),
+
                       if(requestxconroller.tripdetails.value.tripstatus == "coming")
                           ElevatedButton(onPressed: () async {
                             requestxconroller.launchMapsUrl( requestxconroller.tripdetails.value.picklocationid as String,requestxconroller.tripdetails.value.droplocationid as String,requestxconroller.tripdetails.value.droplocation as LatLng);
                           }, child:Text('Open With Google Map Assistant ')),
+
+                          if(Get.arguments["from"] != null)
+        if(Get.arguments["from"] !="trip")
+          Container(
+              child: ElevatedButton(onPressed: (){
+
+                
+                print(Get.arguments["from"]);
+                goToScreen();
+
+              }, child: Text("back")),
+          ),
                     ],
                   );
                 }),
@@ -397,5 +410,20 @@ class _OngoingtripState extends State<Ongoingtrip> {
         
       ),
     );
+  }
+
+  void goToScreen(){
+
+
+    if(Get.arguments["from"] =="request"){
+      
+      Get.toNamed(HomeScreenManager.screenName);
+
+    } if(Get.arguments["from"] =="trip"){
+      Get.back();
+
+    }
+
+    
   }
 }

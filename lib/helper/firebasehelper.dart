@@ -15,11 +15,13 @@ User? firebaseuser;
 //cloudfirestore
 FirebaseFirestore firestore = FirebaseFirestore.instance;
 CollectionReference driversusers = firestore.collection('drivers');
+ CollectionReference drivercurrentrequestaccepted = driversusers.doc(authinstance.currentUser!.uid).collection('acceptedrequest');
 CollectionReference availabledriverrefference = firestore.collection('availabledrivers');
 CollectionReference requestcollecctionrefference = firestore.collection('request');
 CollectionReference drivertriphistoryreferrence = firestore.collection('driverstriphistory');
 CollectionReference passengertriphistoryreferrence = firestore.collection('passengertriphistory');
 CollectionReference ongointripreferrence = firestore.collection('ongointrip');
+CollectionReference ratingsreferrence = firestore.collection('ratings');
 
 //streams
 

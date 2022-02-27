@@ -82,8 +82,9 @@ class Requestcontroller extends GetxController {
               
  
             }).then((_) async {
-               // driverxcontroller.disableLiveLocationUpdate();
-              var isTripDetailsReady = await getRouteDirection(requestid);
+
+              await drivercurrentrequestaccepted.doc(requestid).set({'status': 'accepted'}).then((_)  async{
+                   var isTripDetailsReady = await getRouteDirection(requestid);
 
               if (isTripDetailsReady) {
                 await ongointripreferrence
@@ -113,6 +114,10 @@ class Requestcontroller extends GetxController {
                 Get.back();
                 infoDialog('Route Direction');
               }
+              });
+            
+               // driverxcontroller.disableLiveLocationUpdate();
+             
             });
           }else{
              Get.back();
@@ -408,25 +413,30 @@ Future<void> launchMapsUrl(String originPlaceId, String destionationplaceid, Lat
 
     await drivertriphistoryreferrence.doc(authinstance.currentUser!.uid).collection('trips').add(ongoingtripdata).then((_) async {
       await passengertriphistoryreferrence.doc(requestid).collection('trips').add(ongoingtripdata).then((_)  async{
-         await requestcollecctionrefference.doc(requestid).delete().then((value) {
-         mapxcontroller.makeDriverOnline();
-          if (driverlocationstream != null) {
-            driverlocationstream!.cancel();
-          }
-          
-          tripdetails = Tripdetails().obs;
-          tripdetails.value.tripstatus = "prepairing";
-          directiondetails = Directiondetails().obs;
-          livedirectiondetails = Directiondetails().obs;
-          pageindexcontroller.updateIndex(2);
-         // driverxcontroller.enableLibeLocationUpdate();
-         hasongingtrip(false);
-         pagexcontroller.updateIndex(2);
-          Get.back();
-          Future.delayed(Duration(milliseconds: 300), () {
-            Get.offNamedUntil(HomeScreenManager.screenName, (route) => false);
-            //Get.offNamed(HomeScreenManager.screenName);
-          });
+         await requestcollecctionrefference.doc(requestid).delete().then((value) async {
+           await drivercurrentrequestaccepted.doc(requestid).delete().then((value) async{
+                  mapxcontroller.makeDriverOnline();
+              if (driverlocationstream != null) {
+                driverlocationstream!.cancel();
+              }
+              
+              tripdetails = Tripdetails().obs;
+              tripdetails.value.tripstatus = "prepairing";
+              directiondetails = Directiondetails().obs;
+              livedirectiondetails = Directiondetails().obs;
+              pageindexcontroller.updateIndex(2);
+            // driverxcontroller.enableLibeLocationUpdate();
+            hasongingtrip(false);
+            pagexcontroller.updateIndex(2);
+              Get.back();
+              Future.delayed(Duration(milliseconds: 300), () {
+                Get.offNamedUntil(HomeScreenManager.screenName, (route) => false);
+                //Get.offNamed(HomeScreenManager.screenName);
+              });
+                
+              });
+              
+        
       });
       });
      
@@ -453,4 +463,33 @@ Future<void> launchMapsUrl(String originPlaceId, String destionationplaceid, Lat
 
     return isTripReady as bool;
   }
+
+
+Future<bool> checkIfHasOngoingRequest() async{
+bool  hasacceptedid = false;
+
+  await drivercurrentrequestaccepted.get().then((value) async{
+
+      if(value.docs.isNotEmpty){
+        value.docs.forEach((snapshot){
+          var data = snapshot.id;
+          hasacceptedid  =  true;
+        });
+        
+        print('___________________');
+        print('_______has accepted request__________');
+        print('___________________');
+        print(hasacceptedid);
+       
+
+      }else{
+        print('___________________');
+        print('_______empty__________');
+        print('___________________');
+        hasacceptedid = false;
+      }
+  });
+   return hasacceptedid;
+}    
+
 }

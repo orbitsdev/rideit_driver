@@ -32,6 +32,7 @@ var driverxcontroller = Get.find<Drivercontroller>();
   UploadTask? task;
   Stream? userdetails;
  final Stream<DocumentSnapshot<Object?>> _usersStream = driversusers.doc(authinstance.currentUser!.uid).snapshots();
+ Stream<QuerySnapshot<Map<String, dynamic>>> ratingsstream = ratingsreferrence.doc(authinstance.currentUser!.uid).collection("ratings").snapshots();
   @override
   void initState() {
     super.initState();
@@ -90,74 +91,119 @@ var driverxcontroller = Get.find<Drivercontroller>();
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(
-          height: 20,
-        ),
-        Stack(children: [
-
-      StreamBuilder<DocumentSnapshot<Object?>>(
-      stream: _usersStream,
-      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Object?>> snapshot) {
-        if (snapshot.hasError) {
-          return Text('Something went wrong');
-        }
-
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Text("Loading");
-        }
-        if(snapshot.data!["image_url"] == null){
-          return Container();
-        }
-
-        return  ClipRRect(
-            borderRadius: BorderRadius.circular(100),
-            child: Container(
-              width: 170,
-              height: 170,
-              color: Colors.pinkAccent,
-              child: Image.network(snapshot.data!["image_url"], fit: BoxFit.cover,),
-          
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          SizedBox(
+            height: 20,
+          ),
+          Stack(children: [
+    
+        StreamBuilder<DocumentSnapshot<Object?>>(
+        stream: _usersStream,
+        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Object?>> snapshot) {
+          if (snapshot.hasError) {
+            return Text('Something went wrong');
+          }
+    
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Text("Loading");
+          }
+    
+           
+          if(snapshot.data!["image_url"] == null){
+            return  ClipRRect(
+              borderRadius: BorderRadius.circular(100),
+              child: Container(
+                width: 170,
+                height: 170,
+                color: Colors.pinkAccent,
+                child: Text("No Image")),
+            
+              );
+            
+          }
+    
+          return  ClipRRect(
+              borderRadius: BorderRadius.circular(100),
+              child: Container(
+                width: 170,
+                height: 170,
+                color: Colors.pinkAccent,
+                child: Image.network(snapshot.data!["image_url"], fit: BoxFit.cover,),
+            
+              ),
+            );
+        }),
+            
+            Positioned(
+                bottom: 10,
+                right: 10,
+                child: IconButton(
+                    onPressed: () {
+                      pickImage(ImageSource.camera);
+                    },
+                    icon: Icon(
+                      Icons.camera_alt,
+                    ),
+                    iconSize: 34,
+                    color: Colors.white))
+          ]),
+          SizedBox(
+            height: 3,
+          ),
+          // if (filnametext != null) Text(filnametext as String),
+          ElevatedButton.icon(
+              onPressed: () {
+                pickImage(ImageSource.gallery);
+              },
+              icon: Icon(Icons.folder),
+              label: Text('Pick Image')),
+          SizedBox(
+            height: 12,
+          ),
+          task != null ? builUploadStatus(task) : Container(),
+          StreamBuilder<QuerySnapshot>(
+        stream: ratingsstream,
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) {
+            return Text('Something went wrong');
+          }
+    
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Text("Loading");
+          }
+    
+          return Container(
+            constraints: BoxConstraints(
+              maxHeight: 400,
+            ),
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: snapshot.data!.docs.length,
+              itemBuilder: (context, index){
+    
+                   return ListTile(
+                  title: Text('${snapshot.data!.docs[index]['rate']}'),
+                  subtitle: Text('${snapshot.data!.docs[index]['created_at']}')
+                );
+              },
+              
             ),
           );
-      }),
-          
-          Positioned(
-              bottom: 10,
-              right: 10,
-              child: IconButton(
-                  onPressed: () {
-                    pickImage(ImageSource.camera);
-                  },
-                  icon: Icon(
-                    Icons.camera_alt,
-                  ),
-                  iconSize: 34,
-                  color: Colors.white))
-        ]),
-        SizedBox(
-          height: 3,
-        ),
-        // if (filnametext != null) Text(filnametext as String),
-        ElevatedButton.icon(
-            onPressed: () {
-              pickImage(ImageSource.gallery);
-            },
-            icon: Icon(Icons.folder),
-            label: Text('Pick Image')),
-        SizedBox(
-          height: 12,
-        ),
-        task != null ? builUploadStatus(task) : Container(),
+        },
+      ),
+          ElevatedButton(
+              onPressed: () {
+                authinstance.signOut();
+                Get.offAllNamed(SigninScreen.screenName);
+              },
+              child: Text('Signout')),
         
-        ElevatedButton(
-            onPressed: () {
-              authinstance.signOut();
-              Get.offAllNamed(SigninScreen.screenName);
-            },
-            child: Text('Signout'))
-      ],
+    
+              
+        ],
+      ),
     );
   }
 
