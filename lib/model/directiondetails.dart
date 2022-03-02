@@ -28,35 +28,41 @@ class Directiondetails {
     this.durationValue,
   });
 
+
+
  factory Directiondetails.fromJason(Map<String,dynamic> json){
+
+
         var boundne = json['routes'][0]['bounds']['northeast'];
         var boundswe = json['routes'][0]['bounds']['southwest'];
         var startlocations = json['routes'][0]['legs'][0]['start_location'];
         var endlocation = json['routes'][0]['legs'][0]['end_location'];
-
+        
 
        Directiondetails newdirectiondetails = Directiondetails();
-        newdirectiondetails.bound_ne = LatLng(boundne['lat'], boundne['lng']);
-        newdirectiondetails.bound_sw = LatLng(boundswe['lat'], boundswe['lng']);
-        newdirectiondetails.startlocation =
-            LatLng(startlocations['lat'], startlocations['lng']);
-        newdirectiondetails.endlocation =
-            LatLng(endlocation['lat'], endlocation['lng']);
-        newdirectiondetails.polylines =
-            json['routes'][0]['overview_polyline']['points'];
-        newdirectiondetails.polylines_encoded = PolylinePoints().decodePolyline(
-            json['routes'][0]['overview_polyline']['points']);
-        newdirectiondetails.distanceText =
-            json['routes'][0]['legs'][0]['distance']['text'];
-        newdirectiondetails.distanceValue =
-            json['routes'][0]['legs'][0]['distance']['value'];
-        newdirectiondetails.durationText =
-            json['routes'][0]['legs'][0]['duration']['text'];
-        newdirectiondetails.durationValue =
-              json['routes'][0]['legs'][0]['duration']['value'];
+        newdirectiondetails.bound_ne = LatLng(checkDouble(boundne['lat']) ,checkDouble( boundne['lng']));
+        newdirectiondetails.bound_sw = LatLng(checkDouble(boundswe['lat']) , checkDouble( boundswe['lng']));
+        newdirectiondetails.startlocation =  LatLng( checkDouble(startlocations['lat']) , checkDouble( startlocations['lng']));
+        newdirectiondetails.endlocation =  LatLng(checkDouble(endlocation['lat']) , checkDouble(endlocation['lng']) );
+        newdirectiondetails.polylines =  json['routes'][0]['overview_polyline']['points'];
+        newdirectiondetails.polylines_encoded = PolylinePoints().decodePolyline( json['routes'][0]['overview_polyline']['points']);
+        newdirectiondetails.distanceText =  json['routes'][0]['legs'][0]['distance']['text'];
+        newdirectiondetails.distanceValue =json['routes'][0]['legs'][0]['distance']['value'];
+        newdirectiondetails.durationText = json['routes'][0]['legs'][0]['duration']['text'];
+        newdirectiondetails.durationValue = json['routes'][0]['legs'][0]['duration']['value'];
 
               return newdirectiondetails;
 
   }
+
+  static double checkDouble(dynamic value) {
+    if (value is String) {
+      return double.parse(value);
+    } else {
+      return value;
+    }
+  }
+
+
 }
 

@@ -42,3 +42,4 @@ const TextTheme TEXT_THEME_SMALL  =  TextTheme(
   subtitle1: TextStyle(color:COLOR_BLACK, fontWeight: FontWeight.w400, fontSize: 10 ),
   subtitle2: TextStyle(color:COLOR_GEY, fontWeight: FontWeight.w400, fontSize: 10 ),
 );
+

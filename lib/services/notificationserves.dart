@@ -18,7 +18,9 @@ class Notificationserves {
 
       if(message != null){
          // print('______from terminated push notification');
-               
+              
+          
+
 
           showRequestDialog(message.data['request_id']);
             
@@ -31,8 +33,7 @@ class Notificationserves {
     FirebaseMessaging.onMessage.listen((message) {
         if(message.notification != null){
 
-           
-
+         
           showRequestDialog(message.data['request_id']);
        
     
@@ -48,7 +49,7 @@ class Notificationserves {
           // print('______from push notificaion backround ');
           // print(message.data["request_id"]);
 
-           
+                    
 
           showRequestDialog(message.data['request_id']);
            

@@ -11,7 +11,6 @@ class Requestdialogcontent extends StatelessWidget {
 
     static const screenName = "/requestdialog";
   RequestDetails? requestdetails;
-  
   Requestdialogcontent({
     this.requestdetails,
   });
@@ -68,7 +67,7 @@ class Requestdialogcontent extends StatelessWidget {
                               children: [
                                 Text('Pickup Location', style: Get.theme.textTheme.headline6,),
                                 
-                                Text('${requestdetails!.pickaddressname}', style: Get.theme.textTheme.bodyText1,),
+                                Text('${requestdetails!.pickaddress_name}', style: Get.theme.textTheme.bodyText1,),
                               ],
                             ),
                           ),
@@ -91,7 +90,7 @@ class Requestdialogcontent extends StatelessWidget {
                               children: [
                                 Text('Drop Location', style: Get.theme.textTheme.headline6,),
                                 
-                                Text('${requestdetails!.dropaddressname}', style: Get.theme.textTheme.bodyText1,),
+                                Text('${requestdetails!.dropddress_name}', style: Get.theme.textTheme.bodyText1,),
                               ],
                             ),
                           ),
@@ -113,7 +112,7 @@ class Requestdialogcontent extends StatelessWidget {
                       }, child: const Text('Reject')),
                       ElevatedButton(onPressed: () async{
                       assetaudioplayer.stop();
-                        requestxcontroller.confirmRequest(requestdetails!.requestid as String );                    
+                        requestxcontroller.confirmRequest(requestdetails!.request_id as String );                    
 //                          Get.back();
 
 

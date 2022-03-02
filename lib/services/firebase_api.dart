@@ -16,7 +16,7 @@ class FirebaseApi {
       return ref.putFile(file);
     } on FirebaseException catch (e) {
       // e.g, e.code == 'canceled'
-      return null;
+      return null;  
     }
   }
 

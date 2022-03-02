@@ -14,8 +14,10 @@ class Users {
     this.phone,
     this.image_url,
     this.image_file,
-  });
 
+  });  
+  
+  
   factory Users.fromJson(Map<String, dynamic> json){
 
     Users newuser = Users();
@@ -26,7 +28,8 @@ class Users {
     newuser.image_url = json["image_url"];
     newuser.image_file = json["image_file"];
     return newuser;
-
   }
+
+
 
 }

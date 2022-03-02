@@ -60,7 +60,7 @@ class _HomeScreenManagerState extends State<HomeScreenManager>  with TickerProvi
     );
 
      cloudMessagingSetup();
-    authxcontroller.checkIfAcountDetailsIsNull(); 
+      authxcontroller.checkIfAcountDetailsIsNull(); 
 
 
     super.initState();

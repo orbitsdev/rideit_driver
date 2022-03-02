@@ -12,42 +12,24 @@ import 'package:tricycleappdriver/model/request_details.dart';
 
 void showRequestDialog(String requestid)  async {
 RequestDetails requestdetails = RequestDetails();
-var data;
+
   // print('_________requestid hehe');
   // print(requestid);
 
-  await requestcollecctionrefference.doc(requestid).get().then((documentSnapshot){
+  await requestcollecctionrefference.doc(requestid).get().then((documentSnapshot) async{
      if(documentSnapshot.data() != null){
 
-        data = documentSnapshot.data() as Map<String , dynamic>;
+       //get request coming from notification  and store request id local
 
-          if(data['status'] == 'pending'){
+        requestdetails  =  RequestDetails.fromJson(documentSnapshot.data() as Map<String , dynamic>);
+        requestdetails.request_id = requestid;
 
-            
-          assetaudioplayer.open(Audio("assets/sounds/alert.mp3"));
-          assetaudioplayer.play();
-        
-       
-       requestdetails.requestid = requestid;
-       requestdetails.name = data['passenger_name'];
-       requestdetails.phone = data['passenger_phone'];
-       requestdetails.pickaddressname= data['pickaddress_name'];
-       requestdetails.dropaddressname= data['dropddress_name'];
-       requestdetails.picklocation = LatLng(double.parse(data['pick_location']['latitude']) , double.parse(data['pick_location']['longitude']));
-       requestdetails.droplocation = LatLng(double.parse(data['drop_location']['latitude']) , double.parse(data['drop_location']['longitude']));
-       requestdetails.status = data['status'];
+          if(requestdetails.status == 'pending'){
+           assetaudioplayer.open(Audio("assets/sounds/alert.mp3"));
+            assetaudioplayer.play();
 
-  // print('request_object hehehe_________');
-  //      print(requestdetails.requestid);
-  //      print(requestdetails.name);
-  //      print(requestdetails.phone);
-  //      print(requestdetails.pickaddressname);
-  //      print(requestdetails.dropaddressname);
-  //      print(requestdetails.picklocation);
-  //      print(requestdetails.droplocation);
-  //      print(requestdetails.status);
 
-        Get.defaultDialog(
+               Get.defaultDialog(
               title: '',
               radius: 2,
               barrierDismissible: false,

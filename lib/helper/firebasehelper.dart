@@ -30,6 +30,7 @@ FirebaseDatabase database = FirebaseDatabase.instance;
 DatabaseReference availablereference = database.ref("availableDrivers");
 StreamSubscription<Position>? driverslocationstream; 
 StreamSubscription<Position>? driverlocationstream;
+StreamSubscription<DocumentSnapshot>? collectiontrip;
 //clound messaging
 FirebaseMessaging messaginginstance = FirebaseMessaging.instance;
 

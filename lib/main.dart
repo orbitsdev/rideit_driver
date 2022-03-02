@@ -13,6 +13,7 @@ import 'package:tricycleappdriver/dialog/requestdialog/completetripdialog.dart';
 import 'package:tricycleappdriver/geotest.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/home_screen_manager.dart';
+import 'package:tricycleappdriver/screens/complete_screen.dart';
 import 'package:tricycleappdriver/screens/earnings_screen.dart';
 import 'package:tricycleappdriver/screens/home_screen.dart';
 import 'package:tricycleappdriver/screens/me_screen.dart';
@@ -150,6 +151,7 @@ driversusers.doc(authinstance.currentUser!.uid).update({
          GetPage(name: MeScreen.screenName, page: () => MeScreen(), binding: Getxbinding()),
          GetPage(name: Ongoingtrip.screenName, page: () => Ongoingtrip(), binding: Getxbinding()),
          GetPage(name: Completetripdialog.screenName, page: () => Completetripdialog(), binding: Getxbinding()),
+         GetPage(name: CompleteScreen.screenName, page: () => CompleteScreen(), binding: Getxbinding()),
 
 
          

@@ -18,13 +18,9 @@ class _TripsScreenState extends State<TripsScreen>
   var requestxcontroller = Get.find<Requestcontroller>();
   late TabController tabcontroller;
 
-  Stream<QuerySnapshot> _tripsstream = firestore
-      .collection('driverstriphistory')
-      .doc(authinstance.currentUser!.uid)
-      .collection('trips')
-      .snapshots();
 
-  
+
+
   @override
   void setState(VoidCallback fn) {
     if (mounted) {
@@ -37,7 +33,7 @@ class _TripsScreenState extends State<TripsScreen>
   void initState() {
     // TODO: implement initState
     super.initState();
-   
+    requestxcontroller.checkIfHasOngoingRequest();
     tabcontroller = TabController(length: 2, vsync: this);
     tabcontroller.addListener(() {
       setState(() {});
@@ -52,6 +48,9 @@ class _TripsScreenState extends State<TripsScreen>
     tabcontroller.dispose();
     super.dispose();
   }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -75,8 +74,39 @@ class _TripsScreenState extends State<TripsScreen>
             child: TabBarView(
               controller: tabcontroller,
               children: [
-              Container(child: Text('no data'),),
-                historyBuilder(),
+               
+                Obx((){
+                  if(requestxcontroller.hasongingtrip.value ){
+                    return Container(
+                      height: 200,
+                      child: Center(child: InkWell(
+                        onTap: ()=> Get.offNamed(Ongoingtrip.screenName , arguments: {"from": "trip"}),
+                        child: Text(" View"))),
+                    );
+                  }
+                  return Text('No Data');
+
+                }),
+                //firestore.collection('driverstriphistory').doc(authinstance.currentUser!.uid).collection('trips').snapshots()
+             StreamBuilder(
+    stream: firestore.collection('driverstriphistory').doc(authinstance.currentUser!.uid).collection('trips').snapshots(),
+    builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot){
+      if(!snapshot.hasData){
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+          }
+        return ListView.builder(
+          itemCount: snapshot.data!.docs.length,
+          itemBuilder: (context, index){
+          return ListTile(
+            title: Text("${snapshot.data!.docs[index]['dropddress_name']}"),
+            subtitle: Text("${snapshot.data!.docs[index]['created_at']}"),
+          );
+        });
+
+    }
+  ),
               ],
             ),
           ),
@@ -85,29 +115,5 @@ class _TripsScreenState extends State<TripsScreen>
     );
   }
 
-  StreamBuilder<QuerySnapshot<Object?>> historyBuilder() {
-    return StreamBuilder<QuerySnapshot>(
-      stream: _tripsstream,
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.hasError) {
-          return Text('Something went wrong');
-        }
-
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Text("Loading");
-        }
-
-        return ListView.builder(
-            itemCount: snapshot.data!.docs.length,
-            itemBuilder: (context, index) {
-              var data = snapshot.data!.docs;
-
-              return ListTile(
-                title: Text("${data[index]['pickuplocation_name']}"),
-                subtitle: Text("${data[index]['dropplocation_name']}"),
-              );
-            });
-      },
-    );
-  }
+  
 }

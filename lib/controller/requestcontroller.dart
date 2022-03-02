@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
@@ -14,119 +16,113 @@ import 'package:tricycleappdriver/dialog/requestdialog/completetripdialog.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/home_screen_manager.dart';
 import 'package:tricycleappdriver/model/directiondetails.dart';
-import 'package:tricycleappdriver/model/tripdetails.dart';
+import 'package:tricycleappdriver/model/ongoing_trip_details.dart';
+import 'package:tricycleappdriver/model/request_details.dart';
 import 'package:tricycleappdriver/screens/ongoingtrip.dart';
 import 'package:tricycleappdriver/screens/trips_screen.dart';
 import 'package:tricycleappdriver/services/mapservices.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../assistant/debub_assistant.dart';
+
 class Requestcontroller extends GetxController {
-  var authxcontroller =  Get.find<Authcontroller>();
+  var authxcontroller = Get.find<Authcontroller>();
   var driverxcontroller = Get.find<Drivercontroller>();
   var mapxcontroller = Get.find<Mapcontroller>();
-  var pagexcontroller = Get.find<Pageindexcontroller>();
-  var tripdetails = Tripdetails().obs;
+
+  var requestdetails = RequestDetails();
+  var ongoingtrip = OngoingTripDetails().obs;
   var directiondetails = Directiondetails().obs;
   var livedirectiondetails = Directiondetails().obs;
   var pageindexcontroller = Get.find<Pageindexcontroller>();
   var isDirectiionReady = false.obs;
-  var isTripDetailsReady = false.obs;
+  var isOngoingReady = false.obs;
   var testpositiono = "".obs;
   var buttontext = "";
   var tripTextIsloading = false.obs;
   var hasongingtrip = false.obs;
+  var hasacceptedrequest = false.obs;
   Position? currentpostion;
   Map<String, dynamic> ongoingtripdata = {};
+
   void confirmRequest(String? requestid) async {
     Get.back();
     progressDialog("Loading...");
-
     if (requestid != null) {
-     await requestcollecctionrefference
+      await requestcollecctionrefference
           .doc(requestid)
           .get()
           .then((documentsnapshot) async {
-
         if (documentsnapshot.data() != null) {
-          
-            var data = documentsnapshot.data() as Map<String, dynamic>;
-            print('__________________________________confriem');
-            print(data);
-            String request_status = data['status'];
-          if(request_status == "pending"){
+          // get request details  ;
+          RequestDetails requestdetails = RequestDetails.fromJson(
+              documentsnapshot.data() as Map<String, dynamic>);
 
+          //check request
+          if (requestdetails.status == "pending") {
+          //get current location
             currentpostion = mapxcontroller.currentposition;
-          //     currentpostion = await Geolocator.getCurrentPosition(
-          //     desiredAccuracy: LocationAccuracy.high);
-               Map<String, dynamic> currentlocation = {
-            'latitude': currentpostion!.latitude.toString(),
-            'longitude': currentpostion!.longitude.toString(),
-          };
+            Map<String, dynamic> currentlocation = {
+              'latitude': currentpostion!.latitude,
+              'longitude': currentpostion!.longitude,
+            };
 
-          print('____________________get driverdata');
-        
-
-          // await driversusers
-          //     .doc(authinstance.currentUser!.uid)
-          //     .get()
-          //     .then((driverinformation) {
-          //   driverdata = driverinformation.data() as Map<String, dynamic>;
-          // });
-
-             requestcollecctionrefference.doc(requestid).update({
+            //accept request with  driver information
+            requestcollecctionrefference.doc(requestid).update({
               'driver_id': authinstance.currentUser!.uid,
               'driver_name': authxcontroller.useracountdetails.value.name,
               'driver_phone': authxcontroller.useracountdetails.value.phone,
               'driver_location': currentlocation,
               "status": "accepted",
-              
- 
             }).then((_) async {
+              
 
-              await drivercurrentrequestaccepted.doc(requestid).set({'status': 'accepted'}).then((_)  async{
-                   var isTripDetailsReady = await getRouteDirection(requestid);
 
-              if (isTripDetailsReady) {
-                await ongointripreferrence
-                    .doc(tripdetails.value.triprequestid)
-                    .set(ongoingtripdata).then((_) async {
-                        await requestcollecctionrefference.doc(requestid).update({
-                           'tripstatus':'ready',  
-                         });
-                    });
-                mapxcontroller.makeDriverOffline();
+            // store requestid in driver for ongoinng trip screen used only
+              await drivercurrentrequestaccepted.doc(requestid).set({'status': 'accepted'}).then((_) async {
 
-                Get.back();
-                
-                pageindexcontroller.updateIndex(2);
-                Future.delayed(Duration(milliseconds: 300), () {  
+            //get direction and ongoingtripdetails local
+                var isOngoingReady = await getDirectionAndCreateOngoingTrip(requestid);
 
-                  //openMap(tripdetails.value.droplocation!.latitude,tripdetails.value.droplocation!.latitude);
-                 //launchMapsUrl(tripdetails.value.picklocationid as String,tripdetails.value.droplocationid as String,tripdetails.value.droplocation as LatLng, directiondetails.value.polylines_encoded as List<PointLatLng>);
-                //  Get.offNamedUntil(Ongoingtrip.screenName, (route) => false);
-                hasongingtrip(true);
-                  Get.toNamed(
-                    Ongoingtrip.screenName,
-                    arguments: {"coming": "request"}
-                  );
-                });
-              } else {
-                Get.back();
-                infoDialog('Route Direction');
-              }
+                if (isOngoingReady) {
+                  await requestcollecctionrefference.doc(requestid).update({
+                    'tripstatus': 'ready',
+                  }).then((value) async {
+                    
+                      //make driver offline
+                       mapxcontroller.makeDriverOffline();
+                      
+                      //close loading screen 
+                        Get.back();
+
+                       //update page to trip para pag back mo malakat ka sa trip screen 
+                        pageindexcontroller.updateIndex(2);
+                        
+                        //after 300 milliseconds lakat ka sa ongoing trip screen 
+                        
+                        Future.delayed(Duration(milliseconds: 300), () {
+                        
+                        //then store data in local na may ongoing trip ka
+                        hasongingtrip(true);
+                          Get.toNamed(Ongoingtrip.screenName,
+                              arguments: {"from": "request"});
+                        });
+                    
+                  });
+
+
+                } else {
+                  Get.back();
+                  infoDialog('Route Direction');
+                }
               });
-            
-               // driverxcontroller.disableLiveLocationUpdate();
-             
+
+              // driverxcontroller.disableLiveLocationUpdate();
             });
-          }else{
-             Get.back();
+          } else {
+            Get.back();
             infoDialog('Request already accepted by other driver');
           }
-
-
-        
-          
         } else {
           Get.back();
           infoDialog('Request Has been canceled');
@@ -135,83 +131,105 @@ class Requestcontroller extends GetxController {
     }
   }
 
-Future<void> launchMapsUrl(String originPlaceId, String destionationplaceid, LatLng destinationposition )   async {
+  Future<void> launchMapsUrl(String originPlaceId, String destionationplaceid,
+      LatLng destinationposition) async {
+    print('___________________ luncher');
+    print(originPlaceId);
+    print(destionationplaceid);
+    print(destinationposition);
+    String googleUrl =
+        'https://www.google.com/maps/search/?api=1&query=${destinationposition.latitude},${destinationposition.longitude}&dir_action=navigate}';
+    // // print('${tripdetails.value.actualmarkerposition!.latitude},${tripdetails.value.actualmarkerposition!.longitude}');
+    //   String googleUrl = 'https://www.google.com/maps/search/?api=1&origin=${originPlaceId}&origin_place_id=${originPlaceId}&destination_place_id=${destionationplaceid}&destination=${destionationplaceid}&dir_action=navigate';
+    // String googleUrl = 'https://www.google.com/maps/search/?api=1&origin_place_id=${originPlaceId}&destination=${destinationposition.latitude},${destinationposition.longitude}&travelmode=driving&dir_action=navigate';
+    if (await canLaunch(googleUrl) != null) {
+      await launch(googleUrl);
+    } else {
+      throw 'Could not open the map.';
+    }
 
-  print('___________________ luncher');
-  print(originPlaceId);
-  print(destionationplaceid);
-  print(destinationposition);
-   String googleUrl = 'https://www.google.com/maps/search/?api=1&query=${destinationposition.latitude},${destinationposition.longitude}&dir_action=navigate}';
-  // // print('${tripdetails.value.actualmarkerposition!.latitude},${tripdetails.value.actualmarkerposition!.longitude}');
-  //   String googleUrl = 'https://www.google.com/maps/search/?api=1&origin=${originPlaceId}&origin_place_id=${originPlaceId}&destination_place_id=${destionationplaceid}&destination=${destionationplaceid}&dir_action=navigate';
-  // String googleUrl = 'https://www.google.com/maps/search/?api=1&origin_place_id=${originPlaceId}&destination=${destinationposition.latitude},${destinationposition.longitude}&travelmode=driving&dir_action=navigate';
-  if(await canLaunch(googleUrl) != null) {
-    await launch(googleUrl);
-  } else {
-    throw 'Could not open the map.';
+    // static Future<void> openMap(double latitude,double longitude) async {
+
+    // String googleUrl = 'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
+    // if(await canLaunch(googleUrl) != null) {
+    //   await launch(googleUrl);
+    // } else {
+    //   throw 'Could not open the map.';
+    // }
   }
-  
 
-  // static Future<void> openMap(double latitude,double longitude) async {
 
-  // String googleUrl = 'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
-  // if(await canLaunch(googleUrl) != null) {
-  //   await launch(googleUrl);
-  // } else {
-  //   throw 'Could not open the map.';
-  // }
-}
-  Future<bool> getRouteDirection(String requestid) async {
-    bool tripDetailsReady = false;
 
-    var data;
+  Future<bool> getDirectionAndCreateOngoingTrip(String requestid) async {
+   
+
+    bool ongoingTripDetailsReady = false;
+    OngoingTripDetails ongoingtripdetails = OngoingTripDetails();
 
     await requestcollecctionrefference
         .doc(requestid)
         .get()
         .then((snapshot) async {
+      
+        //check it has ongoing trip data
       if (snapshot.data() != null) {
 
+        //get request details with driver information then convert is as ongoingtrip details
+        ongoingtripdetails = OngoingTripDetails.fromJson( snapshot.data() as Map<String, dynamic>);
+   
 
-        ongoingtripdata.clear();
-        data = snapshot.data() as Map<String, dynamic>;
-        ongoingtripdata = data;
-        ongoingtripdata['tripstatus']= 'prepairing';
-        ongoingtripdata["payed"]=false;
-        ongoingtripdata["read"]=false;
-        
+        //add more field to null data
+        ongoingtripdetails.tripstatus = 'prepairing';
+        ongoingtripdetails.payed = false;
+        ongoingtripdetails.read = false;
+        ongoingtripdetails.request_id = requestid;
+        // printDebugline();
 
-        Tripdetails newtripdetails = Tripdetails.fromJson(data);
-        newtripdetails.triprequestid = requestid;
-        newtripdetails.driverid = authinstance.currentUser!.uid;
-        tripdetails(newtripdetails);
+        //conver to json
+        ongoingtripdata = ongoingtripdetails.toJson();
+     
 
-      
+        //get deriction details 
+        var isrouteready = await getDirection(
+            ongoingtripdetails.pick_location_id as String,
+            ongoingtripdetails.drop_location_id as String,
+            ongoingtripdetails.actualmarker_position as LatLng);
 
-        if (newtripdetails.driverid != null) {
-          if (newtripdetails.driverid!.isNotEmpty) {
-            //show getting direction
-            var isrouteready = await getDirection(
-                newtripdetails.picklocationid as String,
-                newtripdetails.droplocationid as String,
-                newtripdetails.actualmarkerposition as LatLng);
-            if (isrouteready) {
-              tripDetailsReady = true;
-              isTripDetailsReady(true);
+        //is route ready
+        if (isrouteready) {   
+
+             //store converted data to ongoingtrip database                             
+            var isOngoingTripCreated = await createOngoingTrip(ongoingtripdata);
+            
+            //is created
+            if (isOngoingTripCreated) {
+
+              ongoingTripDetailsReady = isOngoingTripCreated;
+              isOngoingReady(isrouteready);
+
             } else {
-              tripDetailsReady = false;
-              isTripDetailsReady(false);
+
+              ongoingTripDetailsReady = false;
+              isOngoingReady(false);
             }
-          } else {
-            tripDetailsReady = false;
-            isTripDetailsReady(false);
-          }
+
+        }else{
+          
+           ongoingTripDetailsReady = false;
+           isOngoingReady(false);
+
         }
+
+      } else {
+        ongoingTripDetailsReady = false;
+        isOngoingReady(false);
       }
     });
 
-    return tripDetailsReady;
+    return ongoingTripDetailsReady;
   }
+
+
 
   Future<bool> getDirection(String pickuplocationid, String droplocationid,
       LatLng actularmarkerpostion) async {
@@ -225,7 +243,6 @@ Future<void> launchMapsUrl(String originPlaceId, String destionationplaceid, Lat
 
       if (response != 'failed') {
         var newdirectiondetails = Directiondetails.fromJason(response);
-
         directiondetails(newdirectiondetails);
         livedirectiondetails(newdirectiondetails);
         isDirectiionReady(true);
@@ -242,28 +259,59 @@ Future<void> launchMapsUrl(String originPlaceId, String destionationplaceid, Lat
     }
   }
 
-  void updateDriverTripPosition(LatLng position, String requestid) {
+  Future<bool> createOngoingTrip(Map<String, dynamic> ongoingtripdata) async {
+    bool isOngoingTripCreated = false;
+    try {
+      await ongointripreferrence
+          .doc(ongoingtripdata['request_id'])
+          .set(ongoingtripdata)
+          .then((_) async {
+        isOngoingTripCreated = true;
+      });
+      isOngoingTripCreated = true;
+    } catch (e) {
+      isOngoingTripCreated = false;
+    }
+
+    return isOngoingTripCreated;
+  }
+
+  void updateDriverTripPosition(LatLng position, String requestid) async {
     Map<String, dynamic> newdriverlocation = {
       'latitude': position.latitude,
       'longitude': position.longitude,
     };
-        ongointripreferrence.doc(requestid)
-        .update({'driver_location': newdriverlocation});
+
+    await ongointripreferrence.doc(requestid).update({'driver_location': newdriverlocation});
   }
 
   void getNewTripDirection(
-      LatLng drivercurrentpostion, LatLng finaldestionation) async {
-    String url =
-        "https://maps.googleapis.com/maps/api/directions/json?origin=${drivercurrentpostion.latitude},${drivercurrentpostion.longitude}&destination=${finaldestionation.latitude},${finaldestionation.longitude}&mode=walking&key=${Mapconfig.GOOGLEMAP_API_KEY}";
+
+
+
+    LatLng startingposition, LatLng finaldestionation) async {
+    String url =   "https://maps.googleapis.com/maps/api/directions/json?origin=${startingposition.latitude},${startingposition.longitude}&destination=${finaldestionation.latitude},${finaldestionation.longitude}&mode=walking&key=${Mapconfig.GOOGLEMAP_API_KEY}";
 
     try {
       var response = await Mapservices.mapRequest(url);
 
       if (response != 'failed') {
         Directiondetails newdliveirectiondetails =
-            Directiondetails.fromJason(response);
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        Directiondetails.fromJason(response);
         livedirectiondetails(newdliveirectiondetails);
-        testpositiono(drivercurrentpostion.latitude.toString());
+ 
 
         //testpositiono = drivercurrentpostion.latitude.toString();
 
@@ -273,63 +321,120 @@ Future<void> launchMapsUrl(String originPlaceId, String destionationplaceid, Lat
     }
   }
 
-  Future<bool> updateTripStatus(String requestid) async {
+  Future<String> updateOngoingTripStatus() async {
     bool isChange = false;
     tripTextIsloading(true);
-    await ongointripreferrence.doc(requestid).get().then((document) async {
-      if (document.data() != null) {
-        var data = document.data() as Map<String, dynamic>;
+    String? tripstatus;
+    String? newtripstatusvalue;
+    // to make sur
+    
 
-        if (data['tripstatus'] == "prepairing") {
-          await ongointripreferrence.doc(requestid).update({
-            'tripstatus': 'coming',
-          });
+    if(ongoingtrip.value.tripstatus == "prepairing"){
+        newtripstatusvalue = "coming";
+    }else if(ongoingtrip.value.tripstatus == "coming"){
+        newtripstatusvalue = "arrived";
+      
+    }else if(ongoingtrip.value.tripstatus == "arrived"){
 
-          var isupdated = await updatePolylines(
-              LatLng(currentpostion!.latitude, currentpostion!.longitude),
-              tripdetails.value.picklocation as LatLng);
-          isChange =
-              await updateTripStatusDetails(requestid, isChange, isupdated);
-        } else if (data['tripstatus'] == "coming") {
-          await ongointripreferrence.doc(requestid).update({
-            'tripstatus': 'arrived',
-          });
-          var isupdated = await updatePolylines(
-              tripdetails.value.picklocation as LatLng,
-              tripdetails.value.droplocation as LatLng);
-          isChange = await updateTripStatusDetails(requestid, isChange, isupdated);
-           if (driverlocationstream != null) {
-            driverlocationstream!.cancel();
-          }
-        } else if (data['tripstatus'] == "arrived") {
-          await ongointripreferrence.doc(requestid).update({
-            'tripstatus': 'picked',
-                        
-          });
+        newtripstatusvalue = "picked";
+    }
+    else if(ongoingtrip.value.tripstatus == "picked"){
 
-          isChange = await updateTripStatusDetails(requestid, isChange, null);
+        newtripstatusvalue = "complete";
+
+    }
+    else if(ongoingtrip.value.tripstatus == "complete"){
           
-        } else if (data['tripstatus'] == "picked") {
-          await ongointripreferrence.doc(requestid).update({
-            'tripstatus': 'complete',
-          });
-          isChange = await updateTripStatusDetails(requestid, isChange, null);
-         // showEarningDialog();
-        }
+        newtripstatusvalue = "end";
+    }
+
+      
+      
+
+    if(newtripstatusvalue != "end"){
+       isChange = await updateTripStatusAndChangeDirectionDetails(newtripstatusvalue as String);
+      if(isChange){
+
+      //check updated  local tripstatus details  
+        if(ongoingtrip.value.tripstatus == "coming"){
+            
+             //from driver current location to pickup location
+            getNewTripDirection(ongoingtrip.value.driver_location as LatLng, ongoingtrip.value.pick_location as LatLng);
+        
+          }else if(ongoingtrip.value.tripstatus == "arrived"){
+
+            //stop updating driver location
+            cancelDriverLiveLocation();
+            
+           }  
+
+          else if(ongoingtrip.value.tripstatus == "picked"){
+
+                  //from pickup location to dropofflocation
+              getNewTripDirection(ongoingtrip.value.pick_location as LatLng, ongoingtrip.value.drop_location as LatLng);
+
+          }
+          else if(ongoingtrip.value.tripstatus == "complete"){
+            cancelDriverLiveLocation();
+
+           }
+
+     
+      //return update tripstaus
+
+       tripstatus =  ongoingtrip.value.tripstatus;   
+    }else{
+
+      tripstatus =  ongoingtrip.value.tripstatus;    
+    }
+      //check if succefull update
+      
+      }else{
+      tripstatus =  ongoingtrip.value.tripstatus;    
+       //same tripstatus
       }
-    });
 
     tripTextIsloading(false);
-    print('before returning_____||||||||||||||');
-    print(isChange);
 
-    return isChange;
+    return tripstatus as String;
+
   }
+
+  void cancelDriverLiveLocation(){
+    if(driverlocationstream != null){
+
+              driverlocationstream!.cancel();
+
+            }
+
+  }
+  Future<bool> updateTripStatusAndChangeDirectionDetails(String tripstaus_new_value) async{
+
+    bool isUpdated =  false;
+      try{
+         await ongointripreferrence.doc(ongoingtrip.value.request_id).update({
+        "tripstatus": tripstaus_new_value,
+      }).then((_) async {
+        //update local details
+        ongoingtrip.value.tripstatus = tripstaus_new_value;
+        isUpdated = true;
+      });
+      }catch(e){
+        isUpdated = false;
+      }
+     
+
+    return isUpdated;
+  }
+
+  
+
 
   Future<bool> updateTripStatusDetails(
       String requestid, bool isChange, bool? isupdated) async {
     var statusdata;
     await ongointripreferrence.doc(requestid).get().then((value) {
+
       statusdata = value.data() as Map<String, dynamic>;
       if (statusdata != null) {
         switch (statusdata['tripstatus']) {
@@ -347,7 +452,7 @@ Future<void> launchMapsUrl(String originPlaceId, String destionationplaceid, Lat
             break;
         }
 
-        tripdetails.value.tripstatus = statusdata['tripstatus'];
+        ongoingtrip.value.tripstatus = statusdata['tripstatus'];
         tripTextIsloading(false);
         isChange = true;
       }
@@ -383,113 +488,137 @@ Future<void> launchMapsUrl(String originPlaceId, String destionationplaceid, Lat
 
   void endTrip(String requestid) async {
     await ongointripreferrence.doc(requestid).update({
-       'payed': true,
+      'payed': true,
     });
 
-    Map<String, dynamic> pickuplocation = {
-      "latitude": tripdetails.value.picklocation!.latitude.toString(),
-      "longitude": tripdetails.value.picklocation!.longitude.toString(),
-    };
 
-    Map<String, dynamic> destionation = {
-      "latitude": tripdetails.value.droplocation!.latitude.toString(),
-      "longitude": tripdetails.value.droplocation!.longitude.toString(),
-    };
+  ongoingtrip.value.payed  = true;
+    Map<String , dynamic> triphistorydata = ongoingtrip.value.toJson();
 
-    Map<String, dynamic> ongoingtripdata = {
-       "driver_id": tripdetails.value.driverid,
-      "passenger_id": requestid,
-      "pickuplocation": pickuplocation,
-      "pickuplocation_name": tripdetails.value.pickaddressname,
-      "dropplocation_name": tripdetails.value.dropddressname,
+  DebubAssistant.printDataLine('before deleting', triphistorydata);
 
-      
-      "destination": destionation,
-      "earn": 100,
-      "fees": 100,
-      "tripstatus": "completed",
-      "date": DateTime.now().toString(),
-    };
 
-    await drivertriphistoryreferrence.doc(authinstance.currentUser!.uid).collection('trips').add(ongoingtripdata).then((_) async {
-      await passengertriphistoryreferrence.doc(requestid).collection('trips').add(ongoingtripdata).then((_)  async{
-         await requestcollecctionrefference.doc(requestid).delete().then((value) async {
-           await drivercurrentrequestaccepted.doc(requestid).delete().then((value) async{
-                  mapxcontroller.makeDriverOnline();
-              if (driverlocationstream != null) {
-                driverlocationstream!.cancel();
-              }
-              
-              tripdetails = Tripdetails().obs;
-              tripdetails.value.tripstatus = "prepairing";
-              directiondetails = Directiondetails().obs;
-              livedirectiondetails = Directiondetails().obs;
-              pageindexcontroller.updateIndex(2);
+
+
+    await drivertriphistoryreferrence
+        .doc(authinstance.currentUser!.uid)
+        .collection('trips')
+        .add(triphistorydata)
+        .then((_) async {
+          //add to passenger
+      await passengertriphistoryreferrence
+          .doc(requestid)
+          .collection('trips')
+          .add(triphistorydata)
+          .then((_) async {
+        await requestcollecctionrefference
+            .doc(requestid)
+            .delete()
+            .then((value) async {
+          await drivercurrentrequestaccepted
+              .doc(requestid)
+              .delete()
+              .then((value) async {
+            mapxcontroller.makeDriverOnline();
+            cancelDriverLiveLocation();
+
+            ongoingtrip = OngoingTripDetails().obs;
+            directiondetails = Directiondetails().obs;
+            livedirectiondetails = Directiondetails().obs;
+            pageindexcontroller.updateIndex(2);
             // driverxcontroller.enableLibeLocationUpdate();
             hasongingtrip(false);
-            pagexcontroller.updateIndex(2);
-              Get.back();
-              Future.delayed(Duration(milliseconds: 300), () {
-                Get.offNamedUntil(HomeScreenManager.screenName, (route) => false);
-                //Get.offNamed(HomeScreenManager.screenName);
-              });
-                
-              });
-              
-        
+           
+
+            Future.delayed(Duration(milliseconds: 300), () {
+              Get.offNamedUntil(HomeScreenManager.screenName, (route) => false);
+              //Get.offNamed(HomeScreenManager.screenName);
+            });
+
+
+
+          });
+        });
       });
-      });
-     
     });
   }
 
-  Future<bool> checkIsTripReady() async{
-    bool? isTripReady; 
+  Future<String?> getAcceptedRequestId() async {
+    String? requestid;
 
+    var response = await drivercurrentrequestaccepted.get();
 
-    if(tripdetails.value.triprequestid != null){
+    if (response.docs.isNotEmpty) {
+      final _docData = response.docs.map((doc) {
+        requestid = doc.id;
 
-      print('_____insidecheckIsTripready');
+        return doc.data();
+      }).toList();
 
-
-    print(tripdetails.value.picklocation);
-    print('_____before returning tripready');
-    isTripReady = true;
-    }else{
-    isTripReady = false;
+    
+    } else {
+      requestid = null;
+      
     }
- 
-    print(isTripReady);
 
-    return isTripReady as bool;
+    return requestid;
+  }
+
+  Future<bool> listenToOngoingTrip() async {
+    bool? isTripReady;
+    String? requestid;
+     
+    if (ongoingtrip.value.request_id == null) {
+      requestid = await getAcceptedRequestId();
+         await ongointripreferrence.doc(requestid).get().then((value) async {
+         ongoingtrip(OngoingTripDetails.fromJson(value.data() as Map<String, dynamic>));
+         print(ongoingtrip.value.dropddress_name);
+         print(ongoingtrip.value.pickaddress_name);
+      
+        //get direction
+        await getDirection(
+            ongoingtrip.value.pick_location_id as String,
+            ongoingtrip.value.drop_location_id as String,
+            ongoingtrip.value.actualmarker_position as LatLng);
+        // getRouteDirection(requestid as String);
+
+      });
+
+
+
+     
+      isTripReady = true;
+    } else {
+      
+
+
+      isTripReady = true;
+    }
+
+    return isTripReady;
   }
 
 
-Future<bool> checkIfHasOngoingRequest() async{
-bool  hasacceptedid = false;
 
-  await drivercurrentrequestaccepted.get().then((value) async{
-
-      if(value.docs.isNotEmpty){
-        value.docs.forEach((snapshot){
+  void checkIfHasOngoingRequest() async {
+    await drivercurrentrequestaccepted.get().then((value) async {
+      if (value.docs.isNotEmpty) {
+        value.docs.forEach((snapshot) {
           var data = snapshot.id;
-          hasacceptedid  =  true;
+
+          hasongingtrip(true);
         });
-        
+
         print('___________________');
         print('_______has accepted request__________');
         print('___________________');
-        print(hasacceptedid);
-       
-
-      }else{
+      } else {
         print('___________________');
         print('_______empty__________');
         print('___________________');
-        hasacceptedid = false;
-      }
-  });
-   return hasacceptedid;
-}    
 
+        hasongingtrip(false);
+      }
+    });
+  }
 }
