@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:geo_firestore_flutter/geo_firestore_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 
 class Mapcontroller extends GetxController {
@@ -14,8 +16,7 @@ class Mapcontroller extends GetxController {
   var isOnlineLoading = false.obs;
   var isonlinelastime = false.obs;
   Position? currentposition;
-  GeoFirestore geoFirestore =
-  GeoFirestore(firestore.collection('availableDrivers'));
+  //GeoFirestore geoFirestore =GeoFirestore(firestore.collection('availableDrivers'));
   
 
   @override
@@ -91,8 +92,9 @@ class Mapcontroller extends GetxController {
             print('called');
 
           }
+          try{
+             String devicetoken = await messaginginstance.getToken() as String;
 
-        String devicetoken = await messaginginstance.getToken() as String;
         Map<String, dynamic> driverpostion = {
           'latitude': currentposition!.latitude,
           'longitude': currentposition!.longitude,
@@ -100,6 +102,12 @@ class Mapcontroller extends GetxController {
         await availabledriverrefference.doc(authinstance.currentUser!.uid).set(
         {"driver_location":driverpostion , "token": devicetoken, "status": "online"},
       );
+
+          }on PlatformException catch(e){
+              print(e.message);
+          }
+          
+       
         isOnlineLoading(false);
         isOnline(true);
 
@@ -119,10 +127,9 @@ class Mapcontroller extends GetxController {
     //  });
 
     //realtimedatabse
-    driverslocationstream = Geolocator.getPositionStream().listen((position) {
+    driverslocationstream = Geolocator.getPositionStream().listen((position) async {
       currentposition = position;
-      Geofire.setLocation(authinstance.currentUser!.uid,
-          currentposition!.latitude, currentposition!.longitude);
+     Geofire.setLocation(authinstance.currentUser!.uid, currentposition!.latitude, currentposition!.longitude);
     });
   }
 

@@ -24,6 +24,7 @@ import 'package:tricycleappdriver/services/notificationserves.dart';
 import 'package:tricycleappdriver/signin_screen.dart';
 import 'package:tricycleappdriver/sigup_screen.dart';
 import 'package:tricycleappdriver/testwidgets/testdialog.dart';
+import 'package:tricycleappdriver/verifyingemail_screen.dart';
 
 //recieve mesage when app backgound
 Future<void> backgroundHandler(RemoteMessage message) async {
@@ -139,7 +140,7 @@ driversusers.doc(authinstance.currentUser!.uid).update({
       //Testdialog(),
      // Ongoingtrip(),
       
-      FirebaseAuth.instance.currentUser == null ? SigninScreen() : HomeScreenManager(),
+      FirebaseAuth.instance.currentUser == null ?   SigninScreen() : FirebaseAuth.instance.currentUser!.emailVerified == false ? VerifyingemailScreen() :  HomeScreenManager(),
       getPages: [
 
          GetPage(name: SigninScreen.screenName, page: () => SigninScreen() ,binding: Getxbinding() ),
@@ -152,6 +153,7 @@ driversusers.doc(authinstance.currentUser!.uid).update({
          GetPage(name: Ongoingtrip.screenName, page: () => Ongoingtrip(), binding: Getxbinding()),
          GetPage(name: Completetripdialog.screenName, page: () => Completetripdialog(), binding: Getxbinding()),
          GetPage(name: CompleteScreen.screenName, page: () => CompleteScreen(), binding: Getxbinding()),
+         GetPage(name: VerifyingemailScreen.screenName, page: () => VerifyingemailScreen(), binding: Getxbinding()),
 
 
          

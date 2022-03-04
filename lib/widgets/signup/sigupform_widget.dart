@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tricycleappdriver/controller/authcontroller.dart';
+import 'package:email_validator/email_validator.dart';
 
 enum PageState { siningUpPagegSate, otpPageState }
 
@@ -30,16 +31,26 @@ class _SigupformWidgetState extends State<SigupformWidget> {
 
   GlobalKey<FormState> _otpFormKey = GlobalKey<FormState>();
 
+
+@override
+  void initState() {
+    super.initState();
+     email.addListener(onListen);
+  }
+
   @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
     name.dispose();
+    email.removeListener(onListen);
     email.dispose();
     phone.dispose();
     password.dispose();
     confirmpassword.dispose();
   }
+
+void onListen()=>  setState(() {});
   //twilio
 
   @override
@@ -103,15 +114,19 @@ class _SigupformWidgetState extends State<SigupformWidget> {
                 keyboardType: TextInputType.emailAddress,
                 controller: email,
                 textInputAction: TextInputAction.next,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Email enter a name';
-                  }
+                autofillHints: [AutofillHints.email],
 
-                  if (!value.contains("@")) {
-                    return 'Please enter a valid email';
-                  }
-                  return null;
+                validator: (value) {
+
+               return  EmailValidator.validate(value!) == true? null : "Enter A Valid Email";
+                  // if (value.isEmpty) {
+                  //   return 'Email enter a name';
+                  // }
+
+                  // if (!value.contains("@")) {
+                  //   return 'Please enter a valid email';
+                  // }
+                  // return null;
                 },
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
@@ -164,6 +179,7 @@ class _SigupformWidgetState extends State<SigupformWidget> {
                   return null;
                 },
                 decoration: InputDecoration(
+                    suffixIcon: email.text.isEmpty ? Container(width: 0,) :   IconButton(onPressed: ()=> email.clear() , icon: Icon(Icons.close)),
                   border: OutlineInputBorder(),
                   label: Text(
                     'Password',

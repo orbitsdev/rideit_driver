@@ -80,7 +80,7 @@ class _TripsScreenState extends State<TripsScreen>
                     return Container(
                       height: 200,
                       child: Center(child: InkWell(
-                        onTap: ()=> Get.offNamed(Ongoingtrip.screenName , arguments: {"from": "trip"}),
+                        onTap: ()=> Get.offNamed(Ongoingtrip.screenName , arguments: {"from ": "trip"}),
                         child: Text(" View"))),
                     );
                   }

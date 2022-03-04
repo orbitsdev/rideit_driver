@@ -10,6 +10,7 @@ import 'package:tricycleappdriver/assistant/mapkitassistant.dart';
 import 'package:tricycleappdriver/controller/drivercontroller.dart';
 import 'package:tricycleappdriver/controller/requestcontroller.dart';
 import 'package:tricycleappdriver/dialog/requestdialog/completetripdialog.dart';
+import 'package:tricycleappdriver/dialog/requestdialog/dialog_collection.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/home_screen_manager.dart';
 import 'package:tricycleappdriver/screens/complete_screen.dart';
@@ -68,6 +69,9 @@ isTripDetailsReady();
       if(istripready){
         //
         currentripstatus = requestxconroller.ongoingtrip.value.tripstatus;
+
+
+        
         //set map ready
         setTripMapIsready(istripready);
         //set markder
@@ -75,7 +79,9 @@ isTripDetailsReady();
         //draw lout
         setPolylines();
 
-
+        if(requestxconroller.ongoingtrip.value.tripstatus == "coming" || requestxconroller.ongoingtrip.value.tripstatus =="picked"){
+          getLiveLocationUpdate();
+        }
 
           
       }
@@ -149,51 +155,6 @@ isTripDetailsReady();
     });
     
 
- 
-    // pickupmarker = Marker(
-    //   markerId: MarkerId("pickmarker"),
-    //   position: requestxconroller.ongoingtrip.value.pick_location as LatLng,
-    // );
-    // dropmarker = Marker(
-    //   markerId: MarkerId("dropmarker"),
-    //   position:
-    //       requestxconroller.ongoingtrip.value.actualmarker_position as LatLng,
-    // );
-
-    // pickcircle = Circle(
-    //     fillColor: Colors.blueAccent,
-    //     center: requestxconroller.ongoingtrip.value.pick_location as LatLng,
-    //     strokeWidth: 4,
-    //     radius: 12,
-    //     strokeColor: Colors.white,
-    //     circleId: CircleId("pickcircle"));
-
-    // dropcircle = Circle(
-    //     fillColor: Colors.blueAccent,
-    //     center:
-    //         requestxconroller.ongoingtrip.value.actualmarker_position as LatLng,
-    //     strokeWidth: 4,
-    //     radius: 12,
-    //     strokeColor: Colors.white,
-    //     circleId: CircleId("dropcircle"));
-
-    // setState(() {
-    //   markerSet.add(pickupmarker as Marker);
-    //   markerSet.add(dropmarker as Marker);
-    //   circleSet.add(pickcircle as Circle);
-    //   circleSet.add(dropcircle as Circle);
-    //   _polylincecounter++;
-    //   mappadding = 200;
-    // });
-
-    // print('____________  this the posistion');
-    // print('____________  this the posistionda');
-    // print('____________  this the posistiond');
-    // print('____________  this the posistiondsa');
-    // print(requestxconroller.ongoingtrip.value.pick_location_id);
-    // print(requestxconroller.ongoingtrip.value.pick_location);
-    // print(requestxconroller.ongoingtrip.value.drop_location_id);
-    // print(requestxconroller.ongoingtrip.value.drop_location);
   }
 
   void _caneraBoundRoute(LatLng bound_sw, LatLng bound_ne) {
@@ -407,13 +368,38 @@ isTripDetailsReady();
                                 }
                                 if(currentripstatus == 'complete'){
 
+                                    DialogCollection.showpaymentToCollect(context);
 
 
+                                  // Get.offNamedUntil(CompleteScreen.screenName, (route) => false);
+                                  
+                                   //  showEarningDialog();
 
-                                  Get.offNamedUntil(CompleteScreen.screenName, (route) => false);
-                                     //showEarningDialog();
+                                 
 
+                                    // showDialog(context: context, builder: (context){
 
+                                    //   return Scaffold(
+                                    //     body: Container(
+                                    //         child: Column(mainAxisSize: MainAxisSize.min, children: [
+                                    //                 SizedBox(
+                                    //                   height: 12,
+                                    //                 ),
+                                    //                 Column(
+                                    //                   crossAxisAlignment: CrossAxisAlignment.start,
+                                    //                   children: [
+                                    //                     Text('₱ 50'),
+                                    //                     Text('To Be Collected'),
+                                    //                     ElevatedButton(onPressed: () {
+                                    //                       requestxconroller.endTrip(requestxconroller.ongoingtrip.value.request_id as String);
+                                                          
+                                    //                     }, child: Text("CONFIRM"))
+                                    //                   ],
+                                    //                 ),
+                                    //               ])
+                                    //     ),
+                                    //   );
+                                    // });
 
                                     // driverlocationstream!.cancel();
                                     // setState(() {
@@ -457,7 +443,8 @@ isTripDetailsReady();
                       if(requestxconroller.ongoingtrip.value.tripstatus == "coming")
                           ElevatedButton(onPressed: () async {
                             requestxconroller.launchMapsUrl( requestxconroller.ongoingtrip.value.pick_location_id as String, requestxconroller.ongoingtrip.value.drop_location_id as String,
-      requestxconroller.ongoingtrip.value.drop_location as LatLng);
+     
+                  requestxconroller.ongoingtrip.value.drop_location as LatLng);
                           }, child:Text('Open With Google Map Assistant ')),
 
                           

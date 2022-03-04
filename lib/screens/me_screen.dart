@@ -67,7 +67,7 @@ var driverxcontroller = Get.find<Drivercontroller>();
       final fiilename ='${DateTime.now().millisecond}' +path.basename(myimage!.path);
       final saveimage = await myimage!.copy("${pathDir.path}/${fiilename}");
       final destination = 'userimage/${fiilename}';
-
+  
       task = await FirebaseApi.uploadFile(destination, myimage as File);
       
       if (task == null) return;
