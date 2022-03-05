@@ -6,6 +6,7 @@ class Users {
   String? phone;
   String? image_url;
   String? image_file;
+  String? device_token;
 
   Users({
     this.id,
@@ -14,6 +15,7 @@ class Users {
     this.phone,
     this.image_url,
     this.image_file,
+    this.device_token,
 
   });  
   
@@ -27,6 +29,7 @@ class Users {
     newuser.phone = json['phone'];
     newuser.image_url = json["image_url"];
     newuser.image_file = json["image_file"];
+    newuser.image_file = json["device_token"];
     return newuser;
   }
 

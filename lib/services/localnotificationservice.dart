@@ -11,6 +11,7 @@ class Localnotificationservice {
     _notificationplugin.initialize(initializationSettings, onSelectNotification: (String? payload) async{
       print('hhaha_____payload');
       print(payload);
+      
     });
   }
 

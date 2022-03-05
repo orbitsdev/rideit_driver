@@ -17,6 +17,7 @@ class Authcontroller extends GetxController {
   var isCodeSent = false.obs;
   var isVerifying = false.obs;
   bool mailverified = false;
+  String? devicetoken;
 
   String? gname;
   String? gphone;
@@ -54,12 +55,21 @@ class Authcontroller extends GetxController {
               email: gemail as String, password: gpassword as String)
           .then((credential) async {
         progressDialog('Checking..');
-        await firestore.collection('drivers').doc(credential.user!.uid).set({
+
+
+        //get device tokem
+        await getDeviceToken();
+        Map<String, dynamic> userdetailsdata = {
           "name": gname as String,
           "email": gemail as String,
           "phone": gphone as String,
           "image_url": null,
-        }).then((_) async {
+          'device_token': devicetoken,
+
+        };
+        await firestore.collection('drivers').doc(credential.user!.uid).set(userdetailsdata).then((_) async {
+          useracountdetails(Users.fromJson(userdetailsdata));
+          useracountdetails.value.id = credential.user!.uid;
           Get.back();
           isSignUpLoading(false);
           //verifyPhone(context);
@@ -158,6 +168,15 @@ class Authcontroller extends GetxController {
           var useracount = Users.fromJson(data);
           useracount.id = authuser.user!.uid;
           useracountdetails(useracount);
+
+
+           await getDeviceToken();
+          if(devicetoken !=  null){
+            if(useracountdetails.value.device_token != devicetoken){
+              await updateDeviceToken(devicetoken);
+              useracountdetails.value.device_token = devicetoken;
+            }
+          }
           //check mail
           mailverified = authinstance.currentUser!.emailVerified;
 
@@ -215,17 +234,30 @@ class Authcontroller extends GetxController {
           .collection('drivers')
           .doc(authinstance.currentUser!.uid)
           .get()
-          .then((querySnapshot) {
+          .then((querySnapshot) async {
         if (querySnapshot.data() != null) {
-          var data = querySnapshot.data() as Map<String, dynamic>;
-          var useracount = Users.fromJson(data);
-          useracount.id = authinstance.currentUser!.uid;
-          useracountdetails(useracount);
+         
+        useracountdetails(Users.fromJson(querySnapshot.data() as Map<String, dynamic>));
+        useracountdetails.value.id = authinstance.currentUser!.uid;
+          
+
+           await getDeviceToken();
+       
+          if(devicetoken !=  null){
+            if(useracountdetails.value.device_token !=  devicetoken){
+              await updateDeviceToken(devicetoken);
+              useracountdetails.value.device_token = devicetoken;
+            }
+          }
           print('calleds________________acount');
           print(useracountdetails.value.id);
           print(useracountdetails.value.name);
           print(useracountdetails.value.phone);
           print(useracountdetails.value.image_file);
+          print('generted token');
+          print(devicetoken);
+          print('cuurent token');
+          print(useracountdetails.value.device_token);
         }
       });
     }
@@ -239,4 +271,21 @@ class Authcontroller extends GetxController {
       print(e.toString());
     }
   }
+
+  Future<void> getDeviceToken() async {
+  
+    devicetoken =  await messaginginstance.getToken();
+   if (devicetoken != null) {
+      print('device  token is here__________________');
+    }
+  }
+ Future<void> updateDeviceToken(String? devicetoken) async{
+
+    await driversusers.doc(authinstance.currentUser!.uid).update({
+      "device_token": devicetoken
+    });
+    print('device token updated');
+  }
+  
+
 }

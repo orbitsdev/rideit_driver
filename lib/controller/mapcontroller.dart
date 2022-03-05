@@ -8,6 +8,7 @@ import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:geo_firestore_flutter/geo_firestore_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:tricycleappdriver/controller/authcontroller.dart';
 
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 
@@ -16,6 +17,7 @@ class Mapcontroller extends GetxController {
   var isOnlineLoading = false.obs;
   var isonlinelastime = false.obs;
   Position? currentposition;
+  var authxcontroller = Get.find<Authcontroller>();
   //GeoFirestore geoFirestore =GeoFirestore(firestore.collection('availableDrivers'));
   
 
@@ -93,14 +95,14 @@ class Mapcontroller extends GetxController {
 
           }
           try{
-             String devicetoken = await messaginginstance.getToken() as String;
+           
 
         Map<String, dynamic> driverpostion = {
           'latitude': currentposition!.latitude,
           'longitude': currentposition!.longitude,
         };
         await availabledriverrefference.doc(authinstance.currentUser!.uid).set(
-        {"driver_location":driverpostion , "token": devicetoken, "status": "online"},
+        {"driver_location":driverpostion , "token": authxcontroller.useracountdetails.value.device_token, "status": "online"},
       );
 
           }on PlatformException catch(e){

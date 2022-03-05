@@ -19,4 +19,11 @@ static Future<FirebaseApp> firebaseinitilizeapp() async{
   return firebaseapp;
 }
 
+
+//cloud messaging
+
+static const String CLOUD_MESSAGING_SERVEY_KEY = "AAAAJdoKA6c:APA91bGaGnzJj03VxQF7qnG717G-XE2BHFHGDg4yWwndr1xkOpzMxNe5HUj39WeUI48Bpsc0r80U22tcKbdkGewpQ1zBnsjOUTrLKOHY6sA6UXWbjPjAPWLKuMDrpUOEs4y0qYnnL9_f";
+
+
+
 }

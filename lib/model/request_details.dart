@@ -18,6 +18,7 @@ class RequestDetails {
   String? status;
   String? tripstatus;
   String? created_at;
+  String? device_token;
 
   
 
@@ -35,6 +36,7 @@ class RequestDetails {
     this.status,
     this.tripstatus,
     this.created_at,
+    this.device_token,
   });
 
   factory RequestDetails.fromJson(Map<String, dynamic> json){
@@ -57,6 +59,7 @@ class RequestDetails {
     requestdetails.status= json['status']; 
     requestdetails.tripstatus= json['tripstatus']; 
     requestdetails.created_at= json['created_at']; 
+    requestdetails.device_token = json['device_token'];
 
     return requestdetails;
 
@@ -92,6 +95,7 @@ class RequestDetails {
       "status": status,
       'tripstatus': tripstatus,
       "created_at": created_at,
+      'device_token': device_token
     };
   }
 }

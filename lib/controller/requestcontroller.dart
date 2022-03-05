@@ -1,10 +1,13 @@
 
 
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:tricycleappdriver/config/firebaseconfig.dart';
 import 'package:tricycleappdriver/config/mapconfig.dart';
 import 'package:tricycleappdriver/controller/authcontroller.dart';
 import 'package:tricycleappdriver/controller/drivercontroller.dart';
@@ -22,6 +25,7 @@ import 'package:tricycleappdriver/screens/ongoingtrip.dart';
 import 'package:tricycleappdriver/screens/trips_screen.dart';
 import 'package:tricycleappdriver/services/mapservices.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
 
 import '../assistant/debub_assistant.dart';
 
@@ -54,9 +58,11 @@ class Requestcontroller extends GetxController {
           .get()
           .then((documentsnapshot) async {
         if (documentsnapshot.data() != null) {
+
           // get request details  ;
           RequestDetails requestdetails = RequestDetails.fromJson(
               documentsnapshot.data() as Map<String, dynamic>);
+          
 
           //check request
           if (requestdetails.status == "pending") {
@@ -76,6 +82,7 @@ class Requestcontroller extends GetxController {
               "status": "accepted",
             }).then((_) async {
               
+            
 
 
             // store requestid in driver for ongoinng trip screen used only
@@ -363,6 +370,8 @@ class Requestcontroller extends GetxController {
         
           }else if(ongoingtrip.value.tripstatus == "arrived"){
 
+              sendNotification(ongoingtrip.value.device_token as String, 'Drivers is waiting to your pickup location' , 'Your Diver Has Arrived' , 'ongoingtrip');
+
             //stop updating driver location
             cancelDriverLiveLocation();
             
@@ -621,4 +630,58 @@ class Requestcontroller extends GetxController {
       }
     });
   }
+
+
+void  sendNotification(String token, String title, String body, String screenname) async {
+    print('__________sending notfification');
+    
+  
+      var serverKey = Firebaseconfig.CLOUD_MESSAGING_SERVEY_KEY;
+
+      Map<String, String> headerData = {
+        'Content-Type': 'application/json',
+        'Authorization': 'key=$serverKey',
+      };
+
+      Map<String, dynamic> notificationData = {
+        'body': title,
+        'title': body,
+        
+      };
+
+      Map<String, dynamic> passData = {
+        'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+        "id": 1,
+        "status": "done",
+        "screenname": screenname,
+      };
+
+      Map<String, dynamic> sendPushNotification = {
+        "notification": notificationData,
+        "data": passData,
+        "priority": "high",
+        //"registration_ids":token ,
+        "to": token,
+      };
+
+      
+
+      try {
+        var response = await http.post(
+          Uri.parse('https://fcm.googleapis.com/fcm/send'),
+          headers: headerData,
+          body: jsonEncode(sendPushNotification),
+        );
+
+        print(response.statusCode);
+      } catch (e) {
+        print("error push notification");
+      }
+    
+  }
+
+
+  
 }
+
+

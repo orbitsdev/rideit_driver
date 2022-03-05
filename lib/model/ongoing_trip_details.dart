@@ -11,6 +11,7 @@ class OngoingTripDetails {
   //passenger
   String? passenger_name;
   String? passenger_phone;
+  String? device_token;
 
   //driver
   String? driver_id;
@@ -52,6 +53,7 @@ class OngoingTripDetails {
     this.created_at,
     this.payed,
     this.read,
+    this.device_token,
   });
 
 
@@ -88,6 +90,7 @@ class OngoingTripDetails {
     ongoingtripdetails.tripstatus= json['tripstatus']; 
     ongoingtripdetails.payed = json['payed'];
     ongoingtripdetails.read = json['read'];
+    ongoingtripdetails.device_token = json['device_token'];
 
     return ongoingtripdetails;
 
@@ -137,6 +140,7 @@ class OngoingTripDetails {
     "created_at":created_at ,
     "payed":payed ,
     "read":read ,
+    "device_token": device_token
     };
   }
 
