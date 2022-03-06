@@ -58,7 +58,7 @@ class _HomeScreenManagerState extends State<HomeScreenManager>  with TickerProvi
     length: _pages.length,
     vsync: this 
     );
-
+  
      cloudMessagingSetup();
       authxcontroller.checkIfAcountDetailsIsNull();   
 

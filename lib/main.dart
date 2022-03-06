@@ -16,6 +16,7 @@ import 'package:tricycleappdriver/home_screen_manager.dart';
 import 'package:tricycleappdriver/screens/complete_screen.dart';
 import 'package:tricycleappdriver/screens/earnings_screen.dart';
 import 'package:tricycleappdriver/screens/home_screen.dart';
+import 'package:tricycleappdriver/screens/list_of_request.dart';
 import 'package:tricycleappdriver/screens/me_screen.dart';
 import 'package:tricycleappdriver/screens/ongoingtrip.dart';
 import 'package:tricycleappdriver/screens/trips_screen.dart';
@@ -28,7 +29,12 @@ import 'package:tricycleappdriver/verifyingemail_screen.dart';
 
 //recieve mesage when app backgound
 Future<void> backgroundHandler(RemoteMessage message) async {
-  
+
+
+     print('fourground____________');
+
+     print(message.data);
+     print(message.data["recieve_request"]);
 
   // print('_______backgroundhandler');
   // print(message.data.toString());
@@ -154,6 +160,7 @@ driversusers.doc(authinstance.currentUser!.uid).update({
          GetPage(name: Completetripdialog.screenName, page: () => Completetripdialog(), binding: Getxbinding()),
          GetPage(name: CompleteScreen.screenName, page: () => CompleteScreen(), binding: Getxbinding()),
          GetPage(name: VerifyingemailScreen.screenName, page: () => VerifyingemailScreen(), binding: Getxbinding()),
+         GetPage(name: ListOfRequest.screenName, page: () => ListOfRequest(), binding: Getxbinding()),
 
 
          
