@@ -41,6 +41,7 @@ class Requestcontroller extends GetxController {
   var pageindexcontroller = Get.find<Pageindexcontroller>();
   var isDirectiionReady = false.obs;
   var isOngoingReady = false.obs;
+  var collecting = false.obs;
   var testpositiono = "".obs;
   var buttontext = "";
   var tripTextIsloading = false.obs;
@@ -352,13 +353,13 @@ class Requestcontroller extends GetxController {
     }
     else if(ongoingtrip.value.tripstatus == "complete"){
           
-        newtripstatusvalue = "end";
+        newtripstatusvalue = "check";
     }
 
       
       
 
-    if(newtripstatusvalue != "end"){
+    if(newtripstatusvalue != "check"){
        isChange = await updateTripStatusAndChangeDirectionDetails(newtripstatusvalue as String);
       if(isChange){
 
@@ -399,6 +400,15 @@ class Requestcontroller extends GetxController {
       //check if succefull update
       
       }else{
+
+        // await requestcollecctionrefference.doc(authinstance.currentUser!.uid).get().then((value) {
+        //   if(value.data() !=  null){
+        //     var data =  value.data() as Map<String , dynamic>;
+
+        //     if(data['accepted'])
+        //   }
+        // });
+        
       tripstatus =  ongoingtrip.value.tripstatus;    
        //same tripstatus
       }
@@ -496,6 +506,7 @@ class Requestcontroller extends GetxController {
   }
 
   void endTrip(String requestid) async {
+      collecting(true);
     await ongointripreferrence.doc(requestid).update({
       'payed': true,
     });
@@ -528,6 +539,9 @@ class Requestcontroller extends GetxController {
               .doc(requestid)
               .delete()
               .then((value) async {
+            
+            collecting(false);
+            Get.back();
             mapxcontroller.makeDriverOnline();
             cancelDriverLiveLocation();
 
@@ -537,6 +551,7 @@ class Requestcontroller extends GetxController {
             pageindexcontroller.updateIndex(2);
             // driverxcontroller.enableLibeLocationUpdate();
             hasongingtrip(false);
+
            
 
             Future.delayed(Duration(milliseconds: 300), () {

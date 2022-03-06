@@ -33,10 +33,18 @@ class Completetripdialog extends StatelessWidget {
                 children: [
                   Text('₱ 50'),
                   Text('To Be Collected'),
-                  ElevatedButton(onPressed: () {
+
+                  Obx((){
+                      if(requestxcontroller.collecting.value){
+                        return Center(child: CircularProgressIndicator());
+                      }
+
+                       return    ElevatedButton(onPressed: () {
                     requestxcontroller.endTrip(requestxcontroller.ongoingtrip.value.request_id as String);
                     
-                  }, child: Text("CONFIRM"))
+                  }, child: Text("CONFIRM"));
+                  }),
+     
                 ],
               ),
             ]),

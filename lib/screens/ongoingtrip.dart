@@ -369,6 +369,7 @@ isTripDetailsReady();
                                 if(currentripstatus == 'complete'){
 
                                     DialogCollection.showpaymentToCollect(context);
+                                    
 
 
                                   // Get.offNamedUntil(CompleteScreen.screenName, (route) => false);
