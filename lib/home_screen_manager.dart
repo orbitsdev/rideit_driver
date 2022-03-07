@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/UI/hex_color.dart';
 import 'package:tricycleappdriver/controller/authcontroller.dart';
+import 'package:tricycleappdriver/controller/drivercontroller.dart';
 import 'package:tricycleappdriver/controller/mapcontroller.dart';
 import 'package:tricycleappdriver/controller/pageindexcontroller.dart';
 import 'package:tricycleappdriver/screens/earnings_screen.dart';
@@ -29,6 +30,7 @@ class _HomeScreenManagerState extends State<HomeScreenManager>  with TickerProvi
     var authxcontroller = Get.find<Authcontroller>();
     var mapxcontroller = Get.find<Mapcontroller>();
     var pageindexcontroller = Get.find<Pageindexcontroller>();
+    var driverxcontroller = Get.find<Drivercontroller>();
     Color colorwhite = HexColor("#fbfefb");
     Color iconcolor = HexColor("#2F2191");
     Color iconcolorsecondary = HexColor("#594DAF");
@@ -94,7 +96,7 @@ class _HomeScreenManagerState extends State<HomeScreenManager>  with TickerProvi
     super.didChangeAppLifecycleState(state);
       if(state == AppLifecycleState.resumed){
 
-        if(mapxcontroller.isonlinelastime.value){
+        if(driverxcontroller.isonlinelastime.value){
          // mapxcontroller.makeDriverOnline();
         }
         print("resumed_______________ called");
@@ -102,13 +104,13 @@ class _HomeScreenManagerState extends State<HomeScreenManager>  with TickerProvi
      
       if(state == AppLifecycleState.paused){
 
-          if(mapxcontroller.isOnline.value){
-            mapxcontroller.isonlinelastime.value = true;
+          if(driverxcontroller.isOnline.value){
+            driverxcontroller.isonlinelastime.value = true;
          //   mapxcontroller.makeDriverOffline();
                print("paused aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 
           }else{
-            mapxcontroller.isonlinelastime.value =  false;
+            driverxcontroller.isonlinelastime.value =  false;
           }
       }
 

@@ -72,7 +72,7 @@ class Requestcontroller extends GetxController {
           //check request
           if (requestdetails.status == "pending") {
           //get current location
-            currentpostion = mapxcontroller.currentposition;
+            currentpostion = driverxcontroller.currentposition;
             Map<String, dynamic> currentlocation = {
               'latitude': currentpostion!.latitude,
               'longitude': currentpostion!.longitude,
@@ -102,7 +102,7 @@ class Requestcontroller extends GetxController {
                   }).then((value) async {
                     
                       //make driver offline
-                       mapxcontroller.makeDriverOffline();
+                       driverxcontroller.makeDriverOffline();
                       
                       //close loading screen 
                         Get.back();
@@ -546,7 +546,7 @@ class Requestcontroller extends GetxController {
             
             collecting(false);
             Get.back();
-            mapxcontroller.makeDriverOnline();
+            driverxcontroller.makeDriverOnline();
             cancelDriverLiveLocation();
 
             ongoingtrip = OngoingTripDetails().obs;

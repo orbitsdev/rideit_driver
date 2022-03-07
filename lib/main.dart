@@ -7,7 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tricycleappdriver/binding/getxbinding.dart';
 import 'package:tricycleappdriver/config/firebaseconfig.dart';
+import 'package:tricycleappdriver/constant.dart';
 import 'package:tricycleappdriver/controller/mapcontroller.dart';
+import 'package:tricycleappdriver/controller/permissioncontroller.dart';
 import 'package:tricycleappdriver/controller/requestcontroller.dart';
 import 'package:tricycleappdriver/dialog/requestdialog/completetripdialog.dart';
 import 'package:tricycleappdriver/geotest.dart';
@@ -78,12 +80,12 @@ String? token;
   void initState() {
     super.initState();
   
-
+    Get.put(Permissioncontroller());
     // FirebaseMessaging.instance.onTokenRefresh.listen((refreshtoken) { 
     //   token = refreshtoken;
     // });
 
-   
+      pirmissioncontroller.geolocationServicePermission();
    
     user = FirebaseAuth.instance.authStateChanges().listen((user) { 
        if (user == null) {

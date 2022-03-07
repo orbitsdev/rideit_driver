@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:tricycleappdriver/controller/drivercontroller.dart';
 import 'package:tricycleappdriver/controller/mapcontroller.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -14,6 +15,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   var mapxcontroller = Get.find<Mapcontroller>();
+  var driverxcontroller = Get.find<Drivercontroller>();
   Completer<GoogleMapController> _googlemapcontroller = Completer();
   GoogleMapController? _newgooglemapcontroller;
   Position? currentposition;
@@ -48,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void setInitialMapCameraPosition() async {
-    bool serviceEnabled;
+  bool serviceEnabled;
   LocationPermission permission;
 
   // Test if location services are enabled.
@@ -97,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     var getcurrentposition = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
-        mapxcontroller.currentposition = getcurrentposition;
+        driverxcontroller.currentposition = getcurrentposition;
           
     String? currentpositonvalue;
     cameraposition = CameraPosition(
@@ -119,11 +121,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void makeDriverOnlineAndOffline() {
     //mapxcontroller.makeDriverOnline();
-    if (mapxcontroller.isOnline.value != true) {
-      mapxcontroller.makeDriverOnline();
-     mapxcontroller.liveUpdateLocation();
+    if (driverxcontroller.isOnline.value != true) {
+      driverxcontroller.makeDriverOnline();
+     //driverxcontroller.liveUpdateLocation();
     } else {
-     mapxcontroller.makeDriverOffline();
+     driverxcontroller.makeDriverOffline();
     }
   }
 
@@ -227,7 +229,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Obx(() {
                             return Container(
                               decoration: BoxDecoration(
-                                color: mapxcontroller.isOnline.value
+                                color: driverxcontroller.isOnline.value
                                     ? Colors.green
                                     : Colors.black,
                                 borderRadius: BorderRadius.circular(12),
@@ -243,7 +245,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       },
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
-                                        child: mapxcontroller
+                                        child: driverxcontroller
                                                 .isOnlineLoading.value
                                             ? SizedBox(
                                                 width: 15,
@@ -254,7 +256,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   strokeWidth: 3,
                                                 )))
                                             : Text(
-                                                mapxcontroller.isOnline.value
+                                                driverxcontroller.isOnline.value
                                                     ? ' Online'
                                                     : 'Offline-',
                                                 style: TextStyle(

@@ -1,8 +1,11 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:tricycleappdriver/config/twilioconfig.dart';
+import 'package:tricycleappdriver/controller/permissioncontroller.dart';
+import 'package:tricycleappdriver/constant.dart';
 import 'package:tricycleappdriver/dialog/authdialog/authenticating.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/home_screen_manager.dart';
@@ -11,6 +14,7 @@ import 'package:tricycleappdriver/verifyingemail_screen.dart';
 import 'package:twilio_phone_verify/twilio_phone_verify.dart';
 
 class Authcontroller extends GetxController {
+  
   var useracountdetails = Users().obs;
   late TwilioPhoneVerify _twilioPhoneVerify;
   var isSignUpLoading = false.obs;
@@ -37,7 +41,11 @@ class Authcontroller extends GetxController {
   }
 
   void createUser(String name, String phone, String email, String password,
-      BuildContext context) async {
+      BuildContext context) async { 
+
+    Permissioncontroller.instance.geolocationServicePermission();
+      
+
     gname = name.trim();
     gphone = "+63" + phone.trim();
     gemail = email.trim();
@@ -67,11 +75,30 @@ class Authcontroller extends GetxController {
           'device_token': devicetoken,
 
         };
+
+
         await firestore.collection('drivers').doc(credential.user!.uid).set(userdetailsdata).then((_) async {
+          
+          
           useracountdetails(Users.fromJson(userdetailsdata));
           useracountdetails.value.id = credential.user!.uid;
-          Get.back();
           isSignUpLoading(false);
+          
+          Position position =  await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+          
+          Map<String, dynamic> driverposition = {
+            "latitude": position.latitude,
+            "longitude":position.longitude
+          };
+          Map<String, dynamic> availabilitydata = {
+              "device_token" : devicetoken,
+              "status" : "offline",
+              "driver_location" : driverposition,
+          };
+
+           await  availabledriverrefference.doc(authinstance.currentUser!.uid).set(availabilitydata).then((value)  async{
+
+             Get.back();
           //verifyPhone(context);
           // Get.offAllNamed(HomeScreenManager.screenName);
 
@@ -90,6 +117,10 @@ class Authcontroller extends GetxController {
               Get.offAndToNamed(HomeScreenManager.screenName);
             });
           }
+
+           });
+
+          
         });
       });
     } on FirebaseAuthException catch (e) {
