@@ -73,6 +73,9 @@ class Requestcontroller extends GetxController {
           if (requestdetails.status == "pending") {
           //get current location
             currentpostion = driverxcontroller.currentposition;
+            if(currentpostion == null){
+              currentpostion =  await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+            }
             Map<String, dynamic> currentlocation = {
               'latitude': currentpostion!.latitude,
               'longitude': currentpostion!.longitude,

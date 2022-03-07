@@ -8,6 +8,8 @@ import 'package:get/get.dart';
 import 'package:tricycleappdriver/binding/getxbinding.dart';
 import 'package:tricycleappdriver/config/firebaseconfig.dart';
 import 'package:tricycleappdriver/constant.dart';
+import 'package:tricycleappdriver/controller/authcontroller.dart';
+import 'package:tricycleappdriver/controller/drivercontroller.dart';
 import 'package:tricycleappdriver/controller/mapcontroller.dart';
 import 'package:tricycleappdriver/controller/permissioncontroller.dart';
 import 'package:tricycleappdriver/controller/requestcontroller.dart';
@@ -43,8 +45,11 @@ Future<void> backgroundHandler(RemoteMessage message) async {
   // print(message.notification!.title);
  
 }
+
 Future<void> main() async {
 
+ 
+  
   WidgetsFlutterBinding.ensureInitialized();
   Localnotificationservice.initialize();
   try {
@@ -81,7 +86,8 @@ String? token;
     super.initState();
   
     Get.put(Permissioncontroller());
-   // Getxbinding().dependencies();
+   
+   
     // FirebaseMessaging.instance.onTokenRefresh.listen((refreshtoken) { 
     //   token = refreshtoken;
     // });
