@@ -258,7 +258,7 @@ class Authcontroller extends GetxController {
   }
 
   void checkIfAcountDetailsIsNull() async {
-    print('calleds________________acount');
+    
 
     if (useracountdetails.value.id == null) {
       await firestore

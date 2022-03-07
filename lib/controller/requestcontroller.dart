@@ -641,9 +641,7 @@ class Requestcontroller extends GetxController {
         print('_______has accepted request__________');
         print('___________________');
       } else {
-        print('___________________');
-        print('_______empty__________');
-        print('___________________');
+    
 
         hasongingtrip(false);
       }

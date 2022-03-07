@@ -23,11 +23,11 @@ class Mapcontroller extends GetxController {
 
   @override
   void onInit() {
-    checkDriverIsOnline();
+
     super.onInit();
   }
 
-  void checkDriverIsOnline() {
+  void checkDriverIsOnlie() {
     var ref = availablereference
         .orderByKey()
         .equalTo(authinstance.currentUser!.uid)

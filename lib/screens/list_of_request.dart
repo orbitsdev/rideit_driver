@@ -24,8 +24,6 @@ class ListOfRequest extends StatefulWidget {
 }
 
 class _ListOfRequestState extends State<ListOfRequest> {
-
-
   var requestxcontroller = Get.find<Requestcontroller>();
   RequestDetails? requestoaccept;
   @override
@@ -34,17 +32,13 @@ class _ListOfRequestState extends State<ListOfRequest> {
     super.initState();
   }
 
-
-
   void listenToUnAccepteRequest() async {
-    
-
     // requestcollecctionrefference.get().then((querySnapShot) {
-    //   querySnapShot.docs.forEach((element) { 
+    //   querySnapShot.docs.forEach((element) {
 
     //     print(element.id);
     //     print(element.data());
-      
+
     //   });
     // });
 
@@ -52,8 +46,8 @@ class _ListOfRequestState extends State<ListOfRequest> {
     // requestcollecctionrefference.where("status", isEqualTo: "pending").get().then((querySnapshot) {
 
     //     print('__________________ this is from listen lis of un accpeted request');
-    //   querySnapshot.docs.forEach((element) { 
-        
+    //   querySnapshot.docs.forEach((element) {
+
     //     print('______________________________________________');
     //     print('|                                             |');
     //     print('|______________________________________________|');
@@ -62,35 +56,25 @@ class _ListOfRequestState extends State<ListOfRequest> {
     //   });
     // });
 
-    requestcollecctionrefference.where('status', isEqualTo: 'pending').snapshots().listen((querySnapShot) { 
-
-       requestxcontroller.lisofunacceptedrequest(querySnapShot.docs.map((e) {
-       
-       var request = RequestDetails.fromJson(e.data() as Map<String, dynamic>);
-       request.request_id = e.id;
-       return request;
-
-       } 
-       
-       ).toList() );
-
-
-
-
-    
-
+    requestcollecctionrefference
+        .where('status', isEqualTo: 'pending')
+        .snapshots()
+        .listen((querySnapShot) {
+      requestxcontroller.lisofunacceptedrequest(querySnapShot.docs.map((e) {
+        var request = RequestDetails.fromJson(e.data() as Map<String, dynamic>);
+        request.request_id = e.id;
+        return request;
+      }).toList());
 
       print('_________________________________ my list after listen');
-     
-      print(  requestxcontroller.lisofunacceptedrequest.length);
 
-      if(requestxcontroller.lisofunacceptedrequest.length == 0){
-        Get.off(()=> HomeScreenManager());
+      print(requestxcontroller.lisofunacceptedrequest.length);
+
+      if (requestxcontroller.lisofunacceptedrequest.length == 0 && requestxcontroller.hasongingtrip.value == false){
+        Get.offNamed(HomeScreenManager.screenName);
       }
-
       
     });
-
   }
 
   @override
@@ -98,32 +82,35 @@ class _ListOfRequestState extends State<ListOfRequest> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Obx(() {
-
-          if(requestxcontroller.lisofunacceptedrequest.length > 0){
-              return Column(
-            children: [
-              Container(
-                height: 200,
-                width: double.infinity,
-                color: Colors.red,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text("${requestxcontroller.lisofunacceptedrequest[0].pickaddress_name}"),
-                    Text("${requestxcontroller.lisofunacceptedrequest[0].dropddress_name}"),
-                    ElevatedButton(onPressed: (){
-                        requestxcontroller.confirmRequest(requestxcontroller.lisofunacceptedrequest[0].request_id);
-                    }, child: Text('Confirm') )
-                  ],
+          if (requestxcontroller.lisofunacceptedrequest.length > 0) {
+            return Column(
+              children: [
+                Container(
+                  height: 200,
+                  width: double.infinity,
+                  color: Colors.red,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                          "${requestxcontroller.lisofunacceptedrequest[0].pickaddress_name}"),
+                      Text(
+                          "${requestxcontroller.lisofunacceptedrequest[0].dropddress_name}"),
+                      ElevatedButton(
+                          onPressed: () {
+                            requestxcontroller.confirmRequest(requestxcontroller
+                                .lisofunacceptedrequest[0].request_id);
+                          },
+                          child: Text('Confirm'))
+                    ],
+                  ),
                 ),
-              ),
-              
                 ListView.builder(
                     //reverse: true,
                     shrinkWrap: true,
                     itemCount: requestxcontroller.lisofunacceptedrequest.length,
                     itemBuilder: (context, index) {
-                      if (index == 0 ) {
+                      if (index == 0) {
                         return Container(
                           height: 0,
                         );
@@ -138,9 +125,10 @@ class _ListOfRequestState extends State<ListOfRequest> {
                                   children: [
                                     ElevatedButton(
                                         onPressed: () {
-
-                                            requestxcontroller.confirmRequest(requestxcontroller.lisofunacceptedrequest[index].request_id);
-
+                                          requestxcontroller.confirmRequest(
+                                              requestxcontroller
+                                                  .lisofunacceptedrequest[index]
+                                                  .request_id);
                                         },
                                         child: Text('Confirm')),
                                     ElevatedButton(
@@ -153,12 +141,14 @@ class _ListOfRequestState extends State<ListOfRequest> {
                                         onPressed: () {}, child: Text('View')),
                                   ],
                                 ),
-                                Text(requestxcontroller.lisofunacceptedrequest[index]
+                                Text(requestxcontroller
+                                    .lisofunacceptedrequest[index]
                                     .dropddress_name as String),
                                 SizedBox(
                                   height: 12,
                                 ),
-                                Text(requestxcontroller.lisofunacceptedrequest[index]
+                                Text(requestxcontroller
+                                    .lisofunacceptedrequest[index]
                                     .pickaddress_name as String),
                               ],
                             ),
@@ -166,8 +156,8 @@ class _ListOfRequestState extends State<ListOfRequest> {
                         );
                       }
                     })
-            ],
-          );
+              ],
+            );
           }
           return Container();
         }),

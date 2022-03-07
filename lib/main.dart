@@ -81,6 +81,7 @@ String? token;
     super.initState();
   
     Get.put(Permissioncontroller());
+   // Getxbinding().dependencies();
     // FirebaseMessaging.instance.onTokenRefresh.listen((refreshtoken) { 
     //   token = refreshtoken;
     // });

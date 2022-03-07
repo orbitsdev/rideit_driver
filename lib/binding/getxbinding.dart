@@ -12,7 +12,7 @@ class Getxbinding implements Bindings {
   void dependencies() {
     
     Get.lazyPut(() => Authcontroller());
-    Get.lazyPut(() => Mapcontroller()); 
+    Get.put(Mapcontroller()); 
     Get.lazyPut(() => Requestcontroller()); 
     Get.lazyPut(() => Pageindexcontroller()  ) ; 
     Get.lazyPut(() => Drivercontroller()  ) ; 
