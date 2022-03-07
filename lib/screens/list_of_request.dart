@@ -24,7 +24,7 @@ class ListOfRequest extends StatefulWidget {
 }
 
 class _ListOfRequestState extends State<ListOfRequest> {
-  var requestxcontroller = Get.find<Requestcontroller>();
+  var requestxcontroller = Get.put(Requestcontroller());
   RequestDetails? requestoaccept;
   @override
   void initState() {
