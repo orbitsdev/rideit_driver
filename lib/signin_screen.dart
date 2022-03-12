@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/UI/uicolor.dart';
 import 'package:tricycleappdriver/controller/authcontroller.dart';
+import 'package:tricycleappdriver/dialog/Failuredialog/failuredialog.dart';
 import 'package:tricycleappdriver/signup_screen.dart';
 
 
@@ -40,6 +41,12 @@ class _SigninScreenState extends State<SigninScreen> {
        
      });
    });
+
+   email.addListener(() { 
+     setState(() {
+       
+     });
+   });
     super.initState();
     
   }
@@ -53,7 +60,7 @@ class _SigninScreenState extends State<SigninScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
+      backgroundColor: BACKGROUND_BLACK,
       body: SingleChildScrollView(
       
         child: Form(
@@ -99,10 +106,15 @@ class _SigninScreenState extends State<SigninScreen> {
                     filled: true,
                     fillColor: BACKGROUND_BLACK_LIGHT,
                     prefixIcon: Icon(Icons.email_outlined, color: GREEN_LIGHT,),
+                     suffixIcon: email.text.isEmpty ? null :  IconButton( onPressed: (){
+                        email.clear();
+
+                     }, icon: Icon(Icons.close,color: GREEN_LIGHT, )),
                     label: Text(
                       'Email',
                       style: TextStyle(fontSize: 20),
                     ),
+                    
                     labelStyle: const TextStyle(
                       fontSize: 20,
                       color: Colors.white,
@@ -172,6 +184,7 @@ class _SigninScreenState extends State<SigninScreen> {
                     height: 12,
                   ),
                     Column(
+                    
                     children: [
                      
                       ElevatedButton(
@@ -186,7 +199,7 @@ class _SigninScreenState extends State<SigninScreen> {
                           onPressed: () {
                             login();
                           },
-                          child: Text('Sign-up'.toUpperCase() , style: TextStyle(fontSize: 20, color: BACKGROUND_BLACK, fontWeight: FontWeight.w700),)),
+                          child: Text('Sign in' , style: TextStyle(fontSize: 20, color: BACKGROUND_BLACK, fontWeight: FontWeight.w700),)),
                       SizedBox(
                         height: 15,
                       ),
@@ -197,12 +210,12 @@ class _SigninScreenState extends State<SigninScreen> {
                           SizedBox(
                             width: 5,
                           ),
-                          GestureDetector(
+                          InkWell(
                             onTap: () {
                                 Get.to(()=> SignupScreen());
                             },
                             child: Text(
-                              'Signup',
+                              'Sign Up',
                               style: TextStyle(
                                 fontSize: 18,
                                   fontWeight: FontWeight.bold,

@@ -148,7 +148,7 @@ class _TricycleappDriverState extends State<TricycleappDriver> {
       initialBinding: Getxbinding(),
       smartManagement: SmartManagement.keepFactory,
       theme: ThemeData(
-        scaffoldBackgroundColor: BACKGROUND_BLACK,
+        scaffoldBackgroundColor: BACKGROUND_BLACK_LIGHT,
         textTheme: TextTheme(
           bodyText1: TextStyle(color: TEXT_WHITE),
           bodyText2: TextStyle(color: TEXT_WHITE)

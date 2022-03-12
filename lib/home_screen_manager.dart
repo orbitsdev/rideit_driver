@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/UI/hex_color.dart';
+import 'package:tricycleappdriver/UI/uicolor.dart';
 import 'package:tricycleappdriver/controller/authcontroller.dart';
 import 'package:tricycleappdriver/controller/drivercontroller.dart';
 import 'package:tricycleappdriver/controller/mapcontroller.dart';
@@ -164,15 +165,17 @@ class _HomeScreenManagerState extends State<HomeScreenManager>  with TickerProvi
           //   show: true, // true / false
           // ),
         ],
+        
         tabSize: 50,
         tabBarHeight: 55,
-        textStyle:theme.textTheme.subtitle2,
-        tabIconColor: iconcolor,
+        textStyle:TextStyle(fontSize: 12, color: TEXT_WHITE),
+        
+        tabIconColor: ICON_GREY,
         tabIconSize: 28.0,
         tabIconSelectedSize: 26.0,
-        tabSelectedColor: iconcolorsecondary,
-        tabIconSelectedColor: COLOR_WHITE,
-        tabBarColor: colorwhite,
+        tabSelectedColor: Colors.transparent,
+        tabIconSelectedColor: GREEN_LIGHT,
+        tabBarColor: BACKGROUND_BLACK,
         onTabItemSelected: (int value) {
             pageindexcontroller.updateIndex(value);
              setState(() {

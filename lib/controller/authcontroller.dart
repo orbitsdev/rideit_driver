@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:tricycleappdriver/config/twilioconfig.dart';
 import 'package:tricycleappdriver/controller/permissioncontroller.dart';
 import 'package:tricycleappdriver/constant.dart';
+import 'package:tricycleappdriver/dialog/Failuredialog/failuredialog.dart';
 import 'package:tricycleappdriver/dialog/authdialog/authdialog.dart';
 import 'package:tricycleappdriver/dialog/authdialog/authenticating.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
@@ -21,9 +22,9 @@ class Authcontroller extends GetxController {
   var isSignUpLoading = false.obs;
   var isCodeSent = false.obs;
   var isVerifying = false.obs;
+  var timercoundown = 60.obs;
   bool mailverified = false;
   String? devicetoken;
-
   String? gname;
   String? gphone;
   String? gemail;
@@ -59,11 +60,12 @@ class Authcontroller extends GetxController {
 
     try {
       isSignUpLoading(true);
+       Authdialog.showAuthProGress(context, "Creating account...");
       await authinstance
           .createUserWithEmailAndPassword(
               email: gemail as String, password: gpassword as String)
           .then((credential) async {
-        Authdialog.showAuthProGress(context, "Checking...");
+            
 
         //get device tokem
         await getDeviceToken();
@@ -78,8 +80,8 @@ class Authcontroller extends GetxController {
 
 
         await firestore.collection('drivers').doc(credential.user!.uid).set(userdetailsdata).then((_) async {
-          
-          
+          Get.back();
+           Authdialog.showAuthProGress(context, "Please Wait...");
           useracountdetails(Users.fromJson(userdetailsdata));
           useracountdetails.value.id = credential.user!.uid;
           isSignUpLoading(false);
@@ -98,7 +100,7 @@ class Authcontroller extends GetxController {
 
            await  availabledriverrefference.doc(authinstance.currentUser!.uid).set(availabilitydata).then((value)  async{
 
-             Get.back();
+          
           //verifyPhone(context);
           // Get.offAllNamed(HomeScreenManager.screenName);
 
@@ -111,9 +113,9 @@ class Authcontroller extends GetxController {
                 () => Get.offNamed(VerifyingemailScreen.screenName));
           } else {
             Get.back();
-            progressDialog('Authenticating..');
+         
             Future.delayed(Duration(seconds: 1), () {
-              Get.back();
+             
               Get.offAndToNamed(HomeScreenManager.screenName);
             });
           }
@@ -124,16 +126,11 @@ class Authcontroller extends GetxController {
         });
       });
     } on FirebaseAuthException catch (e) {
+      
       isSignUpLoading(false);
+      Get.back();
 
-      AwesomeDialog(
-        context: context,
-        dialogType: DialogType.ERROR,
-        animType: AnimType.BOTTOMSLIDE,
-        title: e.message.toString(),
-        desc: e.message.toString(),
-        btnOkOnPress: () {},
-      )..show();
+      Failuredialog.showErrorDialog(context, 'OPS', e.message.toString());
     } catch (e) {
       rethrow;
     }
@@ -183,7 +180,7 @@ class Authcontroller extends GetxController {
 
   void logInUser(String email, String password, BuildContext context) async {
     try {
-      Authdialog.showAuthProGress(context, 'Authenticating...');
+      Authdialog.showAuthProGress(context, 'Please wait...');
       var authuser = await authinstance.signInWithEmailAndPassword(
           email: email.trim(), password: password.trim());
 
@@ -227,13 +224,15 @@ class Authcontroller extends GetxController {
 
         } else {
           Get.back();
-          notificationDialog(context, 'User doesnt exist');
+          Failuredialog.noDataDialog(context,'Ops', 'User doesnt exist');
+  //        notificationDialog(context, 'User doesnt exist');
           authinstance.signOut();
         }
       });
     } on FirebaseAuthException catch (e) {
       Get.back();
-      notificationDialog(context, e.message.toString());
+       // notificationDialog(context, e.message.toString());
+          Failuredialog.noDataDialog(context,'Ops' ,e.message.toString());
     } catch (e) {
       rethrow;
     }

@@ -12,6 +12,7 @@ class Authdialog {
         context: context,
         builder: (context) {
          return Dialog(
+           backgroundColor: Colors.transparent,
            child: Container(
              decoration: BoxDecoration(
                 color: Colors.black,

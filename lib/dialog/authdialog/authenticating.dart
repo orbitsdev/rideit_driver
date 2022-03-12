@@ -44,7 +44,7 @@ void notificationDialog(BuildContext context, String  message) {
         context: context,
         dialogType: DialogType.ERROR,
         animType: AnimType.BOTTOMSLIDE,
-        title: 'Failed',
+        title: message,
         desc:message ,
         btnOkOnPress: () {},
       )..show();

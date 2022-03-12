@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tricycleappdriver/UI/uicolor.dart';
 import 'package:tricycleappdriver/controller/authcontroller.dart';
+import 'package:tricycleappdriver/dialog/Failuredialog/failuredialog.dart';
 import 'package:tricycleappdriver/dialog/authdialog/authdialog.dart';
 
 enum PageState { siningUpPagegSate, otpPageState }
@@ -36,6 +37,8 @@ class _SignupScreenState extends State<SignupScreen> {
 
   var smsCodeController = TextEditingController();
 
+  bool isObscure1 = true, isObscure2 = true;
+
   GlobalKey<FormState> _signUpFormKey = GlobalKey<FormState>();
 
   GlobalKey<FormState> _otpFormKey = GlobalKey<FormState>();
@@ -44,6 +47,10 @@ class _SignupScreenState extends State<SignupScreen> {
   void initState() {
     super.initState();
     email.addListener(onListen);
+
+    email.addListener(onListen);
+    password.addListener(onListen);
+    confirmpassword.addListener(onListen);
   }
 
   @override
@@ -90,7 +97,9 @@ class _SignupScreenState extends State<SignupScreen> {
 
       
     return Scaffold(
+      backgroundColor: BACKGROUND_BLACK,
       body: SingleChildScrollView(
+
         child: Form(
           key: _signUpFormKey,
           child: Padding(
@@ -112,7 +121,8 @@ class _SignupScreenState extends State<SignupScreen> {
                   height: 34
                 ),
                       // ElevatedButton(onPressed: (){
-                      //      Authdialog.showAuthProGress(context, "Checking...");
+                      //   Failuredialog.showErrorDialog(context, 'OPS', 'ERROR');
+                      //     //  Authdialog.showAuthProGress(context, "Checking...");
                       // }, child: Text('test')),
                 TextFormField(
                   cursorColor: GREEN_LIGHT_3,
@@ -167,6 +177,10 @@ class _SignupScreenState extends State<SignupScreen> {
                     filled: true,
                     fillColor: BACKGROUND_BLACK_LIGHT,
                     prefixIcon: Icon(Icons.email_outlined, color: GREEN_LIGHT,),
+                    suffixIcon: email.text.isEmpty ? null :  IconButton( onPressed: (){
+                        email.clear();
+
+                     }, icon: Icon(Icons.close,color: GREEN_LIGHT, )),
                     label: Text(
                       'Email',
                       style: TextStyle(fontSize: 20),
@@ -228,7 +242,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   height: 12,
                 ),
                 TextFormField(
-                  obscureText: true,
+                  obscureText: isObscure1,
                   cursorColor: GREEN_LIGHT_3,
                   autofocus: false,
                   keyboardType: TextInputType.text,
@@ -245,6 +259,12 @@ class _SignupScreenState extends State<SignupScreen> {
                      
                     fillColor: BACKGROUND_BLACK_LIGHT,
                     prefixIcon: Icon(Icons.lock_outline, color: GREEN_LIGHT,),
+                     suffixIcon: password.text.isEmpty ? null :  IconButton( onPressed: (){
+                        setState(() {
+                            isObscure1 = !isObscure1;
+                        });
+
+                     }, icon: Icon(isObscure1 ? Icons.remove_red_eye_outlined: Icons.remove_red_eye,color: GREEN_LIGHT, )),
                     
                     label: Text(
                       'Password',
@@ -273,7 +293,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   autofocus: false,
                   keyboardType: TextInputType.text,
                   controller: confirmpassword,
-                  obscureText: true,
+                  obscureText: isObscure2,
                   textInputAction: TextInputAction.done,
                   onFieldSubmitted: (_){
                     signUp();
@@ -290,6 +310,12 @@ class _SignupScreenState extends State<SignupScreen> {
                     filled: true,
                     fillColor: BACKGROUND_BLACK_LIGHT,
                     prefixIcon: Icon(Icons.lock_outline, color: GREEN_LIGHT,),
+                     suffixIcon: confirmpassword.text.isEmpty ? null :  IconButton( onPressed: (){
+                        setState(() {
+                            isObscure2 = !isObscure2;
+                        });
+
+                     }, icon: Icon(isObscure2 ? Icons.remove_red_eye_outlined: Icons.remove_red_eye,color: GREEN_LIGHT, )),
                     label: Text(
                       'Confirm Password',
                       style: TextStyle(fontSize: 20),
@@ -348,7 +374,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           SizedBox(
                             width: 5,
                           ),
-                          GestureDetector(
+                          InkWell(
                             onTap: () {
                               Get.back();
                             },
