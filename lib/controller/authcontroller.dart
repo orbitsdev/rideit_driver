@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:tricycleappdriver/config/twilioconfig.dart';
 import 'package:tricycleappdriver/controller/permissioncontroller.dart';
 import 'package:tricycleappdriver/constant.dart';
+import 'package:tricycleappdriver/dialog/authdialog/authdialog.dart';
 import 'package:tricycleappdriver/dialog/authdialog/authenticating.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/home_screen_manager.dart';
@@ -62,8 +63,7 @@ class Authcontroller extends GetxController {
           .createUserWithEmailAndPassword(
               email: gemail as String, password: gpassword as String)
           .then((credential) async {
-        progressDialog('Checking..');
-
+        Authdialog.showAuthProGress(context, "Checking...");
 
         //get device tokem
         await getDeviceToken();
@@ -183,12 +183,12 @@ class Authcontroller extends GetxController {
 
   void logInUser(String email, String password, BuildContext context) async {
     try {
-      progressDialog("Loading...");
+      Authdialog.showAuthProGress(context, 'Authenticating...');
       var authuser = await authinstance.signInWithEmailAndPassword(
           email: email.trim(), password: password.trim());
 
-      Get.back();
-      progressDialog("Authenticating...");
+     
+      
       await firestore
           .collection('drivers')
           .doc(authuser.user!.uid)
@@ -213,14 +213,14 @@ class Authcontroller extends GetxController {
 
           if (mailverified == false) {
             await sendVerification();
-            Get.back();
+           Get.back();
             Future.delayed(Duration(milliseconds: 300),
                 () => Get.offNamed(VerifyingemailScreen.screenName));
           } else {
             Get.back();
-            progressDialog('Authenticating..');
+              
             Future.delayed(Duration(seconds: 1), () {
-              Get.back();
+           
               Get.offAndToNamed(HomeScreenManager.screenName);
             });
           }

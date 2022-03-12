@@ -198,25 +198,30 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Stack(
                   fit: StackFit.loose,
                   children: [
-                    GoogleMap(
-                        myLocationButtonEnabled: true,
-                        myLocationEnabled: true,
-                        mapType: MapType.hybrid,
-                        zoomControlsEnabled: true,
-                        zoomGesturesEnabled: true,
-                        initialCameraPosition: cameraposition as CameraPosition,
-                        onMapCreated: (GoogleMapController mapcontroller) {
+                    Container(
+                      width: double.infinity,
+                      color: Colors.red,
+                      child: Text("Dash board")
+                    ),
+                    // GoogleMap(
+                    //     myLocationButtonEnabled: true,
+                    //     myLocationEnabled: true,
+                    //     mapType: MapType.hybrid,
+                    //     zoomControlsEnabled: true,
+                    //     zoomGesturesEnabled: true,
+                    //     initialCameraPosition: cameraposition as CameraPosition,
+                    //     onMapCreated: (GoogleMapController mapcontroller) {
 
-                          if (!_googlemapcontroller.isCompleted) {
-                      _googlemapcontroller.complete(mapcontroller);
-                      _newgooglemapcontroller = mapcontroller;
-                        _determinePosition();
+                    //       if (!_googlemapcontroller.isCompleted) {
+                    //   _googlemapcontroller.complete(mapcontroller);
+                    //   _newgooglemapcontroller = mapcontroller;
+                    //     _determinePosition();
                      
-                    }
-                          // _googlemapcontroller.complete(mapcontroller);
+                    // }
+                    //       // _googlemapcontroller.complete(mapcontroller);
                           
                         
-                        }),
+                    //     }),
                     Positioned(
                       top: 0,
                       child: Container(

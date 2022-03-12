@@ -7,6 +7,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:tricycleappdriver/model/un_accepted_request.dart';
 
 
 FirebaseAuth authinstance = FirebaseAuth.instance;
@@ -24,6 +25,7 @@ CollectionReference ongointripreferrence = firestore.collection('ongointrip');
 CollectionReference ratingsreferrence = firestore.collection('ratings');
 
 //streams
+StreamController<List<DocumentSnapshot>> streamofunaacceptedrequest = StreamController<List<DocumentSnapshot>>.broadcast(); 
 
 //realtimedatabase
 FirebaseDatabase database = FirebaseDatabase.instance;

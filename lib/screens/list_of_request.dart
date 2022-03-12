@@ -3,12 +3,15 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:tricycleappdriver/controller/requestcontroller.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/home_screen_manager.dart';
 import 'package:tricycleappdriver/model/request_details.dart';
 import 'package:tricycleappdriver/model/un_accepted_request.dart';
+import 'package:tricycleappdriver/screens/map/map_request_controller.dart';
+import 'package:tricycleappdriver/screens/map/request_map_screen.dart';
 
 class ListOfRequest extends StatefulWidget {
   UnAcceptedRequest? unacceptedrequest;
@@ -25,6 +28,7 @@ class ListOfRequest extends StatefulWidget {
 
 class _ListOfRequestState extends State<ListOfRequest> {
   var requestxcontroller = Get.put(Requestcontroller());
+  var maprequestxcontroller = Get.put(MapRequestController());
   RequestDetails? requestoaccept;
   @override
   void initState() {
@@ -33,47 +37,23 @@ class _ListOfRequestState extends State<ListOfRequest> {
   }
 
   void listenToUnAccepteRequest() async {
-    // requestcollecctionrefference.get().then((querySnapShot) {
-    //   querySnapShot.docs.forEach((element) {
-
-    //     print(element.id);
-    //     print(element.data());
-
-    //   });
-    // });
-
-    //using where conding
-    // requestcollecctionrefference.where("status", isEqualTo: "pending").get().then((querySnapshot) {
-
-    //     print('__________________ this is from listen lis of un accpeted request');
-    //   querySnapshot.docs.forEach((element) {
-
-    //     print('______________________________________________');
-    //     print('|                                             |');
-    //     print('|______________________________________________|');
-    //     print(element.id);
-    //     print(element.data());
-    //   });
-    // });
 
     requestcollecctionrefference
         .where('status', isEqualTo: 'pending')
         .snapshots()
         .listen((querySnapShot) {
+
       requestxcontroller.lisofunacceptedrequest(querySnapShot.docs.map((e) {
         var request = RequestDetails.fromJson(e.data() as Map<String, dynamic>);
         request.request_id = e.id;
         return request;
       }).toList());
 
-      print('_________________________________ my list after listen');
-
-      print(requestxcontroller.lisofunacceptedrequest.length);
-
-      if (requestxcontroller.lisofunacceptedrequest.length == 0 && requestxcontroller.hasongingtrip.value == false){
-        Get.offNamed(HomeScreenManager.screenName);
+      if (requestxcontroller.lisofunacceptedrequest.length == 0 &&
+          requestxcontroller.hasongingtrip == false) {
+           Get.offNamed(HomeScreenManager.screenName);
       }
-      
+
     });
   }
 
@@ -84,25 +64,64 @@ class _ListOfRequestState extends State<ListOfRequest> {
         child: Obx(() {
           if (requestxcontroller.lisofunacceptedrequest.length > 0) {
             return Column(
+              
+              
               children: [
+              
                 Container(
-                  height: 200,
+        
                   width: double.infinity,
-                  color: Colors.red,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                          "${requestxcontroller.lisofunacceptedrequest[0].pickaddress_name}"),
-                      Text(
-                          "${requestxcontroller.lisofunacceptedrequest[0].dropddress_name}"),
-                      ElevatedButton(
-                          onPressed: () {
-                            requestxcontroller.confirmRequest(requestxcontroller
-                                .lisofunacceptedrequest[0].request_id);
-                          },
-                          child: Text('Confirm'))
-                    ],
+                  color: Colors.grey[200],
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("${requestxcontroller.lisofunacceptedrequest[0].request_id }"),
+                        Text("${requestxcontroller.lisofunacceptedrequest[0].actualmarker_position }", style: TextStyle(fontWeight: FontWeight.w700)),
+                        Text("${requestxcontroller.lisofunacceptedrequest[0].drop_location_id }"),
+                        Text("${requestxcontroller.lisofunacceptedrequest[0].drop_location }", style: TextStyle(fontWeight: FontWeight.w700),),
+                        Text("${requestxcontroller.lisofunacceptedrequest[0].dropddress_name}"),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text("${requestxcontroller.lisofunacceptedrequest[0].pick_location_id }"),
+                        Text("${requestxcontroller.lisofunacceptedrequest[0].pick_location }"),
+                        Text("${requestxcontroller.lisofunacceptedrequest[0].pickaddress_name}"),
+                        ElevatedButton(
+                            onPressed: () {
+                              requestxcontroller.confirmRequest(requestxcontroller
+                                  .lisofunacceptedrequest[0].request_id);
+                            },
+                            child: Text('Confirm')),
+                             ElevatedButton(
+                                          onPressed: () async{
+
+                                            if(requestxcontroller.lisofunacceptedrequest[0].drop_location_id ==  maprequestxcontroller.requestdroplocatioinid){
+                                                  Get.to(()=> RequestMapScreen(), fullscreenDialog: true);
+                                            }else{
+                                              var response =  await maprequestxcontroller.getDirection(requestxcontroller.lisofunacceptedrequest[0].pick_location_id as String,requestxcontroller.lisofunacceptedrequest[0].drop_location_id as String, requestxcontroller.lisofunacceptedrequest[0].actualmarker_position as LatLng);
+                                            if(response){
+                                            
+
+                                                print(maprequestxcontroller.requestmapdetails.value.polylines_encoded);
+                                              print('wazap');
+                                              Get.to(()=> RequestMapScreen(), fullscreenDialog: true);
+
+                                            }else{
+                                              print('ohn now');
+                                            }
+
+                                            }
+
+                                            
+
+                                          
+
+                                          }, child: Text('View')),
+                            
+                      ],
+                    ),
                   ),
                 ),
                 ListView.builder(
@@ -134,11 +153,12 @@ class _ListOfRequestState extends State<ListOfRequest> {
                                     ElevatedButton(
                                         onPressed: () {},
                                         child: Text('Reject')),
+                                   
                                     ElevatedButton(
-                                        onPressed: () {},
-                                        child: Text('Confirm')),
-                                    ElevatedButton(
-                                        onPressed: () {}, child: Text('View')),
+                                        onPressed: () {
+
+
+                                        }, child: Text('View')),
                                   ],
                                 ),
                                 Text(requestxcontroller

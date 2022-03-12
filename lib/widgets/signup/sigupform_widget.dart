@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tricycleappdriver/allwidgets/authTextFormField.dart';
 import 'package:tricycleappdriver/controller/authcontroller.dart';
 import 'package:email_validator/email_validator.dart';
 
@@ -85,110 +86,22 @@ void onListen()=>  setState(() {});
           ),
           child: Column(
             children: [
-              TextFormField(
-                autofocus: false,
-                keyboardType: TextInputType.text,
-                controller: name,
-                textInputAction: TextInputAction.next,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter a name';
-                  }
-                  return null;
-                },
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  label: Text(
-                    'Name',
-                    style: TextStyle(fontSize: 14),
-                  ),
-                  hintStyle: TextStyle(fontSize: 10),
-                ),
-                style: TextStyle(fontSize: 14),
-              ),
+              Authtextformfield(fieldname: 'Name', controller: name, keyboardType: TextInputType.text, textInputAction: TextInputAction.next, obscureText: false),
               SizedBox(
                 height: 12,
               ),
-              TextFormField(
-                autofocus: false,
-                keyboardType: TextInputType.emailAddress,
-                controller: email,
-                textInputAction: TextInputAction.next,
-                autofillHints: [AutofillHints.email],
-
-                validator: (value) {
-
-               return  EmailValidator.validate(value!) == true? null : "Enter A Valid Email";
-                  // if (value.isEmpty) {
-                  //   return 'Email enter a name';
-                  // }
-
-                  // if (!value.contains("@")) {
-                  //   return 'Please enter a valid email';
-                  // }
-                  // return null;
-                },
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  label: Text(
-                    'Email',
-                    style: TextStyle(fontSize: 14),
-                  ),
-                  hintStyle: TextStyle(fontSize: 10),
-                ),
-                style: TextStyle(fontSize: 14),
-              ),
+              Authtextformfield(fieldname: 'Email', controller: email, keyboardType: TextInputType.emailAddress, textInputAction: TextInputAction.next, obscureText: false),
+             
               SizedBox(
                 height: 12,
               ),
-              TextFormField(
-                autofocus: false,
-                keyboardType: TextInputType.phone,
-                controller: phone,
-                textInputAction: TextInputAction.next,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter a number';
-                  }
-                  return null;
-                },
-                decoration: InputDecoration(
-                  hintText: '9123456799',
-                  border: OutlineInputBorder(),
-                  label: Text(
-                    'phone',
-                    style: TextStyle(fontSize: 14),
-                  ),
-                  hintStyle: TextStyle(fontSize: 10),
-                ),
-                style: TextStyle(fontSize: 14),
-              ),
+              Authtextformfield(fieldname: 'Phone', controller: phone, keyboardType: TextInputType.phone, textInputAction: TextInputAction.next, obscureText: false),
+             
               SizedBox(
                 height: 12,
               ),
-              TextFormField(
-                autofocus: false,
-                keyboardType: TextInputType.text,
-                obscureText: true,
-                controller: password,
-                textInputAction: TextInputAction.next,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter a valid password';
-                  }
-                  return null;
-                },
-                decoration: InputDecoration(
-                    suffixIcon: email.text.isEmpty ? Container(width: 0,) :   IconButton(onPressed: ()=> email.clear() , icon: Icon(Icons.close)),
-                  border: OutlineInputBorder(),
-                  label: Text(
-                    'Password',
-                    style: TextStyle(fontSize: 14),
-                  ),
-                  hintStyle: TextStyle(fontSize: 10),
-                ),
-                style: TextStyle(fontSize: 14),
-              ),
+              
+              Authtextformfield(fieldname: 'Paassword', controller: password, keyboardType: TextInputType.text, textInputAction: TextInputAction.next, obscureText: true),
               SizedBox(
                 height: 12,
               ),

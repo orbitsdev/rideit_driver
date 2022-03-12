@@ -42,8 +42,8 @@ class RequestDetails {
   factory RequestDetails.fromJson(Map<String, dynamic> json){
 
     LatLng picklocation = LatLng(json['pick_location']['latitude'], json['pick_location']['longitude']);
-    LatLng droplocation = LatLng(json['pick_location']['latitude'], json['pick_location']['longitude']);
-    LatLng actualmarker = LatLng(json['pick_location']['latitude'], json['pick_location']['longitude']);
+    LatLng droplocation = LatLng(json['drop_location']['latitude'], json['drop_location']['longitude']);
+    LatLng actualmarker = LatLng(json['actualmarker_position']['latitude'], json['actualmarker_position']['longitude']);
 
     RequestDetails requestdetails = RequestDetails();
     requestdetails.request_id= json['request_id']; 

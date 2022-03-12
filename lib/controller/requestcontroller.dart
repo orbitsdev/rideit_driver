@@ -51,6 +51,7 @@ class Requestcontroller extends GetxController {
   var hasacceptedrequest = false.obs;
 
   var lisofunacceptedrequest = <RequestDetails>[].obs;
+  var lengthofunacceptedrequest = 0.obs;
   Position? currentpostion;
   Map<String, dynamic> ongoingtripdata = {};
 
@@ -119,7 +120,7 @@ class Requestcontroller extends GetxController {
                         
                         //then store data in local na may ongoing trip ka
                         hasongingtrip(true);
-                          Get.toNamed(Ongoingtrip.screenName,
+                          Get.off(Ongoingtrip.screenName,
                               arguments: {"from": "request"});
                         });
                     

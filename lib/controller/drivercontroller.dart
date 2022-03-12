@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tricycleappdriver/controller/authcontroller.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 
@@ -12,6 +13,7 @@ class Drivercontroller  extends GetxController{
   var isOnline = false.obs;
   var isOnlineLoading = false.obs;
   var isonlinelastime = false.obs;
+  LatLng?  latcurrentposition;
   Position? currentposition;
   var authxcontroller = Get.find<Authcontroller>();
   //GeoFirestore geoFirestore =GeoFirestore(firestore.collection('availableDrivers'));
@@ -87,6 +89,7 @@ class Drivercontroller  extends GetxController{
           
           if(currentposition == null){
             currentposition =  await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+            latcurrentposition =  LatLng(currentposition!.latitude , currentposition!.longitude);
             print('called');
 
           }

@@ -6,6 +6,7 @@ import 'package:tricycleappdriver/controller/pageindexcontroller.dart';
 import 'package:tricycleappdriver/controller/permissioncontroller.dart';
 import 'package:tricycleappdriver/controller/requestcontroller.dart';
 import 'package:tricycleappdriver/controller/tripcontroller.dart';
+import 'package:tricycleappdriver/screens/map/map_request_controller.dart';
 
 class Getxbinding implements Bindings {
   @override
@@ -18,6 +19,7 @@ class Getxbinding implements Bindings {
     Get.lazyPut(() => Drivercontroller()  ) ; 
     Get.lazyPut(() => Tripcontroller()  ) ; 
     Get.lazyPut(() => Permissioncontroller()  ) ; 
+    Get.lazyPut(() => MapRequestController()  ) ; 
  
   }
 

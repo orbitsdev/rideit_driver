@@ -24,7 +24,7 @@ class MeScreen extends StatefulWidget {
 
 class _MeScreenState extends State<MeScreen> {
 
-var driverxcontroller = Get.find<Drivercontroller>();  
+var driverxcontroller = Get.put(Drivercontroller());  
   File? myimage;
   bool isUploading = false;
   final ImagePicker _picker = ImagePicker();
