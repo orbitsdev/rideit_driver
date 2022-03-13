@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_switch/flutter_switch.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
@@ -14,6 +15,7 @@ import 'package:tricycleappdriver/screens/me_screen.dart';
 import 'package:tricycleappdriver/screens/trips_screen.dart';
 import 'package:tricycleappdriver/services/notificationserves.dart';
 import 'package:motion_tab_bar_v2/motion-tab-bar.dart';
+import 'package:getwidget/getwidget.dart';
 
 // optional, only if using provided badge style
 import 'package:motion_tab_bar_v2/motion-badge.widget.dart';
@@ -35,7 +37,7 @@ class _HomeScreenManagerState extends State<HomeScreenManager>  with TickerProvi
     Color colorwhite = HexColor("#fbfefb");
     Color iconcolor = HexColor("#2F2191");
     Color iconcolorsecondary = HexColor("#594DAF");
-     
+    bool status = false;     
 
   TabController? _tabController;
 
@@ -184,9 +186,48 @@ class _HomeScreenManagerState extends State<HomeScreenManager>  with TickerProvi
              });
         },
       ),
-        body: 
-        
-        TabBarView(
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: GFFloatingWidget(
+       
+    child: GFIconBadge(
+              
+              child:  Container(
+          child: FlutterSwitch(
+          inactiveColor: BACKGROUND_BLACK,        
+            width: 125.0,
+           height: 55.0,
+            valueFontSize: 16.0,
+            toggleSize: 45.0,
+            value: status,
+            borderRadius: 30.0,
+            padding: 8.0,
+            activeToggleColor: DIALOG_WHITE,
+            activeColor: GREEN_ONLINE,
+            activeText: 'Online',
+            inactiveText: 'Offline',
+            activeTextFontWeight:FontWeight.normal,
+            inactiveTextFontWeight:FontWeight.normal,
+            showOnOff: true,
+            toggleColor: ICON_GREY,
+            onToggle: (val) {
+              setState(() {
+                status = val;
+              });
+            },
+          ),
+        ),
+           counterChild:  GFBadge(
+             color: Colors.transparent,
+           text: '',
+           shape: GFBadgeShape.circle,
+           )
+        ),
+    body:Text('body or any kind of widget here..'),
+    verticalPosition: MediaQuery.of(context).size.height* 0.88,
+    horizontalPosition: MediaQuery.of(context).size.width / 3.333,
+  ),
+
+        body:TabBarView(
           physics: NeverScrollableScrollPhysics(), // swipe navigation handling is not supported
           controller: _tabController,
           // ignore: prefer_const_literals_to_create_immutables

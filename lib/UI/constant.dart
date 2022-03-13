@@ -30,6 +30,7 @@ const ICON_GREY = Color(0xFF696C76);
 const GREEN_LIGHT =  Color(0xFFB9E33F); 
 const GREEN_LIGHT_2 =  Color(0xFFB8E23E); 
 const GREEN_LIGHT_3 =  Color(0xFF93B92B); 
+const GREEN_ONLINE =  Color(0xFF27CE59); 
 
 const DARK_GREEN =  Color(0xFF239035); 
 const YELLOW =  Color(0xFFF7FC29); 
