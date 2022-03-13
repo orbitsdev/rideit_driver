@@ -4,16 +4,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
+import 'package:tricycleappdriver/UI/constant.dart';
+import 'package:tricycleappdriver/controller/authcontroller.dart';
 import 'package:tricycleappdriver/controller/drivercontroller.dart';
 import 'package:tricycleappdriver/dialog/authdialog/authenticating.dart';
+import 'package:tricycleappdriver/dialog/profiledialog/profiledialog.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
-import 'package:tricycleappdriver/model/users.dart';
 import 'package:tricycleappdriver/services/firebase_api.dart';
-import 'package:tricycleappdriver/signin_screen.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart' as pathprovider;
 import 'package:path/path.dart' as path;
+import 'package:tricycleappdriver/signin_screen.dart';
+import 'package:url_launcher/link.dart';
 
 class MeScreen extends StatefulWidget {
   static const screenName = "/me";
@@ -23,23 +27,27 @@ class MeScreen extends StatefulWidget {
 }
 
 class _MeScreenState extends State<MeScreen> {
-
-var driverxcontroller = Get.put(Drivercontroller());  
+  var driverxcontroller = Get.put(Drivercontroller());
+  var authxcontroller = Get.find<Authcontroller>();
   File? myimage;
   bool isUploading = false;
   final ImagePicker _picker = ImagePicker();
   String? filnametext;
   UploadTask? task;
   Stream? userdetails;
- final Stream<DocumentSnapshot<Object?>> _usersStream = driversusers.doc(authinstance.currentUser!.uid).snapshots();
- Stream<QuerySnapshot<Map<String, dynamic>>> ratingsstream = ratingsreferrence.doc(authinstance.currentUser!.uid).collection("ratings").snapshots();
+  final Stream<DocumentSnapshot<Object?>> _usersStream =
+      driversusers.doc(authinstance.currentUser!.uid).snapshots();
+  Stream<QuerySnapshot<Map<String, dynamic>>> ratingsstream = ratingsreferrence
+      .doc(authinstance.currentUser!.uid)
+      .collection("ratings")
+      .snapshots();
   @override
   void initState() {
     super.initState();
-   //userdetails = getUserdetails();
+    //userdetails = getUserdetails();
   }
 
-   getUserdetails() async{
+  getUserdetails() async {
     return await FirebaseApi.getUserDetails();
   }
 
@@ -51,12 +59,12 @@ var driverxcontroller = Get.put(Drivercontroller());
 
   Future pickImage(ImageSource imagesource) async {
     try {
-     
-      final image = await ImagePicker().pickImage(source: imagesource, maxHeight: 480, imageQuality: 85);
+      final image = await ImagePicker()
+          .pickImage(source: imagesource, maxHeight: 480, imageQuality: 85);
       if (image == null) {
         return;
       }
-       loadingSetter(true);
+      loadingSetter(true);
       progressDialog("Uploading");
       final imageTemporary = File(image.path);
       setState(() {
@@ -64,19 +72,19 @@ var driverxcontroller = Get.put(Drivercontroller());
       });
 
       final pathDir = await pathprovider.getApplicationDocumentsDirectory();
-      final fiilename ='${DateTime.now().millisecond}' +path.basename(myimage!.path);
+      final fiilename =
+          '${DateTime.now().millisecond}' + path.basename(myimage!.path);
       final saveimage = await myimage!.copy("${pathDir.path}/${fiilename}");
       final destination = 'userimage/${fiilename}';
-  
+
       task = await FirebaseApi.uploadFile(destination, myimage as File);
-      
+
       if (task == null) return;
       final snapshot = await task!.whenComplete(() {});
 
       final urlDownload = await snapshot.ref.getDownloadURL();
-      FirebaseApi.updateProfile(urlDownload, destination );
+      FirebaseApi.updateProfile(urlDownload, destination);
 
-    
       setState(() {
         filnametext = destination;
       });
@@ -92,116 +100,356 @@ var driverxcontroller = Get.put(Drivercontroller());
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      padding: EdgeInsets.all(10),
       child: Column(
         children: [
           SizedBox(
-            height: 20,
+            height: 40,
           ),
-          Stack(children: [
-    
-        StreamBuilder<DocumentSnapshot<Object?>>(
-        stream: _usersStream,
-        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<Object?>> snapshot) {
-          if (snapshot.hasError) {
-            return Text('Something went wrong');
-          }
-    
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Text("Loading");
-          }
-    
-           
-          if(snapshot.data!["image_url"] == null){
-            return  ClipRRect(
-              borderRadius: BorderRadius.circular(100),
-              child: Container(
-                width: 170,
-                height: 170,
-                color: Colors.pinkAccent,
-                child: Text("No Image")),
-            
-              );
-            
-          }
-    
-          return  ClipRRect(
-              borderRadius: BorderRadius.circular(100),
-              child: Container(
-                width: 170,
-                height: 170,
-                color: Colors.pinkAccent,
-                child: Image.network(snapshot.data!["image_url"], fit: BoxFit.cover,),
-            
-              ),
-            );
-        }),
-            
-            Positioned(
-                bottom: 10,
-                right: 10,
-                child: IconButton(
-                    onPressed: () {
-                      pickImage(ImageSource.camera);
-                    },
-                    icon: Icon(
-                      Icons.camera_alt,
+          Container(
+            width: double.infinity,
+
+            //color: BACKGROUND_BLACK_LIGHT_MORE_LIGHT_2,
+            child: Center(
+              child: Stack(children: [
+                StreamBuilder<DocumentSnapshot<Object?>>(
+                    stream: _usersStream,
+                    builder: (BuildContext context,
+                        AsyncSnapshot<DocumentSnapshot<Object?>> snapshot) {
+                      if (snapshot.hasError) {
+                        return Text('Something went wrong');
+                      }
+
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Text("Loading");
+                      }
+
+                      if (snapshot.data!["image_url"] == null) {
+                        return ClipOval(
+                          child: Container(
+                            color: TEXT_WHITE_2,
+                            padding: EdgeInsets.all(5),
+                            child: ClipOval(
+                              child: Image.asset(
+                                'assets.images/PngItem_1503945.png',
+                                height: 130,
+                                width: 130,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+
+                      return ClipOval(
+                        child: Container(
+                          color: TEXT_WHITE_2,
+                          padding: EdgeInsets.all(5),
+                          child: ClipOval(
+                            child: Image.network(
+                              snapshot.data!["image_url"],
+                              height: 130,
+                              width: 130,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                Positioned(
+                    bottom: 5,
+                    right: 5,
+                    child: IconButton(
+                        onPressed: () {
+                          Profiledialog.showSimpleDialog(context, pickImage);
+                        },
+                        icon: Icon(
+                          Icons.camera_alt,
+                        ),
+                        iconSize: 34,
+                        color: Colors.white))
+              ]),
+            ),
+          ),
+          SizedBox(
+            height: 24,
+          ),
+          Text('${authxcontroller.useracountdetails.value.name}',
+              style: Get.textTheme.bodyText1,),
+          SizedBox(
+            height: 24,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Container(
+                padding: EdgeInsets.all(8),
+                color: BACKGROUND_BLACK_LIGHT_MORE_LIGHT,
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.motorcycle,
+                          size: 24,
+                          color: TEXT_WHITE,
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text(
+                          '200',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w500),
+                        )
+                      ],
                     ),
-                    iconSize: 34,
-                    color: Colors.white))
-          ]),
-          SizedBox(
-            height: 3,
+                    SizedBox(
+                      height: 4,
+                    ),
+                    Center(
+                        child: Text('Total Trips',
+                            style: TextStyle(
+                                color: TEXT_WHITE_2,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w300))),
+                  ],
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.all(8),
+                color: BACKGROUND_BLACK_LIGHT_MORE_LIGHT,
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.motorcycle,
+                          size: 24,
+                          color: TEXT_WHITE,
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text(
+                          '200',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w500),
+                        )
+                      ],
+                    ),
+                    SizedBox(
+                      height: 4,
+                    ),
+                    Center(
+                        child: Text('Total Distance Traveled',
+                            style: TextStyle(
+                                color: TEXT_WHITE_2,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w300))),
+                  ],
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.all(8),
+                color: BACKGROUND_BLACK_LIGHT_MORE_LIGHT,
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.motorcycle,
+                          size: 24,
+                          color: TEXT_WHITE,
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text(
+                          '200',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w500),
+                        )
+                      ],
+                    ),
+                    SizedBox(
+                      height: 4,
+                    ),
+                    Center(
+                        child: Text('Canceled Trip',
+                            style: TextStyle(
+                                color: TEXT_WHITE_2,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w300))),
+                  ],
+                ),
+              ),
+            ],
           ),
-          // if (filnametext != null) Text(filnametext as String),
-          ElevatedButton.icon(
-              onPressed: () {
-                pickImage(ImageSource.gallery);
-              },
-              icon: Icon(Icons.folder),
-              label: Text('Pick Image')),
           SizedBox(
-            height: 12,
+            height: 24,
           ),
-          task != null ? builUploadStatus(task) : Container(),
-          StreamBuilder<QuerySnapshot>(
-        stream: ratingsstream,
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.hasError) {
-            return Text('Something went wrong');
-          }
-    
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Text("Loading");
-          }
-    
-          return Container(
-            constraints: BoxConstraints(
-              maxHeight: 400,
-            ),
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: snapshot.data!.docs.length,
-              itemBuilder: (context, index){
-    
-                   return ListTile(
-                  title: Text('${snapshot.data!.docs[index]['rate']}'),
-                  subtitle: Text('${snapshot.data!.docs[index]['created_at']}')
-                );
-              },
-              
-            ),
-          );
-        },
-      ),
-          ElevatedButton(
-              onPressed: () {
-                authinstance.signOut();
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.email_outlined,
+                    color: GREEN_LIGHT,
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  SizedBox(
+                    width: 12,
+                  ),
+                  Expanded(
+                      child: Text(
+                          '${authxcontroller.useracountdetails.value.email}')),
+                ],
+              ),
+              SizedBox(
+                height: 12,
+              ),
+              Row(
+                children: [
+                  Icon(
+                    Icons.phone_android_outlined,
+                    color: GREEN_LIGHT,
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  SizedBox(
+                    width: 12,
+                  ),
+                  Expanded(
+                      child: Text(
+                          '${authxcontroller.useracountdetails.value.phone}')),
+                ],
+              ),
+              SizedBox(
+                height: 12,
+              ),
+              InkWell
+              (
+                onTap: (){
+                    authinstance.signOut();
                 Get.offAllNamed(SigninScreen.screenName);
-              },
-              child: Text('Signout')),
-        
-    
-              
+                },
+                child: Text('Signout', style: Get.textTheme.bodyText2))
+            ],
+          ),
+
+         
+          StreamBuilder<QuerySnapshot>(
+            stream: ratingsstream,
+            builder:
+                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (snapshot.hasError) {
+                return Text('Something went wrong');
+              }
+
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Text("Loading");
+              }
+
+              return Container(
+                constraints: BoxConstraints(
+                  maxHeight: 400,
+                ),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: snapshot.data!.docs.length,
+                  itemBuilder: (context, index) {
+                    return Container(
+                      padding: EdgeInsets.all(8),
+                      color: BACKGROUND_BLACK,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              ClipOval(
+                                child: Container(
+                                  color: TEXT_WHITE_2,
+                                  padding: EdgeInsets.all(2),
+                                  child: ClipOval(
+                                    child: Image.asset(
+                                      'assets/images/images.jpg',
+                                      height: 60,
+                                      width: 60,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                width: 12,
+                              ),
+                              Flexible(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('KATE KRISITNE  ', style: Get.textTheme.bodyText1,),
+                                    SizedBox(
+                                      height: 4,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        RatingBar.builder(
+                                          initialRating: snapshot.data!.docs[index]['rate'],
+                                          minRating: snapshot.data!.docs[index]['rate'],
+                                          direction: Axis.horizontal,
+                                          allowHalfRating: true,
+                                          itemCount: 5,
+                                          itemSize: 20,
+                                          itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                                          itemBuilder: (context, _) => Icon(
+                                            Icons.star,
+                                            color: Colors.amber,
+                                          ),
+                                          onRatingUpdate: (rating) {
+                              
+                                          },
+                                        ),
+                                        SizedBox(
+                                          width: 5,
+                                        ),
+                                        Text(
+                                        '${snapshot.data!.docs[index]['rate']}',
+                                        style: Get.textTheme.bodyText1,
+                                      ),
+                                        
+                              
+                              
+                              
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 8,
+                          ),
+                          
+                           Text('Nice and Very smooth transactions  '),
+                         
+                        ],
+                      ),
+                    );
+                    
+                  },
+                ),
+              );
+            },
+          ),
+      
         ],
       ),
     );
@@ -214,8 +462,11 @@ var driverxcontroller = Get.put(Drivercontroller());
           if (snapshot.hasData) {
             final snap = snapshot.data;
             final progress = snap!.bytesTransferred / snap.totalBytes;
-            final percentage = (progress * 100 ).toStringAsFixed(0);
-            return Text("${percentage}%", style:TextStyle(fontSize: 20, fontWeight: FontWeight.bold),);
+            final percentage = (progress * 100).toStringAsFixed(0);
+            return Text(
+              "${percentage}%",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            );
           } else {
             return Container();
           }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/UI/uicolor.dart';
 
@@ -33,7 +34,7 @@ class Authdialog {
                  ),
                  Expanded(child: Container(
                    margin: EdgeInsets.only(left: 20),
-                   child: Text(message, style: TextStyle(fontWeight: FontWeight.w600),)))
+                   child: Text(message, style: Get.textTheme.bodyText2,)))
               ],
             ),
              ),

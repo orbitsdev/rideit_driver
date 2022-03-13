@@ -1,5 +1,4 @@
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
@@ -13,17 +12,17 @@ static void noDataDialog(BuildContext context, String title, String body){
         context: context,
         builder: (context) {
          return Dialog(
-           insetPadding: EdgeInsets.symmetric(horizontal: 25, vertical: 40),
+           insetPadding:const EdgeInsets.all(containerPadding),
            backgroundColor: Colors.transparent,
            child: Container(
-             decoration: BoxDecoration(
+             decoration: const BoxDecoration(
                 color: colorwhite,
-               borderRadius: BorderRadius.all(Radius.circular(6)),
+               borderRadius: BorderRadius.all(Radius.circular(containerRadius)),
              ),
            
             
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(10, 70, 10, 10),
+              padding: const EdgeInsets.all(25),
               child: Column(
 
 
@@ -40,9 +39,9 @@ static void noDataDialog(BuildContext context, String title, String body){
             
                   Column(
                     children: [
-                      Text(title.toUpperCase(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: LageTextSize, color: BACKGROUND_BLACK ),),
+                      Text(title.toUpperCase(), style: Get.textTheme.headline1,),
                       SizedBox(height: 5,),
-                      Container(child: Text(body,  textAlign: TextAlign.center, style: TextStyle(fontSize: MediumTextSize, color: BACKGROUND_BLACK_LIGHT,),)),
+                      Container(child: Text(body,  textAlign: TextAlign.center, style: Get.textTheme.headline4,)),
                       SizedBox(height: 20,),
                       ElevatedButton(
                             
@@ -56,7 +55,7 @@ static void noDataDialog(BuildContext context, String title, String body){
                               onPressed: () {
                                 Get.back();
                               },
-                              child: Text('OK'.toUpperCase() , style: TextStyle(fontSize: 20, color: BACKGROUND_BLACK, fontWeight: FontWeight.w700),)),
+                              child: Text('OK'.toUpperCase() , style: Get.textTheme.headline3,)),
                     ],
                   )
                 ],
@@ -73,12 +72,12 @@ static void showErrorDialog(BuildContext context, String title, String body){
         context: context,
         builder: (context) {
          return Dialog(
-           insetPadding: EdgeInsets.symmetric(horizontal: 25, vertical: 40),
+           insetPadding: const EdgeInsets.symmetric(horizontal: 25, vertical: 40),
            backgroundColor: Colors.transparent,
-           child: Container(
-             decoration: BoxDecoration(
+           child:  Container(
+             decoration: const BoxDecoration(
                 color: colorwhite,
-               borderRadius: BorderRadius.all(Radius.circular(6)),
+               borderRadius: BorderRadius.all(Radius.circular(containerRadius)),
              ),
            
             
@@ -100,9 +99,9 @@ static void showErrorDialog(BuildContext context, String title, String body){
             
                   Column(
                     children: [
-                      Text(title.toUpperCase(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: LageTextSize, color: BACKGROUND_BLACK ),),
+                      Text(title.toUpperCase(), style:Get.textTheme.headline1,),
                       SizedBox(height: 5,),
-                      Container(child: Text(body,  textAlign: TextAlign.center, style: TextStyle(fontSize: MediumTextSize, color: BACKGROUND_BLACK_LIGHT,),)),
+                      Container(child: Text(body,  textAlign: TextAlign.center, style: Get.textTheme.headline4  ,)),
                       SizedBox(height: 20,),
                       ElevatedButton(
                             
@@ -116,7 +115,7 @@ static void showErrorDialog(BuildContext context, String title, String body){
                               onPressed: () {
                                 Get.back();
                               },
-                              child: Text('OK'.toUpperCase() , style: TextStyle(fontSize: 20, color: BACKGROUND_BLACK, fontWeight: FontWeight.w700),)),
+                              child: Text('OK'.toUpperCase() , style: Get.textTheme.headline3,)),
                     ],
                   )
                 ],

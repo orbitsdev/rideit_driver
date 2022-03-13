@@ -149,10 +149,7 @@ class _TricycleappDriverState extends State<TricycleappDriver> {
       smartManagement: SmartManagement.keepFactory,
       theme: ThemeData(
         scaffoldBackgroundColor: BACKGROUND_BLACK_LIGHT,
-        textTheme: TextTheme(
-          bodyText1: TextStyle(color: TEXT_WHITE),
-          bodyText2: TextStyle(color: TEXT_WHITE)
-        )
+        textTheme: TEXT_THEME_DEFAULT_DARK, 
       ),
       home:
 

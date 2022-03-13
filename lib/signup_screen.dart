@@ -1,6 +1,7 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/UI/uicolor.dart';
 import 'package:tricycleappdriver/controller/authcontroller.dart';
 import 'package:tricycleappdriver/dialog/Failuredialog/failuredialog.dart';
@@ -121,8 +122,8 @@ class _SignupScreenState extends State<SignupScreen> {
                   height: 34
                 ),
                       // ElevatedButton(onPressed: (){
-                      //   Failuredialog.showErrorDialog(context, 'OPS', 'ERROR');
-                      //     //  Authdialog.showAuthProGress(context, "Checking...");
+                      //   //Failuredialog.showErrorDialog(context, 'OPS', 'ERROR');
+                      //      Authdialog.showAuthProGress(context, "Checking...");
                       // }, child: Text('test')),
                 TextFormField(
                   cursorColor: GREEN_LIGHT_3,

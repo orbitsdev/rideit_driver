@@ -120,7 +120,7 @@ class Requestcontroller extends GetxController {
                         
                         //then store data in local na may ongoing trip ka
                         hasongingtrip(true);
-                          Get.off(Ongoingtrip.screenName,
+                          Get.offNamed(Ongoingtrip.screenName,
                               arguments: {"from": "request"});
                         });
                     
