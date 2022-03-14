@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tricycleappdriver/controller/authcontroller.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
+import 'package:tricycleappdriver/model/ongoing_trip_details.dart';
 
 class Drivercontroller  extends GetxController{
 
@@ -15,35 +16,45 @@ class Drivercontroller  extends GetxController{
   var isonlinelastime = false.obs;
   LatLng?  latcurrentposition;
   Position? currentposition;
+  var listofsuccesstrip = <OngoingTripDetails>[].obs;
+  var listofcanceledtrip = <OngoingTripDetails>[].obs;
+  var totalsuccestrip = 0.obs;
+  var canceledtrip = 0.obs;
+  var totalearning = 0.obs;
+  
   var authxcontroller = Get.find<Authcontroller>();
   //GeoFirestore geoFirestore =GeoFirestore(firestore.collection('availableDrivers'));
   
+  
+  
+void listenToAllTrip() async{
+  drivertriphistoryreferrence.doc(authinstance.currentUser!.uid).collection('trips').snapshots().listen((event) {
+listofsuccesstrip.clear();
+listofcanceledtrip.clear();
+    event.docs.forEach((element) { 
+        var data =  element.data() as  Map<String, dynamic>;
+        if(data['tripstatus']=="complete"){
+          listofsuccesstrip.add(OngoingTripDetails.fromJson(data));
+        }
+        if(data['tripstatus']=="canceled"){
+            listofcanceledtrip.add(OngoingTripDetails.fromJson(data));
+        }
+     
 
-  @override
-  void onInit() {
-    checkDriverIsOnline();
-    super.onInit();
-  }
-
-  void checkDriverIsOnline() {
-    var ref = availablereference
-        .orderByKey()
-        .equalTo(authinstance.currentUser!.uid)
-        .get()
-        .then((value) {
-      if (value.exists) {
-        print('__________ref');
-        print('exist');
-       // liveUpdateLocation();
-        isOnline(true);
-      } else {
-        isOnline(false);
-          
-        print('__________ref');
-        print(value.value);
-      }
     });
-  }
+      totalearning(listofsuccesstrip.fold(0, (prev, trip) =>  int.parse(prev.toString()) +  int.parse(trip.payedamount.toString())));
+     
+     totalsuccestrip(listofsuccesstrip.length) ;
+     canceledtrip(listofcanceledtrip.length) ;
+
+    // print('mylist PRINTINg');
+    // print(listofsuccesstrip.length);
+    // print(listofcanceledtrip.length);
+
+
+  });
+}
+
 @override
   void dispose() {
     // TODO: implement dispose

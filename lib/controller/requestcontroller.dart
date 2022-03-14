@@ -196,6 +196,7 @@ class Requestcontroller extends GetxController {
 
         //add more field to null data
         ongoingtripdetails.tripstatus = 'prepairing';
+        ongoingtripdetails.payedamount = 0;
         ongoingtripdetails.payed = false;
         ongoingtripdetails.read = false;
         ongoingtripdetails.request_id = requestid;
@@ -515,11 +516,15 @@ class Requestcontroller extends GetxController {
 
   void endTrip(String requestid) async {
       collecting(true);
+  
+  //temporary value
     await ongointripreferrence.doc(requestid).update({
+      'payedamount': 50,
       'payed': true,
     });
 
-
+//update variable local to be safe
+  ongoingtrip.value.payedamount  = 50;
   ongoingtrip.value.payed  = true;
     Map<String , dynamic> triphistorydata = ongoingtrip.value.toJson();
 
@@ -633,11 +638,12 @@ class Requestcontroller extends GetxController {
 
 
   void checkIfHasOngoingRequest() async {
-    await drivercurrentrequestaccepted.get().then((value) async {
+
+    try{
+      await drivercurrentrequestaccepted.get().then((value) async {
       if (value.docs.isNotEmpty) {
         value.docs.forEach((snapshot) {
           var data = snapshot.id;
-
           hasongingtrip(true);
         });
 
@@ -650,6 +656,10 @@ class Requestcontroller extends GetxController {
         hasongingtrip(false);
       }
     });
+    }catch(e){
+      print(e);
+    }
+    
   }
 
 

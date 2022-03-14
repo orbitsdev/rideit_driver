@@ -279,15 +279,7 @@ class Authcontroller extends GetxController {
               useracountdetails.value.device_token = devicetoken;
             }
           }
-          print('calleds________________acount');
-          print(useracountdetails.value.id);
-          print(useracountdetails.value.name);
-          print(useracountdetails.value.phone);
-          print(useracountdetails.value.image_file);
-          print('generted token');
-          print(devicetoken);
-          print('cuurent token');
-          print(useracountdetails.value.device_token);
+        
         }
       });
     }

@@ -15,6 +15,7 @@ import 'package:tricycleappdriver/controller/drivercontroller.dart';
 import 'package:tricycleappdriver/controller/mapcontroller.dart';
 import 'package:tricycleappdriver/controller/permissioncontroller.dart';
 import 'package:tricycleappdriver/controller/requestcontroller.dart';
+import 'package:tricycleappdriver/dialog/Failuredialog/failuredialog.dart';
 import 'package:tricycleappdriver/dialog/collectionofdialog.dart';
 import 'package:tricycleappdriver/dialog/requestdialog/completetripdialog.dart';
 import 'package:tricycleappdriver/geotest.dart';
@@ -78,7 +79,8 @@ class _TricycleappDriverState extends State<TricycleappDriver> {
  late StreamSubscription<User?> user;
 
 
-  void listenToInternetConnection() async{
+
+  void listenToInternetConnection(BuildContext context) async{
      sunscription = Connectivity()
         .onConnectivityChanged
         .listen((ConnectivityResult result) {
@@ -91,7 +93,9 @@ class _TricycleappDriverState extends State<TricycleappDriver> {
         // I am connected to a wifi network.
           print('Connected to wifi');
       }else{
-          infoDialog('No Enternet');
+          print("NO ENTERNET");
+
+        internetinfoDialog('OPS', 'No Enternet Connection');
       }
       // Got a new connectivity status!
     });
@@ -101,7 +105,7 @@ class _TricycleappDriverState extends State<TricycleappDriver> {
   void initState() {
     super.initState();
     Get.put(Permissioncontroller());
-    listenToInternetConnection();
+    
 
 
 
@@ -142,13 +146,30 @@ class _TricycleappDriverState extends State<TricycleappDriver> {
     super.dispose();
   }
 
+
+ bool isdidchangecalled = false;
+
+  @override
+  void didChangeDependencies() {
+
+
+    if(isdidchangecalled == false){
+      listenToInternetConnection(context);
+      setState(() {
+        isdidchangecalled = true;
+      });
+    }
+
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       initialBinding: Getxbinding(),
       smartManagement: SmartManagement.keepFactory,
       theme: ThemeData(
-        scaffoldBackgroundColor: BACKGROUND_BLACK_LIGHT,
+        scaffoldBackgroundColor: BOTTOMNAVIGATOR_COLOR,
         textTheme: TEXT_THEME_DEFAULT_DARK, 
       ),
       home:

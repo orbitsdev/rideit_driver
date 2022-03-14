@@ -437,7 +437,9 @@ isTripDetailsReady();
                                     ? requestxconroller.buttontext
                                     : "Start"),),
                           TextButton(onPressed: () {}, child: Text('Info')),
-                          TextButton(onPressed: () {}, child: Text('Pin')),
+                          TextButton(onPressed: () {
+                            Get.offNamed(HomeScreenManager.screenName);
+                          }, child: Text('BACK')),
                         ],
                       ),
 

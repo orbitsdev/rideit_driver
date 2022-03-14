@@ -9,6 +9,8 @@ import 'package:tricycleappdriver/controller/authcontroller.dart';
 import 'package:tricycleappdriver/controller/drivercontroller.dart';
 import 'package:tricycleappdriver/controller/mapcontroller.dart';
 import 'package:tricycleappdriver/controller/pageindexcontroller.dart';
+import 'package:tricycleappdriver/controller/requestcontroller.dart';
+import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/screens/earnings_screen.dart';
 import 'package:tricycleappdriver/screens/home_screen.dart';
 import 'package:tricycleappdriver/screens/me_screen.dart';
@@ -34,23 +36,24 @@ class _HomeScreenManagerState extends State<HomeScreenManager>  with TickerProvi
     var mapxcontroller = Get.find<Mapcontroller>();
     var pageindexcontroller = Get.find<Pageindexcontroller>();
     var driverxcontroller = Get.find<Drivercontroller>();
+    var requestxcontroller = Get.find<Requestcontroller>();
     Color colorwhite = HexColor("#fbfefb");
     Color iconcolor = HexColor("#2F2191");
     Color iconcolorsecondary = HexColor("#594DAF");
     bool status = false;     
+    
 
   TabController? _tabController;
 
 
   List<Widget> _pages = [
     HomeScreen(),
-    EarningsScreen(),
     TripsScreen(),
     MeScreen()
   ];  
 
   List<String?> _pagename = [
-"Dashboard", "Home", "Trip", "Me"
+"Home",  "Trip", "Me"
   ];
 
  
@@ -66,7 +69,8 @@ class _HomeScreenManagerState extends State<HomeScreenManager>  with TickerProvi
   
      cloudMessagingSetup();
       authxcontroller.checkIfAcountDetailsIsNull();   
-
+      getCurrentStatusOfDriver();
+     // requestxcontroller.checkIfHasOngoingRequest();
 
     super.initState();
   
@@ -85,6 +89,27 @@ class _HomeScreenManagerState extends State<HomeScreenManager>  with TickerProvi
     super.setState(fn);
    }
   }
+
+
+void statusSetter(bool value){
+  setState(() {
+    status = value;
+  });
+}
+void getCurrentStatusOfDriver()  async {
+  availabledriverrefference.doc(authinstance.currentUser!.uid).get().then((value) {
+
+    var data =  value.data() as Map<String, dynamic>;
+    print(data['status']);
+    if(data['status']== 'online'){
+     statusSetter(true);
+    }else if(data['status']== 'offline'){
+     statusSetter(false);
+      
+    }
+
+  });
+}
 @override
 
   void dispose() {
@@ -121,6 +146,8 @@ class _HomeScreenManagerState extends State<HomeScreenManager>  with TickerProvi
         print("ditached..........................");
       }
   }
+
+
   @override
   Widget build(BuildContext context) {
      final ThemeData theme =  Theme.of(context);
@@ -130,7 +157,7 @@ class _HomeScreenManagerState extends State<HomeScreenManager>  with TickerProvi
         initialSelectedTab: _pagename[pageindexcontroller.pageindex.value] as String,
         useSafeArea: true, // default: true, apply safe area wrapper
         labels: _pagename ,
-        icons: const [Icons.dashboard, Icons.home, Icons.history, Icons.people_alt],
+        icons: const [Icons.dashboard, Icons.history, Icons.people_alt],
 
         // optional badges, length must be same with labels
         badges: [
@@ -186,6 +213,7 @@ class _HomeScreenManagerState extends State<HomeScreenManager>  with TickerProvi
              });
         },
       ),
+      
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: GFFloatingWidget(
        
@@ -197,11 +225,11 @@ class _HomeScreenManagerState extends State<HomeScreenManager>  with TickerProvi
             width: 125.0,
            height: 55.0,
             valueFontSize: 16.0,
-            toggleSize: 45.0,
+            toggleSize: 60.0,
             value: status,
             borderRadius: 30.0,
-            padding: 8.0,
-            activeToggleColor: DIALOG_WHITE,
+            padding: 0,
+            activeToggleColor: ELSA_TEXT_WHITE,
             activeColor: GREEN_ONLINE,
             activeText: 'Online',
             inactiveText: 'Offline',
@@ -213,6 +241,13 @@ class _HomeScreenManagerState extends State<HomeScreenManager>  with TickerProvi
               setState(() {
                 status = val;
               });
+
+              if(status){
+                driverxcontroller.makeDriverOnline();
+              }else{
+                driverxcontroller.makeDriverOffline();
+              }
+
             },
           ),
         ),
@@ -227,11 +262,31 @@ class _HomeScreenManagerState extends State<HomeScreenManager>  with TickerProvi
     horizontalPosition: MediaQuery.of(context).size.width / 3.333,
   ),
 
-        body:TabBarView(
-          physics: NeverScrollableScrollPhysics(), // swipe navigation handling is not supported
-          controller: _tabController,
-          // ignore: prefer_const_literals_to_create_immutables
-          children:_pages,
+        body:Container(
+          decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                        begin: Alignment.topRight,
+                        end: Alignment.bottomLeft,
+                        colors: [
+                         BACKGROUND_TOP,
+                          BACKGROUND_CEENTER,
+                          BACKGROUND_BOTTOM
+                        ],
+                      ),
+                    // color: BACKGROUND_BLACK_LIGHT_MORE_LIGHT,
+                     borderRadius: BorderRadius.only(
+                     // topRight: Radius.circular(40.0),
+                      bottomRight: Radius.circular(40.0),
+                      //topLeft: Radius.circular(40.0),
+                      bottomLeft: Radius.circular(40.0)),
+                
+                  ),
+          child: TabBarView(
+            physics: NeverScrollableScrollPhysics(), // swipe navigation handling is not supported
+            controller: _tabController,
+            // ignore: prefer_const_literals_to_create_immutables
+            children:_pages,
+          ),
         ),
     );
   }

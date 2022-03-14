@@ -43,6 +43,35 @@ const TEXT_WHITE_2 =  Color.fromARGB(255, 225, 226, 226);
 //for small text
 const TEXT_BLACK_DARK =  Color(0xFF484956); 
 
+//gradient
+const COLOR_G1 =  Color(0xFF0B0830); 
+const COLOR_G2 =  Color(0xFF0C0A31); 
+
+
+//elsa color
+const BACKGROUND_TOP =  Color(0xFF02051C); 
+const BACKGROUND_CEENTER =  Color(0xFF0C0A33); 
+const BACKGROUND_BOTTOM =  Color(0xFF151147); 
+const BOTTOMNAVIGATOR_COLOR =  Color(0xFF13112F); 
+
+//linegradient
+const LINE_LEFT =  Color(0xFF22694E); 
+const lINE_RIGHT =  Color(0xFF161A9E); 
+const lINE_LIGHT =  Color(0xFF5E617A); 
+//container Light box
+const LIGHT_CONTAINER =  Color(0xFF322F65); 
+//elsa text
+const ELSA_TEXT_WHITE =  Color(0xFFF6F6F8); 
+const ELSA_TEXT_LIGHT =  Color(0xFF5E617A); 
+
+//light bg color icon
+
+const ELSA_ORANGE =  Color(0xFFFFAC3E); 
+const ELSA_PINK =  Color(0xFFFA5F62); 
+
+const ELSA_GREEN =  Color(0xFF61F3A8); 
+const ELSA_BLUE =  Color(0xFF09B5FA); 
+
 
 //__________________________________________
 //|headline1 use in error dialog as title

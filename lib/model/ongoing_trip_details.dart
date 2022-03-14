@@ -29,6 +29,7 @@ class OngoingTripDetails {
   String? created_at;
 
   String? tripstatus;
+  int? payedamount;
   bool? payed;
   bool? read;
 
@@ -51,6 +52,7 @@ class OngoingTripDetails {
     this.status,
     this.tripstatus,
     this.created_at,
+    this.payedamount,
     this.payed,
     this.read,
     this.device_token,
@@ -58,9 +60,16 @@ class OngoingTripDetails {
 
 
   factory OngoingTripDetails.fromJson(Map<String, dynamic> json){
-  
+      
 
+      int? payedamount;
+      if(json['payedamount'] == null ){
+          payedamount = 0;
+      }else{
+          payedamount = json['payedamount'].toInt();
 
+      }
+    
     LatLng picklocation = LatLng(checkDouble(json['pick_location']['latitude']), checkDouble(json['pick_location']['longitude']) );
     LatLng droplocation = LatLng(checkDouble(json['drop_location']['latitude'])  , checkDouble( json['drop_location']['longitude']) );
     LatLng actualmarker = LatLng(checkDouble(json['actualmarker_position']['latitude']) , checkDouble(json['actualmarker_position']['longitude']) );
@@ -88,7 +97,8 @@ class OngoingTripDetails {
 
     //
     ongoingtripdetails.tripstatus= json['tripstatus']; 
-    ongoingtripdetails.payed = json['payed'];
+    ongoingtripdetails.payedamount =  payedamount  as int ;
+    ongoingtripdetails.payed =  json['payed'];
     ongoingtripdetails.read = json['read'];
     ongoingtripdetails.device_token = json['device_token'];
 
@@ -138,6 +148,7 @@ class OngoingTripDetails {
     "status": status,
     "tripstatus": tripstatus,
     "created_at":created_at ,
+    "payedamount":payedamount ,
     "payed":payed ,
     "read":read ,
     "device_token": device_token

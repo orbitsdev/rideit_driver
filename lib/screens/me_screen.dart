@@ -332,13 +332,18 @@ class _MeScreenState extends State<MeScreen> {
               SizedBox(
                 height: 12,
               ),
-              InkWell
-              (
-                onTap: (){
-                    authinstance.signOut();
+              ElevatedButton(onPressed: (){
+                authinstance.signOut();
                 Get.offAllNamed(SigninScreen.screenName);
-                },
-                child: Text('Signout', style: Get.textTheme.bodyText2))
+              }, child: Text('SIgnout'))
+              // GestureDetector
+              // (
+              //   onTap: (){
+              //     print('called');
+              //   authinstance.signOut();
+              //   Get.offAllNamed(SigninScreen.screenName);
+              //   },
+              //   child: Text('Signout', style: Get.textTheme.bodyText2))
             ],
           ),
 
