@@ -25,8 +25,8 @@ RequestDetails requestdetails = RequestDetails();
         requestdetails.request_id = requestid;
 
           if(requestdetails.status == 'pending'){
-           assetaudioplayer.open(Audio("assets/sounds/alert.mp3"));
-            assetaudioplayer.play();
+          //  assetaudioplayer.open(Audio("assets/sounds/alert.mp3"));
+          //   assetaudioplayer.play();
 
 
                Get.defaultDialog(

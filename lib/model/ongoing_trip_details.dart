@@ -66,7 +66,7 @@ class OngoingTripDetails {
       if(json['payedamount'] == null ){
           payedamount = 0;
       }else{
-          payedamount = json['payedamount'].toInt();
+        payedamount = json['payedamount'].toInt();
 
       }
     

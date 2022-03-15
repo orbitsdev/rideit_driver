@@ -7,7 +7,7 @@ var pageindex = 0.obs;
 void updateIndex(int index){
 
   pageindex = index.obs;
-  print('callllllllllllllllllllllllllllllllllleed');
+
 }
 
 

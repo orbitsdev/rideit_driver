@@ -71,6 +71,9 @@ const ELSA_PINK =  Color(0xFFFA5F62);
 
 const ELSA_GREEN =  Color(0xFF61F3A8); 
 const ELSA_BLUE =  Color(0xFF09B5FA); 
+//button
+const ELSA_BLUE_1_ =  Color(0xFF5560FF); 
+const ELSA_BLUE_2_ =  Color(0xFF32D0FF); 
 
 
 //__________________________________________

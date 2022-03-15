@@ -1,119 +1,175 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/controller/requestcontroller.dart';
-import 'package:tricycleappdriver/controller/tripcontroller.dart';
-import 'package:tricycleappdriver/helper/firebasehelper.dart';
-import 'package:tricycleappdriver/screens/ongoingtrip.dart';
 
 class TripsScreen extends StatefulWidget {
-  static const screenName = "/trips";
+  const TripsScreen({Key? key}) : super(key: key);
+  static const screenName = '/tripscreen';
 
   @override
-  State<TripsScreen> createState() => _TripsScreenState();
+  _TripsScreenState createState() => _TripsScreenState();
 }
 
-class _TripsScreenState extends State<TripsScreen>
-    with SingleTickerProviderStateMixin {
-  var requestxcontroller = Get.find<Requestcontroller>();
-  late TabController tabcontroller;
-
-
-
-
-  @override
-  void setState(VoidCallback fn) {
-    if (mounted) {
-      super.setState(fn);
-    }
-    // TODO: implement setState
-  }
+class _TripsScreenState extends State<TripsScreen> with SingleTickerProviderStateMixin {
+  
+  late TabController tabController;
+  var requestxcontroller =  Get.find<Requestcontroller>();
+  bool hasongointrip = false;
+  bool loadingrequest = true;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    requestxcontroller.checkIfHasOngoingRequest();
-    tabcontroller = TabController(length: 2, vsync: this);
-    tabcontroller.addListener(() {
-      setState(() {});
-    });
-  }
-
+    tabController = TabController(length: 2, vsync: this);
+    this.tabController.addListener(() => setState(() {}));
+   
   
 
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    tabcontroller.dispose();
-    super.dispose();
   }
 
 
+bool isdepencycalled = false;
+@override
+  void didChangeDependencies() {
+     getOngoinTripDataIfHasRequqest(context);
+    super.didChangeDependencies();
+  }
 
+  void getOngoinTripDataIfHasRequqest(BuildContext context) async{
+  
+    if(requestxcontroller.requestdetails.value.request_id !=  null){
+        tripSetter(true);
+        loaderSetter(false);
 
+    }else{ 
+        //check database ia has trip
+        bool response = await requestxcontroller.checkIfHasOngoingRequest();
+        if(response){ 
+          var ready = await requestxcontroller.getRequestData(context);
+          if(ready){
+
+            tripSetter(true);
+            loaderSetter(false);
+          }else{
+
+            //error uccor when fetch data
+              tripSetter(false);
+              loaderSetter(false);
+          }
+        }else{
+          //false then display emty
+          tripSetter(false);
+          loaderSetter(false);
+
+        }
+
+    }
+  
+  }
+
+  void tripSetter(bool value){
+    setState(() {
+      hasongointrip = value;
+    });
+  }
+  
+
+  void loaderSetter(bool value){
+    setState(() {
+      loadingrequest = value;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Container(
-            color: Colors.blueAccent,
-            height: 100,
-            width: double.infinity,
-            child: TabBar(
-              indicatorColor: Colors.pinkAccent,
-              controller: tabcontroller,
+      body: Column(children: [
+        Container(
+          padding: EdgeInsets.only(top: 40),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
+              colors: [
+                BACKGROUND_TOP,
+                BACKGROUND_CEENTER,
+              ],
+            ),
+            // color: BACKGROUND_BLACK_LIGHT_MORE_LIGHT,
+          ),
+          height: 80,
+          child: TabBar(
+              controller: tabController,
+              labelColor: TEXT_COLOR_WHITE,
+              unselectedLabelColor: Colors.white,
+              indicatorSize: TabBarIndicatorSize.label,
+              indicator: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10)),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    ELSA_BLUE_2_,
+                    ELSA_BLUE_1_, 
+                    ],
+                ),
+              ),
               tabs: [
-                Tab(text: 'Ongoing', icon: Icon(Icons.document_scanner)),
-                Tab(text: 'History', icon: Icon(Icons.time_to_leave)),
-              ],
-            ),
-          ),
-          Expanded(
+                Tab(
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text("Ongoing".toUpperCase()),
+                  ),
+                ),
+                Tab(
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text("Records".toUpperCase()),
+                  ),
+                ),
+              ]),
+        ),
+        Expanded(
+          child: Container(
+            margin: EdgeInsets.all(16),
             child: TabBarView(
-              controller: tabcontroller,
+
+              controller: tabController,
               children: [
-               
+                loadingrequest ? Center(child: CircularProgressIndicator(),) 
+                : !hasongointrip ? Center(child: Text('No Data'),) :  
                 Obx((){
-                  if(requestxcontroller.hasongingtrip.value ){
-                    return Container(
-                      height: 200,
-                      child: Center(child: InkWell(
-                        onTap: ()=> Get.offNamed(Ongoingtrip.screenName , arguments: {"from ": "trip"}),
-                        child: Text(" View"))),
-                    );
-                  }
-                  return Text('No Data');
-
+                  return Column(
+                 crossAxisAlignment: CrossAxisAlignment.start,
+                 children: [
+                    Container(
+                      padding: EdgeInsets.all(12),
+                      width: double.infinity,
+                       decoration: BoxDecoration(
+                   color: LIGHT_CONTAINER,
+                    borderRadius: BorderRadius.all(Radius.circular(containerRadius)),
+                    ),
+                    child:Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                       Text('${requestxcontroller.requestdetails.value.pickaddress_name}'),
+                       Text('${requestxcontroller.requestdetails.value.dropddress_name}'),
+                       Text('${requestxcontroller.requestdetails.value.passenger_name}'),
+                       Text('${requestxcontroller.requestdetails.value.passenger_phone}'),
+                                ],
+                    ) ,
+                    ),
+                 ],
+               );
                 }),
-                //firestore.collection('driverstriphistory').doc(authinstance.currentUser!.uid).collection('trips').snapshots()
-             StreamBuilder(
-    stream: firestore.collection('driverstriphistory').doc(authinstance.currentUser!.uid).collection('trips').snapshots(),
-    builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot){
-      if(!snapshot.hasData){
-        return Center(
-          child: CircularProgressIndicator(),
-        );
-          }
-        return ListView.builder(
-          itemCount: snapshot.data!.docs.length,
-          itemBuilder: (context, index){
-          return ListTile(
-            title: Text("${snapshot.data!.docs[index]['dropddress_name']}"),
-            subtitle: Text("${snapshot.data!.docs[index]['created_at']}"),
-          );
-        });
-
-    }
-  ),
+                Icon(Icons.directions_car, size: 350),
               ],
             ),
           ),
-        ],
-      ),
+        ),
+      ]),
     );
   }
-
-  
 }

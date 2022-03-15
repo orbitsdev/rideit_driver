@@ -30,7 +30,7 @@ static const screenName = '/homescreencontroller';
   _HomeScreenManagerState createState() => _HomeScreenManagerState();
 }
 
-class _HomeScreenManagerState extends State<HomeScreenManager>  with TickerProviderStateMixin,  WidgetsBindingObserver{
+class _HomeScreenManagerState extends State<HomeScreenManager>  with SingleTickerProviderStateMixin,  WidgetsBindingObserver{
 
     var authxcontroller = Get.find<Authcontroller>();
     var mapxcontroller = Get.find<Mapcontroller>();
@@ -100,7 +100,7 @@ void getCurrentStatusOfDriver()  async {
   availabledriverrefference.doc(authinstance.currentUser!.uid).get().then((value) {
 
     var data =  value.data() as Map<String, dynamic>;
-    print(data['status']);
+  
     if(data['status']== 'online'){
      statusSetter(true);
     }else if(data['status']== 'offline'){
@@ -213,11 +213,11 @@ void getCurrentStatusOfDriver()  async {
              });
         },
       ),
-      
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+
+  //     floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: GFFloatingWidget(
        
-    child: GFIconBadge(
+       child: GFIconBadge(
               
               child:  Container(
           child: FlutterSwitch(
@@ -257,7 +257,7 @@ void getCurrentStatusOfDriver()  async {
            shape: GFBadgeShape.circle,
            )
         ),
-    body:Text('body or any kind of widget here..'),
+   
     verticalPosition: MediaQuery.of(context).size.height* 0.88,
     horizontalPosition: MediaQuery.of(context).size.width / 3.333,
   ),

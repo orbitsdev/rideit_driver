@@ -298,7 +298,7 @@ class Authcontroller extends GetxController {
   
     devicetoken =  await messaginginstance.getToken();
    if (devicetoken != null) {
-      print('device  token is here__________________');
+
     }
   }
  Future<void> updateDeviceToken(String? devicetoken) async{

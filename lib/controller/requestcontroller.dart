@@ -1,6 +1,5 @@
-
-
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -14,6 +13,7 @@ import 'package:tricycleappdriver/controller/authcontroller.dart';
 import 'package:tricycleappdriver/controller/drivercontroller.dart';
 import 'package:tricycleappdriver/controller/mapcontroller.dart';
 import 'package:tricycleappdriver/controller/pageindexcontroller.dart';
+import 'package:tricycleappdriver/dialog/Failuredialog/failuredialog.dart';
 import 'package:tricycleappdriver/dialog/authdialog/authenticating.dart';
 import 'package:tricycleappdriver/dialog/collectionofdialog.dart';
 import 'package:tricycleappdriver/dialog/requestdialog/completetripdialog.dart';
@@ -36,7 +36,7 @@ class Requestcontroller extends GetxController {
   var driverxcontroller = Get.find<Drivercontroller>();
   var mapxcontroller = Get.find<Mapcontroller>();
 
-  var requestdetails = RequestDetails();
+  var requestdetails = RequestDetails().obs;
   var ongoingtrip = OngoingTripDetails().obs;
   var directiondetails = Directiondetails().obs;
   var livedirectiondetails = Directiondetails().obs;
@@ -54,7 +54,9 @@ class Requestcontroller extends GetxController {
   var lengthofunacceptedrequest = 0.obs;
   Position? currentpostion;
   Map<String, dynamic> ongoingtripdata = {};
-
+  
+  //
+  String? requestid;
   void confirmRequest(String? requestid) async {
     Get.back();
     progressDialog("Loading...");
@@ -64,18 +66,22 @@ class Requestcontroller extends GetxController {
           .get()
           .then((documentsnapshot) async {
         if (documentsnapshot.data() != null) {
-
           // get request details  ;
-          RequestDetails requestdetails = RequestDetails.fromJson(
+          RequestDetails getrequestdetails = RequestDetails.fromJson(
               documentsnapshot.data() as Map<String, dynamic>);
-          
+
+          //store to local after confirming
+
+          requestdetails(getrequestdetails);
+          requestdetails.value.request_id = requestid;
 
           //check request
-          if (requestdetails.status == "pending") {
-          //get current location
+          if (getrequestdetails.status == "pending") {
+            //get current location
             currentpostion = driverxcontroller.currentposition;
-            if(currentpostion == null){
-              currentpostion =  await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+            if (currentpostion == null) {
+              currentpostion = await Geolocator.getCurrentPosition(
+                  desiredAccuracy: LocationAccuracy.high);
             }
             Map<String, dynamic> currentlocation = {
               'latitude': currentpostion!.latitude,
@@ -90,43 +96,36 @@ class Requestcontroller extends GetxController {
               'driver_location': currentlocation,
               "status": "accepted",
             }).then((_) async {
-              
-            
-
-
-            // store requestid in driver for ongoinng trip screen used only
-              await drivercurrentrequestaccepted.doc(requestid).set({'status': 'accepted'}).then((_) async {
-
-            //get direction and ongoingtripdetails local
-                var isOngoingReady = await getDirectionAndCreateOngoingTrip(requestid);
+              // store requestid in driver for ongoinng trip screen used only
+              await drivercurrentrequestaccepted
+                  .doc(requestid)
+                  .set({'status': 'accepted'}).then((_) async {
+                //get direction and ongoingtripdetails local
+                var isOngoingReady =
+                    await getDirectionAndCreateOngoingTrip(requestid);
 
                 if (isOngoingReady) {
                   await requestcollecctionrefference.doc(requestid).update({
                     'tripstatus': 'ready',
                   }).then((value) async {
-                    
-                      //make driver offline
-                       driverxcontroller.makeDriverOffline();
-                      
-                      //close loading screen 
-                        Get.back();
+                    //make driver offline
+                    driverxcontroller.makeDriverOffline();
 
-                       //update page to trip para pag back mo malakat ka sa trip screen 
-                        pageindexcontroller.updateIndex(2);
-                        
-                        //after 300 milliseconds lakat ka sa ongoing trip screen 
-                        
-                        Future.delayed(Duration(milliseconds: 300), () {
-                        
-                        //then store data in local na may ongoing trip ka
-                        hasongingtrip(true);
-                          Get.offNamed(Ongoingtrip.screenName,
-                              arguments: {"from": "request"});
-                        });
-                    
+                    //close loading screen
+                    Get.back();
+
+                    //update page to trip para pag back mo malakat ka sa trip screen
+                    pageindexcontroller.updateIndex(2);
+
+                    //after 300 milliseconds lakat ka sa ongoing trip screen
+
+                    Future.delayed(Duration(milliseconds: 300), () {
+                      //then store data in local na may ongoing trip ka
+                      hasongingtrip(true);
+                      Get.offNamed(Ongoingtrip.screenName,
+                          arguments: {"from": "request"});
+                    });
                   });
-
-
                 } else {
                   Get.back();
                   infoDialog('Route Direction');
@@ -174,11 +173,7 @@ class Requestcontroller extends GetxController {
     // }
   }
 
-
-
   Future<bool> getDirectionAndCreateOngoingTrip(String requestid) async {
-   
-
     bool ongoingTripDetailsReady = false;
     OngoingTripDetails ongoingtripdetails = OngoingTripDetails();
 
@@ -186,13 +181,16 @@ class Requestcontroller extends GetxController {
         .doc(requestid)
         .get()
         .then((snapshot) async {
-      
-        //check it has ongoing trip data
+      //check it has ongoing trip data
       if (snapshot.data() != null) {
-
         //get request details with driver information then convert is as ongoingtrip details
-        ongoingtripdetails = OngoingTripDetails.fromJson( snapshot.data() as Map<String, dynamic>);
-   
+        //update local request data to latest
+        requestdetails(
+            RequestDetails.fromJson(snapshot.data() as Map<String, dynamic>));
+        requestdetails.value.request_id = requestid;
+
+        ongoingtripdetails = OngoingTripDetails.fromJson(
+            snapshot.data() as Map<String, dynamic>);
 
         //add more field to null data
         ongoingtripdetails.tripstatus = 'prepairing';
@@ -204,39 +202,30 @@ class Requestcontroller extends GetxController {
 
         //conver to json
         ongoingtripdata = ongoingtripdetails.toJson();
-     
 
-        //get deriction details 
+        //get deriction details
         var isrouteready = await getDirection(
             ongoingtripdetails.pick_location_id as String,
             ongoingtripdetails.drop_location_id as String,
             ongoingtripdetails.actualmarker_position as LatLng);
 
         //is route ready
-        if (isrouteready) {   
+        if (isrouteready) {
+          //store converted data to ongoingtrip database
+          var isOngoingTripCreated = await createOngoingTrip(ongoingtripdata);
 
-             //store converted data to ongoingtrip database                             
-            var isOngoingTripCreated = await createOngoingTrip(ongoingtripdata);
-            
-            //is created
-            if (isOngoingTripCreated) {
-
-              ongoingTripDetailsReady = isOngoingTripCreated;
-              isOngoingReady(isrouteready);
-
-            } else {
-
-              ongoingTripDetailsReady = false;
-              isOngoingReady(false);
-            }
-
-        }else{
-          
-           ongoingTripDetailsReady = false;
-           isOngoingReady(false);
-
+          //is created
+          if (isOngoingTripCreated) {
+            ongoingTripDetailsReady = isOngoingTripCreated;
+            isOngoingReady(isrouteready);
+          } else {
+            ongoingTripDetailsReady = false;
+            isOngoingReady(false);
+          }
+        } else {
+          ongoingTripDetailsReady = false;
+          isOngoingReady(false);
         }
-
       } else {
         ongoingTripDetailsReady = false;
         isOngoingReady(false);
@@ -245,8 +234,6 @@ class Requestcontroller extends GetxController {
 
     return ongoingTripDetailsReady;
   }
-
-
 
   Future<bool> getDirection(String pickuplocationid, String droplocationid,
       LatLng actularmarkerpostion) async {
@@ -299,36 +286,23 @@ class Requestcontroller extends GetxController {
       'longitude': position.longitude,
     };
 
-    await ongointripreferrence.doc(requestid).update({'driver_location': newdriverlocation});
+    await ongointripreferrence
+        .doc(requestid)
+        .update({'driver_location': newdriverlocation});
   }
 
   void getNewTripDirection(
-
-
-
-    LatLng startingposition, LatLng finaldestionation) async {
-    String url =   "https://maps.googleapis.com/maps/api/directions/json?origin=${startingposition.latitude},${startingposition.longitude}&destination=${finaldestionation.latitude},${finaldestionation.longitude}&mode=walking&key=${Mapconfig.GOOGLEMAP_API_KEY}";
+      LatLng startingposition, LatLng finaldestionation) async {
+    String url =
+        "https://maps.googleapis.com/maps/api/directions/json?origin=${startingposition.latitude},${startingposition.longitude}&destination=${finaldestionation.latitude},${finaldestionation.longitude}&mode=walking&key=${Mapconfig.GOOGLEMAP_API_KEY}";
 
     try {
       var response = await Mapservices.mapRequest(url);
 
       if (response != 'failed') {
         Directiondetails newdliveirectiondetails =
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        Directiondetails.fromJason(response);
+            Directiondetails.fromJason(response);
         livedirectiondetails(newdliveirectiondetails);
- 
 
         //testpositiono = drivercurrentpostion.latitude.toString();
 
@@ -344,125 +318,99 @@ class Requestcontroller extends GetxController {
     String? tripstatus;
     String? newtripstatusvalue;
     // to make sur
-    
 
-    if(ongoingtrip.value.tripstatus == "prepairing"){
-        newtripstatusvalue = "coming";
-    }else if(ongoingtrip.value.tripstatus == "coming"){
-        newtripstatusvalue = "arrived";
-      
-    }else if(ongoingtrip.value.tripstatus == "arrived"){
-
-        newtripstatusvalue = "picked";
-    }
-    else if(ongoingtrip.value.tripstatus == "picked"){
-
-        newtripstatusvalue = "complete";
-
-    }
-    else if(ongoingtrip.value.tripstatus == "complete"){
-          
-        newtripstatusvalue = "check";
+    if (ongoingtrip.value.tripstatus == "prepairing") {
+      newtripstatusvalue = "coming";
+    } else if (ongoingtrip.value.tripstatus == "coming") {
+      newtripstatusvalue = "arrived";
+    } else if (ongoingtrip.value.tripstatus == "arrived") {
+      newtripstatusvalue = "picked";
+    } else if (ongoingtrip.value.tripstatus == "picked") {
+      newtripstatusvalue = "complete";
+    } else if (ongoingtrip.value.tripstatus == "complete") {
+      newtripstatusvalue = "check";
     }
 
-      
-      
+    if (newtripstatusvalue != "check") {
+      isChange = await updateTripStatusAndChangeDirectionDetails(
+          newtripstatusvalue as String);
+      if (isChange) {
+        //check updated  local tripstatus details
+        if (ongoingtrip.value.tripstatus == "coming") {
+          //from driver current location to pickup location
+          getNewTripDirection(ongoingtrip.value.driver_location as LatLng,
+              ongoingtrip.value.pick_location as LatLng);
+        } else if (ongoingtrip.value.tripstatus == "arrived") {
+          sendNotification(
+              ongoingtrip.value.device_token as String,
+              'Drivers is waiting to your pickup location',
+              'Your Diver Has Arrived',
+              'ongoingtrip');
 
-    if(newtripstatusvalue != "check"){
-       isChange = await updateTripStatusAndChangeDirectionDetails(newtripstatusvalue as String);
-      if(isChange){
+          //stop updating driver location
+          cancelDriverLiveLocation();
+        } else if (ongoingtrip.value.tripstatus == "picked") {
+          //from pickup location to dropofflocation
+          getNewTripDirection(ongoingtrip.value.pick_location as LatLng,
+              ongoingtrip.value.drop_location as LatLng);
+        } else if (ongoingtrip.value.tripstatus == "complete") {
+          cancelDriverLiveLocation();
+        }
 
-      //check updated  local tripstatus details  
-        if(ongoingtrip.value.tripstatus == "coming"){
-            
-             //from driver current location to pickup location
-            getNewTripDirection(ongoingtrip.value.driver_location as LatLng, ongoingtrip.value.pick_location as LatLng);
-        
-          }else if(ongoingtrip.value.tripstatus == "arrived"){
+        //return update tripstaus
 
-              sendNotification(ongoingtrip.value.device_token as String, 'Drivers is waiting to your pickup location' , 'Your Diver Has Arrived' , 'ongoingtrip');
-
-            //stop updating driver location
-            cancelDriverLiveLocation();
-            
-           }  
-
-          else if(ongoingtrip.value.tripstatus == "picked"){
-
-                  //from pickup location to dropofflocation
-              getNewTripDirection(ongoingtrip.value.pick_location as LatLng, ongoingtrip.value.drop_location as LatLng);
-
-          }
-          else if(ongoingtrip.value.tripstatus == "complete"){
-            cancelDriverLiveLocation();
-
-           }
-
-     
-      //return update tripstaus
-
-       tripstatus =  ongoingtrip.value.tripstatus;   
-    }else{
-
-      tripstatus =  ongoingtrip.value.tripstatus;    
-    }
-      //check if succefull update
-      
-      }else{
-
-        // await requestcollecctionrefference.doc(authinstance.currentUser!.uid).get().then((value) {
-        //   if(value.data() !=  null){
-        //     var data =  value.data() as Map<String , dynamic>;
-
-        //     if(data['accepted'])
-        //   }
-        // });
-        
-      tripstatus =  ongoingtrip.value.tripstatus;    
-       //same tripstatus
+        tripstatus = ongoingtrip.value.tripstatus;
+      } else {
+        tripstatus = ongoingtrip.value.tripstatus;
       }
+      //check if succefull update
+
+    } else {
+      // await requestcollecctionrefference.doc(authinstance.currentUser!.uid).get().then((value) {
+      //   if(value.data() !=  null){
+      //     var data =  value.data() as Map<String , dynamic>;
+
+      //     if(data['accepted'])
+      //   }
+      // });
+
+      tripstatus = ongoingtrip.value.tripstatus;
+      //same tripstatus
+    }
 
     tripTextIsloading(false);
 
     return tripstatus as String;
-
   }
 
-  void cancelDriverLiveLocation(){
-    if(driverlocationstream != null){
-
-              driverlocationstream!.cancel();
-
-            }
-
+  void cancelDriverLiveLocation() {
+    if (driverlocationstream != null) {
+      driverlocationstream!.cancel();
+    }
   }
-  Future<bool> updateTripStatusAndChangeDirectionDetails(String tripstaus_new_value) async{
 
-    bool isUpdated =  false;
-      try{
-         await ongointripreferrence.doc(ongoingtrip.value.request_id).update({
+  Future<bool> updateTripStatusAndChangeDirectionDetails(
+      String tripstaus_new_value) async {
+    bool isUpdated = false;
+    try {
+      await ongointripreferrence.doc(ongoingtrip.value.request_id).update({
         "tripstatus": tripstaus_new_value,
       }).then((_) async {
         //update local details
         ongoingtrip.value.tripstatus = tripstaus_new_value;
         isUpdated = true;
       });
-      }catch(e){
-        isUpdated = false;
-      }
-     
+    } catch (e) {
+      isUpdated = false;
+    }
 
     return isUpdated;
   }
-
-  
-
 
   Future<bool> updateTripStatusDetails(
       String requestid, bool isChange, bool? isupdated) async {
     var statusdata;
     await ongointripreferrence.doc(requestid).get().then((value) {
-
       statusdata = value.data() as Map<String, dynamic>;
       if (statusdata != null) {
         switch (statusdata['tripstatus']) {
@@ -515,30 +463,27 @@ class Requestcontroller extends GetxController {
   }
 
   void endTrip(String requestid) async {
-      collecting(true);
-  
-  //temporary value
+    collecting(true);
+
+    //temporary value
     await ongointripreferrence.doc(requestid).update({
       'payedamount': 50,
       'payed': true,
     });
 
 //update variable local to be safe
-  ongoingtrip.value.payedamount  = 50;
-  ongoingtrip.value.payed  = true;
-    Map<String , dynamic> triphistorydata = ongoingtrip.value.toJson();
+    ongoingtrip.value.payedamount = 50;
+    ongoingtrip.value.payed = true;
+    Map<String, dynamic> triphistorydata = ongoingtrip.value.toJson();
 
-  DebubAssistant.printDataLine('before deleting', triphistorydata);
-
-
-
+    DebubAssistant.printDataLine('before deleting', triphistorydata);
 
     await drivertriphistoryreferrence
         .doc(authinstance.currentUser!.uid)
         .collection('trips')
         .add(triphistorydata)
         .then((_) async {
-          //add to passenger
+      //add to passenger
       await passengertriphistoryreferrence
           .doc(requestid)
           .collection('trips')
@@ -552,7 +497,6 @@ class Requestcontroller extends GetxController {
               .doc(requestid)
               .delete()
               .then((value) async {
-            
             collecting(false);
             Get.back();
             driverxcontroller.makeDriverOnline();
@@ -565,15 +509,10 @@ class Requestcontroller extends GetxController {
             // driverxcontroller.enableLibeLocationUpdate();
             hasongingtrip(false);
 
-           
-
             Future.delayed(Duration(milliseconds: 300), () {
               Get.offNamedUntil(HomeScreenManager.screenName, (route) => false);
               //Get.offNamed(HomeScreenManager.screenName);
             });
-
-
-
           });
         });
       });
@@ -591,11 +530,8 @@ class Requestcontroller extends GetxController {
 
         return doc.data();
       }).toList();
-
-    
     } else {
       requestid = null;
-      
     }
 
     return requestid;
@@ -604,115 +540,131 @@ class Requestcontroller extends GetxController {
   Future<bool> listenToOngoingTrip() async {
     bool? isTripReady;
     String? requestid;
-     
+
     if (ongoingtrip.value.request_id == null) {
       requestid = await getAcceptedRequestId();
-         await ongointripreferrence.doc(requestid).get().then((value) async {
-         ongoingtrip(OngoingTripDetails.fromJson(value.data() as Map<String, dynamic>));
-         print(ongoingtrip.value.dropddress_name);
-         print(ongoingtrip.value.pickaddress_name);
-      
+      await ongointripreferrence.doc(requestid).get().then((value) async {
+        ongoingtrip(
+            OngoingTripDetails.fromJson(value.data() as Map<String, dynamic>));
+        print(ongoingtrip.value.dropddress_name);
+        print(ongoingtrip.value.pickaddress_name);
+
         //get direction
         await getDirection(
             ongoingtrip.value.pick_location_id as String,
             ongoingtrip.value.drop_location_id as String,
             ongoingtrip.value.actualmarker_position as LatLng);
         // getRouteDirection(requestid as String);
-
       });
 
-
-
-     
       isTripReady = true;
     } else {
-      
-
-
       isTripReady = true;
     }
 
     return isTripReady;
   }
 
+  Future<bool> checkIfHasOngoingRequest() async {
+    bool hastrip = false;
 
-
-  void checkIfHasOngoingRequest() async {
-
-    try{
-      await drivercurrentrequestaccepted.get().then((value) async {
-      if (value.docs.isNotEmpty) {
-        value.docs.forEach((snapshot) {
-          var data = snapshot.id;
-          hasongingtrip(true);
-        });
-
-        print('___________________');
-        print('_______has accepted request__________');
-        print('___________________');
-      } else {
-    
-
-        hasongingtrip(false);
-      }
-    });
-    }catch(e){
-      print(e);
-    }
-    
-  }
-
-
-void  sendNotification(String token, String title, String body, String screenname) async {
-    print('__________sending notfification');
-    
-  
-      var serverKey = Firebaseconfig.CLOUD_MESSAGING_SERVEY_KEY;
-
-      Map<String, String> headerData = {
-        'Content-Type': 'application/json',
-        'Authorization': 'key=$serverKey',
-      };
-
-      Map<String, dynamic> notificationData = {
-        'body': title,
-        'title': body,
-        
-      };
-
-      Map<String, dynamic> passData = {
-        'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-        "id": 1,
-        "status": "done",
-        "screenname": screenname,
-      };
-
-      Map<String, dynamic> sendPushNotification = {
-        "notification": notificationData,
-        "data": passData,
-        "priority": "high",
-        //"registration_ids":token ,
-        "to": token,
-      };
-
-      
-
+   
+      //check database
       try {
-        var response = await http.post(
-          Uri.parse('https://fcm.googleapis.com/fcm/send'),
-          headers: headerData,
-          body: jsonEncode(sendPushNotification),
-        );
+        await drivercurrentrequestaccepted.get().then((value) async {
+          if (value.docs.isNotEmpty) {
 
-        print(response.statusCode);
+            value.docs.forEach((element) { 
+                requestid = element.id;
+            });
+
+            hastrip = true;
+          } else {
+            hastrip = false;
+          }
+        });
       } catch (e) {
-        print("error push notification");
+        hastrip = false;
       }
     
+
+
+
+    return hastrip;
+
   }
 
 
+  Future<bool> getRequestData(BuildContext context) async{
+   bool ready = false;
+
+    try{  
+       await requestcollecctionrefference.doc(requestid).get().then((value) {
+          requestdetails(RequestDetails.fromJson(value.data() as Map<String, dynamic>));
+          requestdetails.value.request_id = requestid;
+      
   
+          ready = true;
+        });
+    }on SocketException {
+        Failuredialog.showInternetConnectionInfoDialog(context, 'Ops', 'NO Enternet Connecttion');
+       ready = false;
+    }on HttpException catch(e){
+       Failuredialog.showErrorDialog (context, 'Ops', e.toString());
+      ready = false;
+
+    }on FormatException catch(e){
+      Failuredialog.showErrorDialog (context, 'Ops', e.toString());
+      ready = false;
+    }
+   
+   print("GET READY BEFRO ERETURNING");
+   print(ready);
+   return ready; 
+
+  }
+
+  void sendNotification(
+      String token, String title, String body, String screenname) async {
+    print('__________sending notfification');
+
+    var serverKey = Firebaseconfig.CLOUD_MESSAGING_SERVEY_KEY;
+
+    Map<String, String> headerData = {
+      'Content-Type': 'application/json',
+      'Authorization': 'key=$serverKey',
+    };
+
+    Map<String, dynamic> notificationData = {
+      'body': title,
+      'title': body,
+    };
+
+    Map<String, dynamic> passData = {
+      'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+      "id": 1,
+      "status": "done",
+      "screenname": screenname,
+    };
+
+    Map<String, dynamic> sendPushNotification = {
+      "notification": notificationData,
+      "data": passData,
+      "priority": "high",
+      //"registration_ids":token ,
+      "to": token,
+    };
+
+    try {
+      var response = await http.post(
+        Uri.parse('https://fcm.googleapis.com/fcm/send'),
+        headers: headerData,
+        body: jsonEncode(sendPushNotification),
+      );
+
+      print(response.statusCode);
+    } catch (e) {
+      print("error push notification");
+    }
+  }
 }
-
-
