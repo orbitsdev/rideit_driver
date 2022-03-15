@@ -6,7 +6,7 @@ Horizontalspace(this.horizontalvalue);
   @override
   Widget build(BuildContext context){
     return SizedBox(
-      width: 0.0,
+      width: horizontalvalue,
     );
   }
 }

@@ -83,11 +83,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                Verticalspace(34),
+                Verticalspace(12),
                 Container(
                     margin: EdgeInsets.only(left: 10),
                     child: Text(
-                      'Trips Information',
+                      'Dashboard',
                       style: Get.textTheme.headline5!.copyWith(
                         fontSize: 20,
                       ),

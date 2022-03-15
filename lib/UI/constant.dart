@@ -74,6 +74,10 @@ const ELSA_BLUE =  Color(0xFF09B5FA);
 //button
 const ELSA_BLUE_1_ =  Color(0xFF5560FF); 
 const ELSA_BLUE_2_ =  Color(0xFF32D0FF); 
+//prurple
+
+const ELSA_PURPLE_1_ =  Color(0xFF9731FD); 
+const ELSA_PURPLE_2_ =  Color(0xFFD75BFA); 
 
 
 //__________________________________________
