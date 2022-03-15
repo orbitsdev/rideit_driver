@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/controller/drivercontroller.dart';
 import 'package:tricycleappdriver/controller/requestcontroller.dart';
+import 'package:tricycleappdriver/screens/ongoingtrip.dart';
 import 'package:tricycleappdriver/widgets/elsabutton.dart';
 import 'package:tricycleappdriver/widgets/horizontalspace.dart';
 import 'package:tricycleappdriver/widgets/tripwidget/custompinlocation.dart';
@@ -280,7 +281,11 @@ class _TripsScreenState extends State<TripsScreen>
                                       ),
                                     ),
                                     Verticalspace(34),
-                                    Elsabutton(label: 'View', function: (){print('hellow');}),
+                                    Elsabutton(label: 'View', function: (){
+                                      
+                                      Get.toNamed(Ongoingtrip.screenName);
+
+                                    }),
                                     Verticalspace(140),
                                     
                                   ],
