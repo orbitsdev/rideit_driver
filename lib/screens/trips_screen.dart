@@ -178,7 +178,7 @@ class _TripsScreenState extends State<TripsScreen>
     return  ListView.builder(
                    itemCount: 10,
                    itemBuilder: (context, index){
-                  return  Listcontainer(picklocation: 'Kalawag Central  School', droplocation: 'Tacurong', date: 'December 20, 2021');
+                  return  Listcontainer(status: 'Success', statuscolor: ELSA_GREEN, picklocation: 'Kalawag Central  School', droplocation: 'Tacurong', date: 'December 20, 2021');
                  });
   }
 

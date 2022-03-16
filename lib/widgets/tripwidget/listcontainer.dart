@@ -2,23 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
+
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/widgets/horizontalspace.dart';
 import 'package:tricycleappdriver/widgets/verticalspace.dart';
 
 class Listcontainer extends StatelessWidget {
 
+  final String status;
+  final Color statuscolor;
   final String picklocation;
   final String droplocation;
   final String date;
-  
+
   const Listcontainer({
     Key? key,
+    required this.status,
+    required this.statuscolor,
     required this.picklocation,
     required this.droplocation,
     required this.date,
   }) : super(key: key);
   
+
 
   @override
   Widget build(BuildContext context){
@@ -38,7 +44,7 @@ class Listcontainer extends StatelessWidget {
                           children: [
                             FaIcon(FontAwesomeIcons.check, size: 14, color: ELSA_GREEN,),
                             Horizontalspace(8),
-                            Text('Success', style: TextStyle(color: ELSA_GREEN, fontWeight: FontWeight.w100),),
+                            Text(status, style: TextStyle(color: statuscolor, fontWeight: FontWeight.w100),),
                           ],
                         ),
                          Verticalspace(12),
