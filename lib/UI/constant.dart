@@ -63,6 +63,7 @@ const LIGHT_CONTAINER =  Color(0xFF322F65);
 //elsa text
 const ELSA_TEXT_WHITE =  Color(0xFFF6F6F8); 
 const ELSA_TEXT_LIGHT =  Color(0xFF5E617A); 
+const ELSA_TEXT_GREY =  Color(0xFF9897A9); 
 
 //light bg color icon
 

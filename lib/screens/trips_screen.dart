@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/controller/drivercontroller.dart';
 import 'package:tricycleappdriver/controller/requestcontroller.dart';
@@ -9,6 +10,8 @@ import 'package:tricycleappdriver/widgets/elsabutton.dart';
 import 'package:tricycleappdriver/widgets/horizontalspace.dart';
 import 'package:tricycleappdriver/widgets/tripwidget/custompinlocation.dart';
 import 'package:tricycleappdriver/widgets/verticalspace.dart';
+import 'package:twilio_phone_verify/twilio_phone_verify.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TripsScreen extends StatefulWidget {
   const TripsScreen({Key? key}) : super(key: key);
@@ -82,7 +85,9 @@ class _TripsScreenState extends State<TripsScreen>
     return Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,
-        child: Column(children: [
+        child: Column(
+        
+          children: [
           Container(
             padding: EdgeInsets.only(top: 40),
             decoration: BoxDecoration(
@@ -141,157 +146,40 @@ class _TripsScreenState extends State<TripsScreen>
                           child: CircularProgressIndicator(),
                         )
                       : !hasongointrip
-                          ? Center(
-                              child: Text('No Data'),
-                            )
-                          : Obx(() {
-                              return SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Verticalspace(8),
-                                    Container(
-                                      margin: EdgeInsets.only(left: 5),
-                                      padding: EdgeInsets.symmetric(
-                                        vertical: 8.0,
-                                      ),
-                                      child: Text(
-                                        'Details',
-                                        style: Get.textTheme.headline5!.copyWith(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: EdgeInsets.all(12),
-                                      width: double.infinity,
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter,
-                                          colors: [
-                                            BACKGROUND_BOTTOM,
-                                            BACKGROUND_TOP,
-                                          ],
-                                        ),
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(containerRadius)),
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Expanded(
-                                            child: Container(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    'To collect',
-                                                    style: Get.textTheme.bodyText1!
-                                                        .copyWith(
-                                                            fontWeight:
-                                                                FontWeight.w300),
-                                                  ),
-                                                  RichText(
-                                                    text: TextSpan(
-                                                      style: Get
-                                                          .textTheme.headline5!
-                                                          .copyWith(
-                                                              fontWeight:
-                                                                  FontWeight.w600,
-                                                              fontSize: 34),
-                                                      children: [
-                                                        TextSpan(
-                                                            text: '₱ ',
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .amber[300])),
-                                                        TextSpan(
-                                                            text:
-                                                                '${driverxcontroller.totalearning}.00'),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          Container(
-                                             
-                                              margin: EdgeInsets.only(right: 12),
-                                              padding: EdgeInsets.all(12),
-                                              child: FaIcon(
-                                                FontAwesomeIcons.coins,
-                                                color: Colors.amber[400],
-                                                size: 34,
-                                              )),
-                                        ],
-                                      ),
-                                     
-                                    ),
-                                    Verticalspace(12),
-                                    SingleChildScrollView(
-                                      child: Container(
-                                        padding: EdgeInsets.all(12),
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(containerRadius)),
-                                          color: LIGHT_CONTAINER,
-                                        ),
-                                        constraints: BoxConstraints(minHeight: 200),
-                                        width: double.infinity,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Custompinlocation(
-                                                title: 'Passenger Name',
-                                                lication: '${requestxcontroller.requestdetails.value.passenger_name }',
-                                                icon: FontAwesomeIcons.user,
-                                                color: ELSA_BLUE_2_),
-                                            Material(
-                                              color: Colors.transparent,
-                                              child: InkWell(
-                                                onTap: (){
-                                        
-                                                },
-                                                child: Custompinlocation(
-                                                    title: 'Passenger Phone',
-                                                    lication: '${requestxcontroller.requestdetails.value.passenger_phone }',
-                                                    icon: FontAwesomeIcons.mobileAlt,
-                                                    color: ELSA_ORANGE),
-                                              ),
-                                            ),
-                                            Custompinlocation(
-                                                title: 'Passenger Pickup Location',
-                                                lication: '${requestxcontroller.requestdetails.value.pickaddress_name }',
-                                                icon: FontAwesomeIcons.mapMarkerAlt,
-                                                color: ELSA_PINK),
-                                          
-                                            Custompinlocation(
-                                                title: 'Passenger Drop-off Location',
-                                                lication: '${requestxcontroller.requestdetails.value.dropddress_name}',
-                                                icon: FontAwesomeIcons.mapPin,
-                                                color: ELSA_GREEN),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    Verticalspace(34),
-                                    Elsabutton(label: 'View', function: (){
-                                      
-                                      Get.toNamed(Ongoingtrip.screenName);
+                          ? Container(
+                            height: MediaQuery.of(context).size.height,
+                           
+                            child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center, 
+                              children: [
+                                Lottie.asset(
+                                  'assets/images/66528-qntm.json',
+                                                                    ),
+                                Text('No current trip yet ',
+                                    style: Get.textTheme.headline1!.copyWith(
+                                        color: ELSA_TEXT_GREY,
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w800)),
+                                Verticalspace(8),
+                                 Container(
 
-                                    }),
-                                    Verticalspace(140),
+                                   width: MediaQuery.of(context).size.width * 0.5,
+                                   child: Text(
                                     
-                                  ],
+                                    'Just chill while waiting customers request',
+                                    textAlign: TextAlign.center,
+                                    style:
+                                        Get.theme.textTheme.bodyText1!.copyWith(
+                                      color: ELSA_TEXT_GREY,
+                                      
+                                    ),
                                 ),
-                              );
-                            }),
+                                 ),
+                                 Verticalspace(100),
+                              ],
+                            ),
+                          )
+                          : requestBuilder(),
                   Icon(Icons.directions_car, size: 350),
                 ],
               ),
@@ -300,5 +188,146 @@ class _TripsScreenState extends State<TripsScreen>
         ]),
       ),
     );
+  }
+
+  Widget requestBuilder() {
+    return Obx(() {
+      return SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Verticalspace(8),
+            Container(
+              margin: EdgeInsets.only(left: 5),
+              padding: EdgeInsets.symmetric(
+                vertical: 8.0,
+              ),
+              child: Text(
+                'Details',
+                style: Get.textTheme.headline5!.copyWith(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.all(12),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    BACKGROUND_BOTTOM,
+                    BACKGROUND_TOP,
+                  ],
+                ),
+                borderRadius:
+                    BorderRadius.all(Radius.circular(containerRadius)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Container(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'To collect',
+                            style: Get.textTheme.bodyText1!
+                                .copyWith(fontWeight: FontWeight.w300),
+                          ),
+                          RichText(
+                            text: TextSpan(
+                              style: Get.textTheme.headline5!.copyWith(
+                                  fontWeight: FontWeight.w600, fontSize: 34),
+                              children: [
+                                TextSpan(
+                                    text: '₱ ',
+                                    style: TextStyle(color: Colors.amber[300])),
+                                TextSpan(
+                                    text:
+                                        '${driverxcontroller.totalearning}.00'),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                      margin: EdgeInsets.only(right: 12),
+                      padding: EdgeInsets.all(12),
+                      child: FaIcon(
+                        FontAwesomeIcons.coins,
+                        color: Colors.amber[400],
+                        size: 34,
+                      )),
+                ],
+              ),
+            ),
+            Verticalspace(12),
+            SingleChildScrollView(
+              child: Container(
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  borderRadius:
+                      BorderRadius.all(Radius.circular(containerRadius)),
+                  color: LIGHT_CONTAINER,
+                ),
+                constraints: BoxConstraints(minHeight: 200),
+                width: double.infinity,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Custompinlocation(
+                        title: 'Passenger Name',
+                        lication:
+                            '${requestxcontroller.requestdetails.value.passenger_name}',
+                        icon: FontAwesomeIcons.user,
+                        color: ELSA_BLUE_2_),
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () async {
+                          await launch(
+                              'tel:${requestxcontroller.requestdetails.value.passenger_phone}');
+                        },
+                        child: Custompinlocation(
+                            title: 'Passenger Phone',
+                            lication:
+                                '${requestxcontroller.requestdetails.value.passenger_phone}',
+                            icon: FontAwesomeIcons.mobileAlt,
+                            color: ELSA_ORANGE),
+                      ),
+                    ),
+                    Custompinlocation(
+                        title: 'Passenger Pickup Location',
+                        lication:
+                            '${requestxcontroller.requestdetails.value.pickaddress_name}',
+                        icon: FontAwesomeIcons.mapMarkerAlt,
+                        color: ELSA_PINK),
+                    Custompinlocation(
+                        title: 'Passenger Drop-off Location',
+                        lication:
+                            '${requestxcontroller.requestdetails.value.dropddress_name}',
+                        icon: FontAwesomeIcons.mapPin,
+                        color: ELSA_GREEN),
+                  ],
+                ),
+              ),
+            ),
+            Verticalspace(34),
+            Elsabutton(
+                label: 'View',
+                function: () {
+                  Get.toNamed(Ongoingtrip.screenName);
+                }),
+            Verticalspace(120),
+          ],
+        ),
+      );
+    });
   }
 }
