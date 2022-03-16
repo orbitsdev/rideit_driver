@@ -5,7 +5,9 @@ import 'package:lottie/lottie.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/controller/drivercontroller.dart';
 import 'package:tricycleappdriver/controller/requestcontroller.dart';
+import 'package:tricycleappdriver/dialog/infodialog.dart/info_dialog.dart';
 import 'package:tricycleappdriver/screens/ongoingtrip.dart';
+import 'package:tricycleappdriver/screens/tripdetails_screen.dart';
 import 'package:tricycleappdriver/widgets/elsabutton.dart';
 import 'package:tricycleappdriver/widgets/horizontalspace.dart';
 import 'package:tricycleappdriver/widgets/tripwidget/custompinlocation.dart';
@@ -86,9 +88,7 @@ class _TripsScreenState extends State<TripsScreen>
     return Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,
-        child: Column(
-        
-          children: [
+        child: Column(children: [
           Container(
             padding: EdgeInsets.only(top: 40),
             decoration: BoxDecoration(
@@ -125,7 +125,7 @@ class _TripsScreenState extends State<TripsScreen>
                   Tab(
                     child: Align(
                       alignment: Alignment.center,
-                      child: Text("Ongoing".toUpperCase()),
+                      child: Text("Ongoing Trip".toUpperCase()),
                     ),
                   ),
                   Tab(
@@ -143,8 +143,6 @@ class _TripsScreenState extends State<TripsScreen>
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-
-
                     BACKGROUND_TOP,
                     BACKGROUND_BOTTOM,
                   ],
@@ -152,7 +150,6 @@ class _TripsScreenState extends State<TripsScreen>
                 borderRadius:
                     BorderRadius.all(Radius.circular(containerRadius)),
               ),
-
               child: TabBarView(
                 controller: tabController,
                 children: [
@@ -163,8 +160,7 @@ class _TripsScreenState extends State<TripsScreen>
                       : !hasongointrip
                           ? noDataBuilder()
                           : requestBuilder(),
-                        listtBuilder(),
-                
+                  listtBuilder(),
                 ],
               ),
             ),
@@ -174,48 +170,69 @@ class _TripsScreenState extends State<TripsScreen>
     );
   }
 
-  Widget listtBuilder(){
-    return  ListView.builder(
-                   itemCount: 10,
-                   itemBuilder: (context, index){
-                  return  Listcontainer(status: 'Success', statuscolor: ELSA_GREEN, picklocation: 'Kalawag Central  School', droplocation: 'Tacurong', date: 'December 20, 2021');
-                 });
+  Widget listtBuilder() {
+    return Obx(() {
+      if (driverxcontroller.lisoftriprecord.length > 0) {
+        return ListView.builder(
+            shrinkWrap: true,
+            itemCount: driverxcontroller.lisoftriprecord.length,
+            itemBuilder: (context, index) {
+              return Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                      onTap: () {
+                        Get.to(
+                            () => TripdetailsScreen(
+                                  trip:
+                                      driverxcontroller.lisoftriprecord[index],
+                                ),
+                            fullscreenDialog: true);
+                      },
+                      child: Listcontainer(
+                          status:
+                              '${driverxcontroller.lisoftriprecord[index].tripstatus}',
+                          statuscolor: ELSA_GREEN,
+                          picklocation:
+                              '${driverxcontroller.lisoftriprecord[index].pickaddress_name}',
+                          droplocation:
+                              '${driverxcontroller.lisoftriprecord[index].dropddress_name}',
+                          date:
+                              '${driverxcontroller.lisoftriprecord[index].created_at}')));
+            });
+      }
+      return noDataBuilder();
+    });
   }
 
-  Widget noDataBuilder(){
+  Widget noDataBuilder() {
     return Container(
-                            height: MediaQuery.of(context).size.height,
-                           
-                            child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center, 
-                              children: [
-                                Lottie.asset(
-                                  'assets/images/66528-qntm.json',
-                                                                    ),
-                                Text('No current trip yet ',
-                                    style: Get.textTheme.headline1!.copyWith(
-                                        color: ELSA_TEXT_GREY,
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.w800)),
-                                Verticalspace(8),
-                                 Container(
-
-                                   width: MediaQuery.of(context).size.width * 0.5,
-                                   child: Text(
-                                    
-                                    'Just chill while waiting customers request',
-                                    textAlign: TextAlign.center,
-                                    style:
-                                        Get.theme.textTheme.bodyText1!.copyWith(
-                                      color: ELSA_TEXT_GREY,
-                                      
-                                    ),
-                                ),
-                                 ),
-                                 Verticalspace(100),
-                              ],
-                            ),
-                          );
+      height: MediaQuery.of(context).size.height,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Lottie.asset(
+            'assets/images/66528-qntm.json',
+          ),
+          Text('No current trip yet ',
+              style: Get.textTheme.headline1!.copyWith(
+                  color: ELSA_TEXT_GREY,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800)),
+          Verticalspace(8),
+          Container(
+            width: MediaQuery.of(context).size.width * 0.5,
+            child: Text(
+              'Just chill while waiting customers request',
+              textAlign: TextAlign.center,
+              style: Get.theme.textTheme.bodyText1!.copyWith(
+                color: ELSA_TEXT_GREY,
+              ),
+            ),
+          ),
+          Verticalspace(100),
+        ],
+      ),
+    );
   }
 
   Widget requestBuilder() {
@@ -227,11 +244,9 @@ class _TripsScreenState extends State<TripsScreen>
             Verticalspace(8),
             Container(
               margin: EdgeInsets.only(left: 10),
-              padding: EdgeInsets.symmetric(
-
-              ),
+              padding: EdgeInsets.symmetric(),
               child: Text(
-                'Request details',
+                'Details',
                 style: Get.textTheme.headline5!.copyWith(
                   fontSize: 20,
                   fontWeight: FontWeight.w400,
@@ -298,7 +313,9 @@ class _TripsScreenState extends State<TripsScreen>
             Verticalspace(12),
             SingleChildScrollView(
               child: Container(
-                margin: EdgeInsets.symmetric( horizontal: 10,),
+                margin: EdgeInsets.symmetric(
+                  horizontal: 10,
+                ),
                 padding: EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   borderRadius:
@@ -310,6 +327,44 @@ class _TripsScreenState extends State<TripsScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Horizontalspace(12),
+                        ClipOval(
+                          child: Material(
+             
+                            child: InkWell(
+                              splashColor: Colors.red, // Splash color
+                              onTap: () {
+                                InfoDialog.noDataDialog(context);
+
+                              },
+                              child: Container(
+                            height: 30,
+                            width: 30,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.all(Radius.circular(17)),
+                                //
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomLeft,
+                                  colors: [
+                                    ELSA_GREEN,
+                                    ELSA_BLUE,
+                                  ],
+                                )),
+                            child: Center(
+                                child: FaIcon(
+                              FontAwesomeIcons.exclamation,
+                              color: Colors.white,
+                            ))
+                            ),
+                          ),
+                        )
+                        ),
+                      ],
+                    ),
                     Custompinlocation(
                         title: 'Passenger Name',
                         lication:

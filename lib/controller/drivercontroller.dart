@@ -18,6 +18,7 @@ class Drivercontroller  extends GetxController{
   Position? currentposition;
   var listofsuccesstrip = <OngoingTripDetails>[].obs;
   var listofcanceledtrip = <OngoingTripDetails>[].obs;
+  var lisoftriprecord = <OngoingTripDetails>[].obs;
   var totalsuccestrip = 0.obs;
   var canceledtrip = 0.obs;
   var totalearning = 0.obs;
@@ -32,7 +33,10 @@ void listenToAllTrip() async{
 listofsuccesstrip.clear();
 listofcanceledtrip.clear();
     event.docs.forEach((element) { 
+
         var data =  element.data() as  Map<String, dynamic>;
+
+          lisoftriprecord.add(OngoingTripDetails.fromJson(data));
         if(data['tripstatus']=="complete"){
           listofsuccesstrip.add(OngoingTripDetails.fromJson(data));
         }
@@ -46,6 +50,7 @@ listofcanceledtrip.clear();
      
      totalsuccestrip(listofsuccesstrip.length) ;
      canceledtrip(listofcanceledtrip.length) ;
+
 
     // print('mylist PRINTINg');
     // print(listofsuccesstrip.length);
@@ -209,6 +214,7 @@ void disableLiveLocationUpdate() async {
 
   return isupdate;
   }
+
 
 
 

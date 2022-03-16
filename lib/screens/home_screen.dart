@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/controller/drivercontroller.dart';
+import 'package:tricycleappdriver/dialog/Failuredialog/failuredialog.dart';
+import 'package:tricycleappdriver/screens/list_screen.dart';
 import 'package:tricycleappdriver/widgets/signup/homewidgets/customsbox.dart';
 import 'package:tricycleappdriver/widgets/signup/homewidgets/totalearningline.dart';
 import 'package:tricycleappdriver/widgets/verticalspace.dart';
@@ -93,23 +95,35 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     )),
                 Verticalspace(8),
+
+              
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
-                        child: Customsbox(
-                            title: 'Success',
-                            subtitle:
-                                '${driverxcontroller.totalsuccestrip.value}',
-                            icon: Icons.check,
-                            colors: [ELSA_GREEN, ELSA_BLUE])),
+                        child: GestureDetector(
+                          onTap: driverxcontroller.listofsuccesstrip.length> 0 ? (){
+                            Get.to(()=> ListScreen(collection: driverxcontroller.listofsuccesstrip, ), fullscreenDialog: true,  );
+                          } : null,
+                          child: Customsbox(
+                              title: 'Success',
+                              subtitle:
+                                  '${driverxcontroller.totalsuccestrip.value}',
+                              icon: Icons.check,
+                              colors: [ELSA_GREEN, ELSA_BLUE]),
+                        )),
                     Expanded(
-                        child: Customsbox(
-                            title: 'Canceled',
-                            subtitle: '${driverxcontroller.canceledtrip.value}',
-                            icon: Icons.cancel_schedule_send_sharp,
-                            colors: [ELSA_ORANGE, ELSA_PINK])),
+                        child: GestureDetector(
+                           onTap: driverxcontroller.listofcanceledtrip.length> 0 ? (){
+                            Get.to(()=> ListScreen(collection: driverxcontroller.listofcanceledtrip, ), fullscreenDialog: true);
+                          } : null,
+                          child: Customsbox(
+                              title: 'Canceled',
+                              subtitle: '${driverxcontroller.canceledtrip.value}',
+                              icon: Icons.cancel_schedule_send_sharp,
+                              colors: [ELSA_ORANGE, ELSA_PINK]),
+                        )),
                   ],
                 ),
               ],

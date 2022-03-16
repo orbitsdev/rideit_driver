@@ -6,6 +6,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
+import 'package:tricycleappdriver/UI/palette.dart';
 import 'package:tricycleappdriver/UI/uicolor.dart';
 import 'package:tricycleappdriver/binding/getxbinding.dart';
 import 'package:tricycleappdriver/config/firebaseconfig.dart';
@@ -25,9 +26,11 @@ import 'package:tricycleappdriver/screens/complete_screen.dart';
 import 'package:tricycleappdriver/screens/earnings_screen.dart';
 import 'package:tricycleappdriver/screens/home_screen.dart';
 import 'package:tricycleappdriver/screens/list_of_request.dart';
+import 'package:tricycleappdriver/screens/list_screen.dart';
 import 'package:tricycleappdriver/screens/me_screen.dart';
 import 'package:tricycleappdriver/screens/ongoingtrip.dart';
 import 'package:tricycleappdriver/screens/map/request_map_screen.dart';
+import 'package:tricycleappdriver/screens/tripdetails_screen.dart';
 import 'package:tricycleappdriver/screens/trips_screen.dart';
 import 'package:tricycleappdriver/services/localnotificationservice.dart';
 import 'package:tricycleappdriver/services/notificationserves.dart';
@@ -168,9 +171,11 @@ class _TricycleappDriverState extends State<TricycleappDriver> {
     return GetMaterialApp(
       initialBinding: Getxbinding(),
       smartManagement: SmartManagement.keepFactory,
+      
       theme: ThemeData(
         scaffoldBackgroundColor: BOTTOMNAVIGATOR_COLOR,
-        textTheme: TEXT_THEME_DEFAULT_DARK, 
+        textTheme: TEXT_THEME_DEFAULT_DARK,
+        primarySwatch: Palette.generateMaterialColor(0xFF151147),
       ),
       home:
 
@@ -232,6 +237,8 @@ class _TricycleappDriverState extends State<TricycleappDriver> {
             name: RequestMapScreen.screenName,
             page: () => RequestMapScreen(),
             binding: Getxbinding()),
+            GetPage(name: TripdetailsScreen.screenName, page: ()=> TripdetailsScreen()),
+            GetPage(name: ListScreen.screenName, page: ()=> ListScreen()),
       ],
       debugShowCheckedModeBanner: false,
     );
