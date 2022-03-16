@@ -9,6 +9,7 @@ import 'package:tricycleappdriver/screens/ongoingtrip.dart';
 import 'package:tricycleappdriver/widgets/elsabutton.dart';
 import 'package:tricycleappdriver/widgets/horizontalspace.dart';
 import 'package:tricycleappdriver/widgets/tripwidget/custompinlocation.dart';
+import 'package:tricycleappdriver/widgets/tripwidget/listcontainer.dart';
 import 'package:tricycleappdriver/widgets/verticalspace.dart';
 import 'package:twilio_phone_verify/twilio_phone_verify.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -137,7 +138,21 @@ class _TripsScreenState extends State<TripsScreen>
           ),
           Expanded(
             child: Container(
-              margin: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+
+
+                    BACKGROUND_TOP,
+                    BACKGROUND_BOTTOM,
+                  ],
+                ),
+                borderRadius:
+                    BorderRadius.all(Radius.circular(containerRadius)),
+              ),
+
               child: TabBarView(
                 controller: tabController,
                 children: [
@@ -146,7 +161,29 @@ class _TripsScreenState extends State<TripsScreen>
                           child: CircularProgressIndicator(),
                         )
                       : !hasongointrip
-                          ? Container(
+                          ? noDataBuilder()
+                          : requestBuilder(),
+                        listtBuilder(),
+                
+                ],
+              ),
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  Widget listtBuilder(){
+    return  ListView.builder(
+                   itemCount: 10,
+                   itemBuilder: (context, index){
+                  return  Listcontainer(picklocation: 'Kalawag Central  School', droplocation: 'Tacurong', date: 'December 20, 2021');
+                 });
+  }
+
+  Widget noDataBuilder(){
+    return Container(
                             height: MediaQuery.of(context).size.height,
                            
                             child: Column(
@@ -178,16 +215,7 @@ class _TripsScreenState extends State<TripsScreen>
                                  Verticalspace(100),
                               ],
                             ),
-                          )
-                          : requestBuilder(),
-                  Icon(Icons.directions_car, size: 350),
-                ],
-              ),
-            ),
-          ),
-        ]),
-      ),
-    );
+                          );
   }
 
   Widget requestBuilder() {
@@ -198,12 +226,12 @@ class _TripsScreenState extends State<TripsScreen>
           children: [
             Verticalspace(8),
             Container(
-              margin: EdgeInsets.only(left: 5),
+              margin: EdgeInsets.only(left: 10),
               padding: EdgeInsets.symmetric(
-                vertical: 8.0,
+
               ),
               child: Text(
-                'Details',
+                'Request details',
                 style: Get.textTheme.headline5!.copyWith(
                   fontSize: 20,
                   fontWeight: FontWeight.w400,
@@ -270,6 +298,7 @@ class _TripsScreenState extends State<TripsScreen>
             Verticalspace(12),
             SingleChildScrollView(
               child: Container(
+                margin: EdgeInsets.symmetric( horizontal: 10,),
                 padding: EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   borderRadius:
@@ -318,7 +347,7 @@ class _TripsScreenState extends State<TripsScreen>
                 ),
               ),
             ),
-            Verticalspace(34),
+            Verticalspace(24),
             Elsabutton(
                 label: 'View',
                 function: () {

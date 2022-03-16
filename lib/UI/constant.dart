@@ -53,6 +53,7 @@ const BACKGROUND_TOP =  Color(0xFF02051C);
 const BACKGROUND_CEENTER =  Color(0xFF0C0A33); 
 const BACKGROUND_BOTTOM =  Color(0xFF151147); 
 const BOTTOMNAVIGATOR_COLOR =  Color(0xFF13112F); 
+const ELSA_CONTAINER_DARK =  Color(0xFF0D0A34); 
 
 //linegradient
 const LINE_LEFT =  Color(0xFF22694E); 
@@ -80,7 +81,11 @@ const ELSA_BLUE_2_ =  Color(0xFF32D0FF);
 const ELSA_PURPLE_1_ =  Color(0xFF9731FD); 
 const ELSA_PURPLE_2_ =  Color(0xFFD75BFA); 
 
+const ELSA_DARK_TEX =  Color(0xFF43425B); 
+const ELSA_DARK_LIGHT_TEXT =  Color(0xFFD6D9E1); 
 
+const ELSA_PINK_TEXT =  Color(0xFFDE5D7B); 
+const ELSA_YELLOW_TEXT =  Color(0xFFE5BB26); 
 //__________________________________________
 //|headline1 use in error dialog as title
 //|headline2 use as body text

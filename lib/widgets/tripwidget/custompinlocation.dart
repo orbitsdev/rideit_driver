@@ -57,6 +57,7 @@ class Custompinlocation extends StatelessWidget {
                   lication,
                   style: Get.theme.textTheme.bodyText1!.copyWith(
                     color: ELSA_TEXT_WHITE,
+                    fontWeight: FontWeight.w100,
                   ),
                 ),
               ),
