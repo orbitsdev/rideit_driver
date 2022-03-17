@@ -104,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Expanded(
                         child: GestureDetector(
                           onTap: driverxcontroller.listofsuccesstrip.length> 0 ? (){
-                            Get.to(()=> ListScreen(collection: driverxcontroller.listofsuccesstrip, ), fullscreenDialog: true,  );
+                            Get.to(()=> ListScreen(collection: driverxcontroller.listofsuccesstrip, ), fullscreenDialog: true, transition: Transition.rightToLeft );
                           } : null,
                           child: Customsbox(
                               title: 'Success',
@@ -116,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Expanded(
                         child: GestureDetector(
                            onTap: driverxcontroller.listofcanceledtrip.length> 0 ? (){
-                            Get.to(()=> ListScreen(collection: driverxcontroller.listofcanceledtrip, ), fullscreenDialog: true);
+                            Get.to(()=> ListScreen(collection: driverxcontroller.listofcanceledtrip, ), fullscreenDialog: true, transition: Transition.rightToLeft);
                           } : null,
                           child: Customsbox(
                               title: 'Canceled',

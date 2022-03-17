@@ -53,6 +53,8 @@ class Requestcontroller extends GetxController {
   var lisofunacceptedrequest = <RequestDetails>[].obs;
   var lengthofunacceptedrequest = 0.obs;
   Position? currentpostion;
+
+  var loaderoftrip = false.obs;
   Map<String, dynamic> ongoingtripdata = {};
   
   //
@@ -538,6 +540,7 @@ class Requestcontroller extends GetxController {
   }
 
   Future<bool> listenToOngoingTrip() async {
+      
     bool? isTripReady;
     String? requestid;
 
@@ -558,7 +561,9 @@ class Requestcontroller extends GetxController {
       });
 
       isTripReady = true;
+     
     } else {
+      
       isTripReady = true;
     }
 

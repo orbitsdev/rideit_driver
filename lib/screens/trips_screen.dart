@@ -15,6 +15,7 @@ import 'package:tricycleappdriver/widgets/tripwidget/listcontainer.dart';
 import 'package:tricycleappdriver/widgets/verticalspace.dart';
 import 'package:twilio_phone_verify/twilio_phone_verify.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 class TripsScreen extends StatefulWidget {
   const TripsScreen({Key? key}) : super(key: key);
@@ -46,6 +47,8 @@ class _TripsScreenState extends State<TripsScreen>
     super.didChangeDependencies();
   }
 
+
+  
   void getOngoinTripDataIfHasRequqest(BuildContext context) async {
     if (requestxcontroller.requestdetails.value.request_id != null) {
       tripSetter(true);
@@ -82,6 +85,8 @@ class _TripsScreenState extends State<TripsScreen>
       loadingrequest = value;
     });
   }
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -155,7 +160,9 @@ class _TripsScreenState extends State<TripsScreen>
                 children: [
                   loadingrequest
                       ? Center(
-                          child: CircularProgressIndicator(),
+                          child: CircularProgressIndicator(
+                            color: Colors.blueAccent,
+                          ),
                         )
                       : !hasongointrip
                           ? noDataBuilder()
@@ -173,7 +180,10 @@ class _TripsScreenState extends State<TripsScreen>
   Widget listtBuilder() {
     return Obx(() {
       if (driverxcontroller.lisoftriprecord.length > 0) {
-        return ListView.builder(
+
+
+         return  AnimationLimiter(
+           child: ListView.builder(
             shrinkWrap: true,
             itemCount: driverxcontroller.lisoftriprecord.length,
             itemBuilder: (context, index) {
@@ -185,12 +195,12 @@ class _TripsScreenState extends State<TripsScreen>
                             () => TripdetailsScreen(
                                   trip:
                                       driverxcontroller.lisoftriprecord[index],
+                                    
                                 ),
-                            fullscreenDialog: true);
+                            fullscreenDialog: true, transition: Transition.zoom);
                       },
                       child: Listcontainer(
-                          status:
-                              '${driverxcontroller.lisoftriprecord[index].tripstatus}',
+                          status:'${driverxcontroller.lisoftriprecord[index].tripstatus}',
                           statuscolor: ELSA_GREEN,
                           picklocation:
                               '${driverxcontroller.lisoftriprecord[index].pickaddress_name}',
@@ -198,7 +208,9 @@ class _TripsScreenState extends State<TripsScreen>
                               '${driverxcontroller.lisoftriprecord[index].dropddress_name}',
                           date:
                               '${driverxcontroller.lisoftriprecord[index].created_at}')));
-            });
+            }),
+         );
+       
       }
       return noDataBuilder();
     });

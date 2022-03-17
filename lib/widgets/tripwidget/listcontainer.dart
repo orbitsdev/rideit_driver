@@ -42,9 +42,9 @@ class Listcontainer extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            FaIcon(FontAwesomeIcons.check, size: 14, color: ELSA_GREEN,),
+                            FaIcon( status =='canceled'? FontAwesomeIcons.times :  FontAwesomeIcons.check, size: 14, color: status =='canceled'? Colors.red : ELSA_GREEN,),
                             Horizontalspace(8),
-                            Text(status, style: TextStyle(color: statuscolor, fontWeight: FontWeight.w100),),
+                            Text(status, style: TextStyle(color: status =='canceled'? Colors.red[100] : statuscolor, fontWeight: FontWeight.w100),),
                           ],
                         ),
                          Verticalspace(12),
@@ -69,7 +69,7 @@ class Listcontainer extends StatelessWidget {
                                 children: [
                                   TextSpan(
                                       text: 'From\n',
-                                      style: TextStyle(color: Colors.red[300])),
+                                      style: TextStyle(color: Colors.red[300] ,  fontWeight: FontWeight.w800 )),
                                   TextSpan(
                                       text:
                                           '${picklocation}'),
@@ -104,7 +104,7 @@ class Listcontainer extends StatelessWidget {
                                 children: [
                                   TextSpan(
                                       text: 'To\n',
-                                      style: TextStyle(color: Colors.blue[300])),
+                                      style: TextStyle(color: Colors.blue[300], fontWeight: FontWeight.w800 )),
                                   TextSpan(
                                       text:
                                           '${droplocation}'),
