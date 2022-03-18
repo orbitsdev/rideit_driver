@@ -3,6 +3,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/UI/uicolor.dart';
+import 'package:tricycleappdriver/helper/firebasehelper.dart';
+import 'package:tricycleappdriver/signin_screen.dart';
 import 'package:tricycleappdriver/widgets/horizontalspace.dart';
 import 'package:tricycleappdriver/widgets/verticalspace.dart';
 
@@ -93,10 +95,15 @@ class Authdialog {
                           child: Text('Yes',
                               style: Get.textTheme.bodyText1!
                                   .copyWith(fontWeight: FontWeight.w400)),
-                          onPressed: () async {},
+                          onPressed: () async {
+
+                               authinstance.signOut();
+                            Get.offAll(()=> SigninScreen());
+
+                          },
                         ),
                       ),
-                      Horizontalspace(5),
+                      Horizontalspace(10),
                       Container(
                         height: 50,
                         decoration: const ShapeDecoration(
@@ -117,7 +124,9 @@ class Authdialog {
                           child: Text('No',
                               style: Get.textTheme.bodyText1!
                                   .copyWith(fontWeight: FontWeight.w400)),
-                          onPressed: () async {},
+                          onPressed: () async {
+                           Get.back();
+                          },
                         ),
                       ),
                     ]),

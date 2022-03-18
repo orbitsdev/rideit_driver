@@ -20,9 +20,7 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   PageState currentPageState = PageState.siningUpPagegSate;
 
-
   final FocusNode node1 = FocusNode();
-
 
   var autxcontroller = Get.find<Authcontroller>();
 
@@ -91,16 +89,11 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
-    
-
   @override
   Widget build(BuildContext context) {
-
-      
     return Scaffold(
       backgroundColor: BACKGROUND_BLACK,
       body: SingleChildScrollView(
-
         child: Form(
           key: _signUpFormKey,
           child: Padding(
@@ -110,21 +103,19 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
             child: Column(
               children: [
-
-                SizedBox(
-                  height: 24
-                ),
+                SizedBox(height: 24),
                 Container(
-                  child: Image.asset('assets/images/Isulan.png', fit: BoxFit.cover,),
+                  child: Image.asset(
+                    'assets/images/Isulan.png',
+                    fit: BoxFit.cover,
+                  ),
                   height: 180,
                 ),
-                SizedBox(
-                  height: 34
-                ),
-                      // ElevatedButton(onPressed: (){
-                      //   //Failuredialog.showErrorDialog(context, 'OPS', 'ERROR');
-                      //      Authdialog.showAuthProGress(context, "Checking...");
-                      // }, child: Text('test')),
+                SizedBox(height: 34),
+                // ElevatedButton(onPressed: (){
+                //   //Failuredialog.showErrorDialog(context, 'OPS', 'ERROR');
+                //      Authdialog.showAuthProGress(context, "Checking...");
+                // }, child: Text('test')),
                 TextFormField(
                   cursorColor: GREEN_LIGHT_3,
                   autofocus: false,
@@ -140,7 +131,10 @@ class _SignupScreenState extends State<SignupScreen> {
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: BACKGROUND_BLACK_LIGHT,
-                    prefixIcon: Icon(Icons.account_circle_outlined, color: GREEN_LIGHT,),
+                    prefixIcon: Icon(
+                      Icons.account_circle_outlined,
+                      color: GREEN_LIGHT,
+                    ),
                     label: Text(
                       'Name',
                       style: TextStyle(fontSize: 20),
@@ -149,15 +143,13 @@ class _SignupScreenState extends State<SignupScreen> {
                       fontSize: 20,
                       color: Colors.white,
                     ),
-                    
                     focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(5),
                         borderSide: BorderSide(color: GREEN_LIGHT)),
                   ),
                   style: TextStyle(
                     fontSize: 14,
-                                          color: GREEN_LIGHT,
-
+                    color: GREEN_LIGHT,
                   ),
                 ),
                 SizedBox(
@@ -170,18 +162,27 @@ class _SignupScreenState extends State<SignupScreen> {
                   controller: email,
                   textInputAction: TextInputAction.next,
                   validator: (value) {
-                   return EmailValidator.validate(value!) == true
+                    return EmailValidator.validate(value!) == true
                         ? null
                         : "Enter A Valid Email";
                   },
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: BACKGROUND_BLACK_LIGHT,
-                    prefixIcon: Icon(Icons.email_outlined, color: GREEN_LIGHT,),
-                    suffixIcon: email.text.isEmpty ? null :  IconButton( onPressed: (){
-                        email.clear();
-
-                     }, icon: Icon(Icons.close,color: GREEN_LIGHT, )),
+                    prefixIcon: Icon(
+                      Icons.email_outlined,
+                      color: GREEN_LIGHT,
+                    ),
+                    suffixIcon: email.text.isEmpty
+                        ? null
+                        : IconButton(
+                            onPressed: () {
+                              email.clear();
+                            },
+                            icon: Icon(
+                              Icons.close,
+                              color: GREEN_LIGHT,
+                            )),
                     label: Text(
                       'Email',
                       style: TextStyle(fontSize: 20),
@@ -190,15 +191,13 @@ class _SignupScreenState extends State<SignupScreen> {
                       fontSize: 20,
                       color: Colors.white,
                     ),
-                    
                     focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(5),
                         borderSide: BorderSide(color: GREEN_LIGHT)),
                   ),
                   style: TextStyle(
                     fontSize: 14,
-                                          color: GREEN_LIGHT,
-
+                    color: GREEN_LIGHT,
                   ),
                 ),
                 SizedBox(
@@ -219,7 +218,10 @@ class _SignupScreenState extends State<SignupScreen> {
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: BACKGROUND_BLACK_LIGHT,
-                    prefixIcon: Icon(Icons.phone_android_outlined, color: GREEN_LIGHT,),
+                    prefixIcon: Icon(
+                      Icons.phone_android_outlined,
+                      color: GREEN_LIGHT,
+                    ),
                     label: Text(
                       'Phone',
                       style: TextStyle(fontSize: 20),
@@ -228,15 +230,13 @@ class _SignupScreenState extends State<SignupScreen> {
                       fontSize: 20,
                       color: Colors.white,
                     ),
-                    
                     focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(5),
                         borderSide: BorderSide(color: GREEN_LIGHT)),
                   ),
                   style: TextStyle(
                     fontSize: 14,
-                                          color: GREEN_LIGHT,
-
+                    color: GREEN_LIGHT,
                   ),
                 ),
                 SizedBox(
@@ -257,16 +257,25 @@ class _SignupScreenState extends State<SignupScreen> {
                   },
                   decoration: InputDecoration(
                     filled: true,
-                     
                     fillColor: BACKGROUND_BLACK_LIGHT,
-                    prefixIcon: Icon(Icons.lock_outline, color: GREEN_LIGHT,),
-                     suffixIcon: password.text.isEmpty ? null :  IconButton( onPressed: (){
-                        setState(() {
-                            isObscure1 = !isObscure1;
-                        });
-
-                     }, icon: Icon(isObscure1 ? Icons.remove_red_eye_outlined: Icons.remove_red_eye,color: GREEN_LIGHT, )),
-                    
+                    prefixIcon: Icon(
+                      Icons.lock_outline,
+                      color: GREEN_LIGHT,
+                    ),
+                    suffixIcon: password.text.isEmpty
+                        ? null
+                        : IconButton(
+                            onPressed: () {
+                              setState(() {
+                                isObscure1 = !isObscure1;
+                              });
+                            },
+                            icon: Icon(
+                              isObscure1
+                                  ? Icons.remove_red_eye_outlined
+                                  : Icons.remove_red_eye,
+                              color: GREEN_LIGHT,
+                            )),
                     label: Text(
                       'Password',
                       style: TextStyle(fontSize: 20),
@@ -275,15 +284,13 @@ class _SignupScreenState extends State<SignupScreen> {
                       fontSize: 20,
                       color: Colors.white,
                     ),
-                    
                     focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(5),
                         borderSide: BorderSide(color: GREEN_LIGHT)),
                   ),
                   style: TextStyle(
                     fontSize: 14,
-                                          color: GREEN_LIGHT,
-
+                    color: GREEN_LIGHT,
                   ),
                 ),
                 SizedBox(
@@ -296,27 +303,36 @@ class _SignupScreenState extends State<SignupScreen> {
                   controller: confirmpassword,
                   obscureText: isObscure2,
                   textInputAction: TextInputAction.done,
-                  onFieldSubmitted: (_){
+                  onFieldSubmitted: (_) {
                     signUp();
                   },
                   validator: (value) {
-
-                    if(value !=  password.text){
+                    if (value != password.text) {
                       return "Password did not match";
                     }
                     return null;
-               
                   },
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: BACKGROUND_BLACK_LIGHT,
-                    prefixIcon: Icon(Icons.lock_outline, color: GREEN_LIGHT,),
-                     suffixIcon: confirmpassword.text.isEmpty ? null :  IconButton( onPressed: (){
-                        setState(() {
-                            isObscure2 = !isObscure2;
-                        });
-
-                     }, icon: Icon(isObscure2 ? Icons.remove_red_eye_outlined: Icons.remove_red_eye,color: GREEN_LIGHT, )),
+                    prefixIcon: Icon(
+                      Icons.lock_outline,
+                      color: GREEN_LIGHT,
+                    ),
+                    suffixIcon: confirmpassword.text.isEmpty
+                        ? null
+                        : IconButton(
+                            onPressed: () {
+                              setState(() {
+                                isObscure2 = !isObscure2;
+                              });
+                            },
+                            icon: Icon(
+                              isObscure2
+                                  ? Icons.remove_red_eye_outlined
+                                  : Icons.remove_red_eye,
+                              color: GREEN_LIGHT,
+                            )),
                     label: Text(
                       'Confirm Password',
                       style: TextStyle(fontSize: 20),
@@ -325,22 +341,19 @@ class _SignupScreenState extends State<SignupScreen> {
                       fontSize: 20,
                       color: Colors.white,
                     ),
-                    
                     focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(5),
                         borderSide: BorderSide(color: GREEN_LIGHT)),
                   ),
                   style: TextStyle(
                     fontSize: 14,
-                                          color: GREEN_LIGHT,
-
+                    color: GREEN_LIGHT,
                   ),
                 ),
                 SizedBox(
                   height: 24,
                 ),
-                
-                
+
                 Obx(() {
                   if (autxcontroller.isSignUpLoading.value == true) {
                     return Center(
@@ -351,24 +364,27 @@ class _SignupScreenState extends State<SignupScreen> {
                   }
                   return Column(
                     children: [
-                     
                       ElevatedButton(
-                        
                           style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                              
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(25),
+                              ),
                               primary: GREEN_LIGHT,
                               minimumSize: const Size.fromHeight(50)),
                           onPressed: () {
                             signUp();
                           },
-                          child: Text('Sign-up'.toUpperCase() , style: TextStyle(fontSize: 20, color: BACKGROUND_BLACK, fontWeight: FontWeight.w700),)),
+                          child: Text(
+                            'Sign-up'.toUpperCase(),
+                            style: TextStyle(
+                                fontSize: 20,
+                                color: BACKGROUND_BLACK,
+                                fontWeight: FontWeight.w700),
+                          )),
                       SizedBox(
                         height: 15,
                       ),
-                       Row(
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text('Already Have an account?'),
@@ -382,7 +398,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             child: Text(
                               'Signin',
                               style: TextStyle(
-                                fontSize: 18,
+                                  fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                   color: GREEN_LIGHT),
                             ),

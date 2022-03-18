@@ -1,11 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/controller/authcontroller.dart';
+import 'package:tricycleappdriver/controller/drivercontroller.dart';
 import 'package:tricycleappdriver/dialog/authdialog/authdialog.dart';
+import 'package:tricycleappdriver/screens/editprofile_screen.dart';
 import 'package:tricycleappdriver/widgets/horizontalspace.dart';
 import 'package:tricycleappdriver/widgets/verticalspace.dart';
 import 'dart:math';
@@ -19,6 +24,9 @@ class MeScreen extends StatefulWidget {
 }
 
 class _MeScreenState extends State<MeScreen> {
+
+File? myimage;
+
   List<Color> listofcolors = [
     ELSA_ORANGE,
     ELSA_BLUE_2_,
@@ -32,8 +40,27 @@ class _MeScreenState extends State<MeScreen> {
     iconcolorsecondary,
   ];
   var authxcontroller = Get.find<Authcontroller>();
+  var driverxcontroller = Get.find<Drivercontroller>();
 
   Random random = Random();
+@override
+void initState() {
+  super.initState();
+
+  
+  
+}
+@override
+  void setState(VoidCallback fn) {
+    
+    if(mounted){
+      super.setState(fn);
+      driverxcontroller.listenToAcountUser();
+    }
+  }
+  
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +68,8 @@ class _MeScreenState extends State<MeScreen> {
       body: SingleChildScrollView(
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 20, horizontal: 40),
-          child: Column(
+          child: Obx((){
+            return Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Verticalspace(20),
@@ -55,8 +83,13 @@ class _MeScreenState extends State<MeScreen> {
                       color: TEXT_WHITE_2,
                       padding: EdgeInsets.all(5),
                       child: ClipOval(
-                        child: Image.asset(
+                        child: authxcontroller.useracountdetails.value.image_url == null ? Image.asset(
                           'assets/images/images.jpg',
+                          height: 130,
+                          width: 130,
+                          fit: BoxFit.cover,
+                        ) : Image.network(
+                          '${authxcontroller.useracountdetails.value.image_url}',
                           height: 130,
                           width: 130,
                           fit: BoxFit.cover,
@@ -115,7 +148,11 @@ class _MeScreenState extends State<MeScreen> {
                           ),
                         ],
                       ),
-                      onPressed: () async {},
+                      onPressed: () async {
+
+                          Get.to(()=>EditprofileScreen(), fullscreenDialog: true, transition: Transition.zoom);
+
+                      },
                     ),
                   ),
                   IconButton(
@@ -262,7 +299,8 @@ class _MeScreenState extends State<MeScreen> {
               ),
               Verticalspace(120),
             ],
-          ),
+          );
+          }),
         ),
       ),
     );

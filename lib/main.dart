@@ -24,6 +24,7 @@ import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/home_screen_manager.dart';
 import 'package:tricycleappdriver/screens/complete_screen.dart';
 import 'package:tricycleappdriver/screens/earnings_screen.dart';
+import 'package:tricycleappdriver/screens/editprofile_screen.dart';
 import 'package:tricycleappdriver/screens/home_screen.dart';
 import 'package:tricycleappdriver/screens/list_of_request.dart';
 import 'package:tricycleappdriver/screens/list_screen.dart';
@@ -239,6 +240,7 @@ class _TricycleappDriverState extends State<TricycleappDriver> {
             binding: Getxbinding()),
             GetPage(name: TripdetailsScreen.screenName, page: ()=> TripdetailsScreen()),
             GetPage(name: ListScreen.screenName, page: ()=> ListScreen()),
+            GetPage(name: EditprofileScreen.screenName, page: ()=> EditprofileScreen()),
       ],
       debugShowCheckedModeBanner: false,
     );

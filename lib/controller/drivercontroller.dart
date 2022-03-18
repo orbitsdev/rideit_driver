@@ -7,14 +7,13 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tricycleappdriver/controller/authcontroller.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/model/ongoing_trip_details.dart';
+import 'package:tricycleappdriver/model/users.dart';
 
-class Drivercontroller  extends GetxController{
-
-
+class Drivercontroller extends GetxController {
   var isOnline = false.obs;
   var isOnlineLoading = false.obs;
   var isonlinelastime = false.obs;
-  LatLng?  latcurrentposition;
+  LatLng? latcurrentposition;
   Position? currentposition;
   var listofsuccesstrip = <OngoingTripDetails>[].obs;
   var listofcanceledtrip = <OngoingTripDetails>[].obs;
@@ -22,48 +21,48 @@ class Drivercontroller  extends GetxController{
   var totalsuccestrip = 0.obs;
   var canceledtrip = 0.obs;
   var totalearning = 0.obs;
-  
+
   var authxcontroller = Get.find<Authcontroller>();
   //GeoFirestore geoFirestore =GeoFirestore(firestore.collection('availableDrivers'));
-  
-  
-  
-void listenToAllTrip() async{
-  drivertriphistoryreferrence.doc(authinstance.currentUser!.uid).collection('trips').snapshots().listen((event) {
-listofsuccesstrip.clear();
-listofcanceledtrip.clear();
-    event.docs.forEach((element) { 
 
-        var data =  element.data() as  Map<String, dynamic>;
+  void listenToAllTrip() async {
+    drivertriphistoryreferrence
+        .doc(authinstance.currentUser!.uid)
+        .collection('trips')
+        .snapshots()
+        .listen((event) {
+      listofsuccesstrip.clear();
+      listofcanceledtrip.clear();
+      event.docs.forEach((element) {
+        var data = element.data() as Map<String, dynamic>;
 
-          lisoftriprecord.add(OngoingTripDetails.fromJson(data));
-        if(data['tripstatus']=="complete"){
+        lisoftriprecord.add(OngoingTripDetails.fromJson(data));
+        if (data['tripstatus'] == "complete") {
           listofsuccesstrip.add(OngoingTripDetails.fromJson(data));
         }
-        if(data['tripstatus']=="canceled"){
-            listofcanceledtrip.add(OngoingTripDetails.fromJson(data));
+        if (data['tripstatus'] == "canceled") {
+          listofcanceledtrip.add(OngoingTripDetails.fromJson(data));
         }
-     
+      });
+      totalearning(listofsuccesstrip.fold(
+          0,
+          (prev, trip) =>
+              int.parse(prev.toString()) +
+              int.parse(trip.payedamount.toString())));
 
+      totalsuccestrip(listofsuccesstrip.length);
+      canceledtrip(listofcanceledtrip.length);
+
+      // print('mylist PRINTINg');
+      // print(listofsuccesstrip.length);
+      // print(listofcanceledtrip.length);
     });
-      totalearning(listofsuccesstrip.fold(0, (prev, trip) =>  int.parse(prev.toString()) +  int.parse(trip.payedamount.toString())));
-     
-     totalsuccestrip(listofsuccesstrip.length) ;
-     canceledtrip(listofcanceledtrip.length) ;
+  }
 
-
-    // print('mylist PRINTINg');
-    // print(listofsuccesstrip.length);
-    // print(listofcanceledtrip.length);
-
-
-  });
-}
-
-@override
+  @override
   void dispose() {
     // TODO: implement dispose
-      driverslocationstream!.cancel();
+    driverslocationstream!.cancel();
     super.dispose();
   }
   // void makeDriverOnline() async {
@@ -98,47 +97,43 @@ listofcanceledtrip.clear();
   //   }
   // }
 
-  void makeDriverOnline() async{
+  void makeDriverOnline() async {
+    try {
+      isOnlineLoading(true);
 
-    try{
-       isOnlineLoading(true);
-          
-          if(currentposition == null){
-            currentposition =  await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-            latcurrentposition =  LatLng(currentposition!.latitude , currentposition!.longitude);
-            print('called');
+      if (currentposition == null) {
+        currentposition = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.high);
+        latcurrentposition =
+            LatLng(currentposition!.latitude, currentposition!.longitude);
+        print('called');
+      }
 
-          }
-          
-          try{
-           
-
+      try {
         Map<String, dynamic> driverpostion = {
           'latitude': currentposition!.latitude,
           'longitude': currentposition!.longitude,
         };
 
         await availabledriverrefference.doc(authinstance.currentUser!.uid).set(
-        {
-        "driver_location":driverpostion ,
-         "device_token": authxcontroller.useracountdetails.value.device_token, 
-         "status": "online"
-         },
-         SetOptions(merge: true),
-      );
+          {
+            "driver_location": driverpostion,
+            "device_token":
+                authxcontroller.useracountdetails.value.device_token,
+            "status": "online"
+          },
+          SetOptions(merge: true),
+        );
+      } on PlatformException catch (e) {
+        print(e.message);
+      }
 
-          }on PlatformException catch(e){
-              print(e.message);
-          }
-          
-       
-        isOnlineLoading(false);
-        isOnline(true);
-
-    }catch(e){
+      isOnlineLoading(false);
+      isOnline(true);
+    } catch (e) {
       print(e);
       isOnlineLoading(false);
-  //     isOnline(false);
+      //     isOnline(false);
     }
   }
 
@@ -151,19 +146,20 @@ listofcanceledtrip.clear();
     //  });
 
     //realtimedatabse
-    driverslocationstream = Geolocator.getPositionStream().listen((position) async {
+    driverslocationstream =
+        Geolocator.getPositionStream().listen((position) async {
       currentposition = position;
-     Geofire.setLocation(authinstance.currentUser!.uid, currentposition!.latitude, currentposition!.longitude);
+      Geofire.setLocation(authinstance.currentUser!.uid,
+          currentposition!.latitude, currentposition!.longitude);
     });
   }
 
   void makeDriverOffline() async {
-
     //availabledriverrefference.doc(authinstance.currentUser!.uid).delete();
     //for realtimedatabse
 
     //_________________________________________________________________________
-   // Geofire.initialize("availableDrivers");
+    // Geofire.initialize("availableDrivers");
     // await availablereference.child(authinstance.currentUser!.uid).remove();
     await availabledriverrefference.doc(authinstance.currentUser!.uid).update({
       "status": "offline",
@@ -177,46 +173,67 @@ listofcanceledtrip.clear();
 
     isOnlineLoading(false);
     isOnline(false);
-        print("make drive offline called");
+    print("make drive offline called");
   }
 
-
-
-
-void disableLiveLocationUpdate() async {
-
-     Geofire.initialize("availableDrivers");
+  void disableLiveLocationUpdate() async {
+    Geofire.initialize("availableDrivers");
     driverslocationstream!.pause();
     Geofire.removeLocation(authinstance.currentUser!.uid);
-
   }
 
-  // void enableLibeLocationUpdate() async{ 
+  // void enableLibeLocationUpdate() async{
   //   var currentpositon =  await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
   //   driverslocationstream!.resume();
   //   Geofire.setLocation(authinstance.currentUser!.uid, currentpositon.latitude, currentpositon.longitude);
 
   // }
 
-  Future<bool> updateProfile(String imageurl) async{
-  bool isupdate = false;
-  
-  try{
+  Future<bool> updateProfile(String imageurl) async {
+    bool isupdate = false;
 
+    try {
       await driversusers.doc(authinstance.currentUser!.uid).update({
-    "image_url": imageurl,
-  }).then((value) => isupdate = true);
+        "image_url": imageurl,
+      }).then((value) => isupdate = true);
+    } catch (e) {
+      isupdate = false;
+    }
 
-
-  }catch (e){
-    isupdate = false;
+    return isupdate;
   }
 
-  return isupdate;
+  var isupdatingloading = false.obs;
+   updateProfileDetails(String name, String email) async {
+    isupdatingloading(true);
+    try {
+      await driversusers
+          .doc(authinstance.currentUser!.uid)
+          .update({'name': name, 'phone': email.trim()}).then((_)  async {
+          
+            
+        
+           isupdatingloading(false);
+        
+           Get.back();
+        
+      });
+    } catch (e) {
+      isupdatingloading(false);
+    }
   }
 
+  void listenToAcountUser() async{  
 
+    print('called');
 
+    driversusers.doc(authinstance.currentUser!.uid).snapshots().listen((event) { 
 
-
+       
+         var data = event.data() as Map<String, dynamic>;
+         data['id'] = authinstance.currentUser!.uid;
+         print(data);
+            authxcontroller.useracountdetails(Users.fromJson(data)) ;
+    });
+  }
 }
