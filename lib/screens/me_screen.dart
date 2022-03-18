@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/controller/authcontroller.dart';
+import 'package:tricycleappdriver/dialog/authdialog/authdialog.dart';
 import 'package:tricycleappdriver/widgets/horizontalspace.dart';
 import 'package:tricycleappdriver/widgets/verticalspace.dart';
 import 'dart:math';
@@ -119,7 +120,7 @@ class _MeScreenState extends State<MeScreen> {
                   ),
                   IconButton(
                       onPressed: () {
-                        
+                          Authdialog.shouwLogoutDialog(context);
 
                       },
                       icon: FaIcon(

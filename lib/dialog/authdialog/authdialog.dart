@@ -1,84 +1,129 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/UI/uicolor.dart';
+import 'package:tricycleappdriver/widgets/horizontalspace.dart';
+import 'package:tricycleappdriver/widgets/verticalspace.dart';
 
 class Authdialog {
-
-
-
- static void showAuthProGress(BuildContext context , String message) {
+  static void showAuthProGress(BuildContext context, String message) {
     showDialog(
         barrierDismissible: false,
         context: context,
         builder: (context) {
-         return Dialog(
-           backgroundColor: Colors.transparent,
-           child: Container(
-             decoration: BoxDecoration(
+          return Dialog(
+            backgroundColor: Colors.transparent,
+            child: Container(
+              decoration: BoxDecoration(
                 color: Colors.black,
-               borderRadius: BorderRadius.all(Radius.circular(6)),
-             ),
-             padding: EdgeInsets.all(16),
-            
-            child:  Row(
+                borderRadius: BorderRadius.all(Radius.circular(6)),
+              ),
+              padding: EdgeInsets.all(16),
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircularProgressIndicator(
-                strokeWidth: 3,
-                color: GREEN_LIGHT,
-                 ),
-                 SizedBox(
-
-                   width: 23,
-                 ),
-                 Expanded(child: Container(
-                   margin: EdgeInsets.only(left: 20),
-                   child: Text(message, style: Get.textTheme.bodyText2,)))
-              ],
+                children: [
+                  CircularProgressIndicator(
+                    strokeWidth: 3,
+                    color: GREEN_LIGHT,
+                  ),
+                  SizedBox(
+                    width: 23,
+                  ),
+                  Expanded(
+                      child: Container(
+                          margin: EdgeInsets.only(left: 20),
+                          child: Text(
+                            message,
+                            style: Get.textTheme.bodyText2,
+                          )))
+                ],
+              ),
             ),
-             ),
-           
-         );
+          );
         });
   }
- static void shouwLogoutDialog(BuildContext context) {
+
+  static void shouwLogoutDialog(BuildContext context) {
     showDialog(
         barrierDismissible: false,
         context: context,
         builder: (context) {
-         return Dialog(
-           backgroundColor: Colors.transparent,
-           child: Container(
-             decoration: BoxDecoration(
-                color: Colors.black,
-               borderRadius: BorderRadius.all(Radius.circular(6)),
-             ),
-             padding: EdgeInsets.all(16),
-            
-            child:Column(
-              children: [
-                Text('Are you sure you want to log out?', style: Get.textTheme.headline1!.copyWith(
-                  color: Colors.black
-                ),),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          return Dialog(
+            backgroundColor: BOTTOMNAVIGATOR_COLOR,
+            child: Container(
+              decoration: BoxDecoration(
+                  color: BOTTOMNAVIGATOR_COLOR,
+                  borderRadius:
+                      BorderRadius.all(Radius.circular(containerRadius))),
+              padding: EdgeInsets.all(20),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    MaterialButton(
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      shape: const StadiumBorder(),
-                      child: Text('Yes'),
-                      onPressed: () async {},
+                    Verticalspace(12),
+                    Text(
+                      'Are you sure you want to log out?',
+                      style: Get.textTheme.headline1!.copyWith(
+                        color: ELSA_TEXT_WHITE,
+                        fontWeight: FontWeight.w600
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                  ],
-                )
-              ],
+                    Verticalspace(16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center, children: [
+                      Container(
+                        height: 50,
+                        decoration: const ShapeDecoration(
+                          shape: StadiumBorder(),
+                          gradient: LinearGradient(
+                            end: Alignment.bottomCenter,
+                            begin: Alignment.topCenter,
+                            colors: [
+                              ELSA_BLUE_1_,
+                              ELSA_BLUE_1_,
+                            ],
+                          ),
+                        ),
+                        child: MaterialButton(
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          shape: const StadiumBorder(),
+                          child: Text('Yes',
+                              style: Get.textTheme.bodyText1!
+                                  .copyWith(fontWeight: FontWeight.w400)),
+                          onPressed: () async {},
+                        ),
+                      ),
+                      Horizontalspace(5),
+                      Container(
+                        height: 50,
+                        decoration: const ShapeDecoration(
+                          shape: StadiumBorder(),
+                          gradient: LinearGradient(
+                            end: Alignment.bottomCenter,
+                            begin: Alignment.topCenter,
+                            colors: [
+                              ELSA_BLUE_1_,
+                              ELSA_BLUE_1_,
+                            ],
+                          ),
+                        ),
+                        child: MaterialButton(
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          shape: const StadiumBorder(),
+                          child: Text('No',
+                              style: Get.textTheme.bodyText1!
+                                  .copyWith(fontWeight: FontWeight.w400)),
+                          onPressed: () async {},
+                        ),
+                      ),
+                    ]),
+                  ]),
             ),
-             ),
-           
-         );
+          );
         });
   }
-
 }
