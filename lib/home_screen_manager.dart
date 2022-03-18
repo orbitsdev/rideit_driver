@@ -215,7 +215,7 @@ void getCurrentStatusOfDriver()  async {
       ),
 
   //     floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: GFFloatingWidget(
+      floatingActionButton: requestxcontroller.ongoingtrip.value.request_id == null?  GFFloatingWidget(
        
        child: GFIconBadge(
               
@@ -260,7 +260,7 @@ void getCurrentStatusOfDriver()  async {
    
     verticalPosition: MediaQuery.of(context).size.height* 0.88,
     horizontalPosition: MediaQuery.of(context).size.width / 3.333,
-  ),
+  ) : null  ,
 
         body:Container(
           decoration: BoxDecoration(

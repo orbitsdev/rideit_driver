@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:tricycleappdriver/controller/requestcontroller.dart';
 
 
-void showEarningDialog(){
+void showEarningDialog(BuildContext context){
    Get.defaultDialog(
               title: '',
               radius: 2,
@@ -40,7 +40,7 @@ class Completetripdialog extends StatelessWidget {
                       }
 
                        return    ElevatedButton(onPressed: () {
-                    requestxcontroller.endTrip(requestxcontroller.ongoingtrip.value.request_id as String);
+                    requestxcontroller.endTrip( requestxcontroller.ongoingtrip.value.request_id as String,context);
                     
                   }, child: Text("CONFIRM"));
                   }),

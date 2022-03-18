@@ -34,7 +34,7 @@ class _CompleteScreenState extends State<CompleteScreen> {
               Text('₱ 50'),
               Text('To Be Collected'),
               ElevatedButton(onPressed: () {
-                requestxcontroller.endTrip(requestxcontroller.ongoingtrip.value.request_id as String);
+                requestxcontroller.endTrip(requestxcontroller.ongoingtrip.value.request_id as String,context);
                 
               }, child: Text("CONFIRM"))
             ],

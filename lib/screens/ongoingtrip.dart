@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animarker/flutter_map_marker_animation.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -11,11 +12,14 @@ import 'package:tricycleappdriver/assistant/debub_assistant.dart';
 import 'package:tricycleappdriver/assistant/mapkitassistant.dart';
 import 'package:tricycleappdriver/controller/drivercontroller.dart';
 import 'package:tricycleappdriver/controller/requestcontroller.dart';
+import 'package:tricycleappdriver/dialog/authdialog/authdialog.dart';
 import 'package:tricycleappdriver/dialog/requestdialog/completetripdialog.dart';
 import 'package:tricycleappdriver/dialog/requestdialog/dialog_collection.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/home_screen_manager.dart';
 import 'package:tricycleappdriver/screens/complete_screen.dart';
+
+
 
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:tricycleappdriver/widgets/verticalspace.dart';
@@ -66,9 +70,11 @@ class _OngoingtripState extends State<Ongoingtrip> {
     super.initState();
 
     isTripDetailsReady();
-
+  
     //isTripDetailsReady();
   }
+
+
 
   void boundCamera() {
     var bound_sw = requestxconroller.directiondetails.value.bound_sw as LatLng;
@@ -84,8 +90,11 @@ class _OngoingtripState extends State<Ongoingtrip> {
     var istripready = await requestxconroller.listenToOngoingTrip();
 
     if (istripready) {
-      //
+      
+    
       currentripstatus = requestxconroller.ongoingtrip.value.tripstatus;
+      print('payed==');
+      print(requestxconroller.ongoingtrip.value.payed);
 
       //set map ready
       setTripMapIsready(istripready);
@@ -129,33 +138,34 @@ class _OngoingtripState extends State<Ongoingtrip> {
   void setTripMarkers() async {
     pickupmarker = Marker(
       markerId: MarkerId("pickmarker"),
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet),
       position: requestxconroller.ongoingtrip.value.pick_location as LatLng,
     );
 
-    dropmarker = Marker(
+    dropmarker =   Marker(
       markerId: MarkerId("dropmarker"),
-      position:
-          requestxconroller.ongoingtrip.value.actualmarker_position as LatLng,
+      position:requestxconroller.ongoingtrip.value.actualmarker_position as LatLng,
+       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
     );
 
     //circle
 
     pickcircle = Circle(
         zIndex: 1,
-        fillColor: Colors.blueAccent,
+        fillColor: Colors.purpleAccent.withOpacity(0.5),
         center: requestxconroller.ongoingtrip.value.pick_location as LatLng,
-        strokeWidth: 4,
-        radius: 12,
-        strokeColor: Colors.white,
+        strokeWidth: 1,
+        radius: 26,
+        strokeColor: Colors.purpleAccent,
         circleId: CircleId("pickcicrcle"));
 
     dropcircle = Circle(
-        fillColor: Colors.blueAccent,
+        fillColor: Colors.redAccent.withOpacity(0.5),
         center:
             requestxconroller.ongoingtrip.value.actualmarker_position as LatLng,
-        strokeWidth: 4,
-        radius: 12,
-        strokeColor: Colors.white,
+        strokeWidth: 1,
+        radius: 26,
+        strokeColor: Colors.redAccent,
         circleId: CircleId("dropcircle"));
 
     setState(() {
@@ -226,7 +236,8 @@ class _OngoingtripState extends State<Ongoingtrip> {
       setState(() {
         CameraPosition camerapostion =
             CameraPosition(target: latlingpostion, zoom: 17);
-            newgooglemapcontroller!.animateCamera(CameraUpdate.newCameraPosition(camerapostion));
+        newgooglemapcontroller!
+            .animateCamera(CameraUpdate.newCameraPosition(camerapostion));
         // newgooglemapcontroller!
         //     .moveCamera(CameraUpdate.newCameraPosition(camerapostion));
         markerSet
@@ -255,18 +266,31 @@ class _OngoingtripState extends State<Ongoingtrip> {
     if (driverlocationstream != null) {
       driverlocationstream!.cancel();
     }
-    super.dispose();
+    super.dispose();  
   }
 
   @override
   Widget build(BuildContext context) {
-    createCustomDriverMarker();
 
+
+
+    
+    createCustomDriverMarker();
+        
     return Scaffold(
       appBar: AppBar(
+        actions: [
+
+          IconButton(
+              onPressed: () {
+                boundCamera();
+              },
+              icon: FaIcon(FontAwesomeIcons.mapMarked),)
+        ],
         leading: IconButton(
             onPressed: () {
               Get.off(() => HomeScreenManager());
+              
             },
             icon: FaIcon(FontAwesomeIcons.times)),
       ),
@@ -327,7 +351,8 @@ class _OngoingtripState extends State<Ongoingtrip> {
                               child: spinkit,
                             );
                           } else {
-                            if (requestxconroller.ongoingtrip.value.request_id !=
+                            if (requestxconroller
+                                    .ongoingtrip.value.request_id !=
                                 null) {
                               return SingleChildScrollView(
                                 child: Column(
@@ -335,38 +360,24 @@ class _OngoingtripState extends State<Ongoingtrip> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                                 
-                                 
-                                    // Container(
-                                    //   width: double.infinity,
-                                    //   child: Text(
-                                    //     '${requestxconroller.ongoingtrip.value.tripstatus}'
-                                    //         .toUpperCase(),
-                                    //     textAlign: TextAlign.center,
-                                    //     style: Get.theme.textTheme.bodyText1!
-                                    //         .copyWith(
-                                    //             fontWeight: FontWeight.w600),
-                                    //   ),
-                                    // ),
-
-                                    // if (durationText != "")
-                                    //   Text(durationText,
-                                    //       style: Get.theme.textTheme.headline5),
-                                     if (durationText != "")
-                                           Text(durationText,
+                                    if (durationText != "")
+                                      Text(durationText,
                                           style: Get.theme.textTheme.headline5),
                                     Verticalspace(8),
 
                                     Text(
                                       'From',
                                       style: Get.theme.textTheme.bodyText1!
-                                          .copyWith(),
+                                          .copyWith(
+                                            color: Colors.purpleAccent
+                                          ),
+                                          
                                     ),
                                     Verticalspace(4),
                                     Text(
                                       '${requestxconroller.ongoingtrip.value.pickaddress_name}',
-                                      style:
-                                          Get.theme.textTheme.bodyText1!.copyWith(
+                                      style: Get.theme.textTheme.bodyText1!
+                                          .copyWith(
                                         fontWeight: FontWeight.w100,
                                         fontSize: 14,
                                       ),
@@ -375,13 +386,15 @@ class _OngoingtripState extends State<Ongoingtrip> {
                                     Text(
                                       'To',
                                       style: Get.theme.textTheme.bodyText1!
-                                          .copyWith(),
+                                          .copyWith(
+                                            color: Colors.redAccent
+                                          ),
                                     ),
                                     Verticalspace(4),
                                     Text(
                                       '${requestxconroller.ongoingtrip.value.dropddress_name}',
-                                      style:
-                                          Get.theme.textTheme.bodyText1!.copyWith(
+                                      style: Get.theme.textTheme.bodyText1!
+                                          .copyWith(
                                         fontWeight: FontWeight.w200,
                                         fontSize: 14,
                                       ),
@@ -391,24 +404,33 @@ class _OngoingtripState extends State<Ongoingtrip> {
                                       thickness: 1,
                                       color: LIGHT_CONTAINER,
                                     ),
-                                     Container(
-                                       width: double.infinity,
-                                       child: Text(
-                                            requestxconroller.ongoingtrip.value.tripstatus == "prepairing" ? 
-                                            'Press the button if you are ready': requestxconroller.ongoingtrip.value.tripstatus == "coming" ? 'Press the button when you already arrived':
-                                            requestxconroller.ongoingtrip.value.tripstatus == "arrived" ? 'Wait for the customer and start the trip if ready': '',
-                                            style: TextStyle(
-                                                color: Colors.white, fontSize: 12, ),
-                                                textAlign: TextAlign.center,
-                                          ),
-                                     ),
+                                    Container(
+                                      width: double.infinity,
+                                      child: Text(
+                                        requestxconroller.ongoingtrip.value
+                                                    .tripstatus ==
+                                                "prepairing"
+                                            ? 'Press the button if you are ready'
+                                            : requestxconroller.ongoingtrip
+                                                        .value.tripstatus ==
+                                                    "coming"
+                                                ? 'Press the button when you already arrived'
+                                                : requestxconroller.ongoingtrip
+                                                            .value.tripstatus ==
+                                                        "arrived"
+                                                    ? 'Wait for the customer and start the trip if ready'
+                                                    : '',
+                                        style: TextStyle(
+                                            color: ELSA_GREEN,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w300),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
                                     //   if (requestxconroller .ongoingtrip.value.tripstatus ==   "coming" || requestxconroller .ongoingtrip.value.tripstatus ==   "picked" )
                                     //  GestureDetector(
                                     //   onTap: () async {
 
-                                        
-                                         
-                                         
                                     //        requestxconroller.launchMapsUrl(
                                     //             requestxconroller
                                     //                 .ongoingtrip
@@ -422,33 +444,33 @@ class _OngoingtripState extends State<Ongoingtrip> {
                                     //                 .ongoingtrip
                                     //                 .value
                                     //                 .drop_location as LatLng);
-                                        
-                                       
+
                                     //   },
                                     //   child: Row(
                                     //     children: [
                                     //       Image.asset('assets/images/icons8-google-maps-48.png' , height: 34 ,width: 34,),
                                     //       Text('Google Map', )
-                                          
+
                                     //     ],
-                                    
+
                                     //   ),
                                     // ),
                                     Verticalspace(16),
-                                   
+
                                     Container(
-                                      margin: EdgeInsets.symmetric(horizontal: 12,),
+                                      margin: EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                      ),
                                       width: double.infinity,
-                                          height: 60,
+                                      height: 60,
                                       decoration: const ShapeDecoration(
                                         shape: StadiumBorder(),
                                         gradient: LinearGradient(
                                           end: Alignment.bottomCenter,
                                           begin: Alignment.topCenter,
                                           colors: [
-                                              ELSA_BLUE_1_,
-                                              ELSA_BLUE_1_,
-
+                                            ELSA_BLUE_1_,
+                                            ELSA_BLUE_1_,
                                           ],
                                         ),
                                       ),
@@ -456,20 +478,32 @@ class _OngoingtripState extends State<Ongoingtrip> {
                                         materialTapTargetSize:
                                             MaterialTapTargetSize.shrinkWrap,
                                         shape: const StadiumBorder(),
-                                        child:  Text(
-                                          requestxconroller.ongoingtrip.value.tripstatus == "prepairing" ? 
-                                          'LET\'S GO': requestxconroller.ongoingtrip.value.tripstatus == "coming" ? 'ARRIVED':
-                                          requestxconroller.ongoingtrip.value.tripstatus == "arrived" ? 'STAR TRIP':    'END TRIP',
+                                        child: Text(
+                                          requestxconroller.ongoingtrip.value
+                                                      .tripstatus ==
+                                                  "prepairing"
+                                              ? 'LET\'S GO'
+                                              : requestxconroller.ongoingtrip
+                                                          .value.tripstatus ==
+                                                      "coming"
+                                                  ? 'ARRIVED'
+                                                  : requestxconroller
+                                                              .ongoingtrip
+                                                              .value
+                                                              .tripstatus ==
+                                                          "arrived"
+                                                      ? 'STAR TRIP'
+                                                      : 'END TRIP',
                                           style: TextStyle(
-                                              color: Colors.white, fontSize: 20),
+                                              color: Colors.white,
+                                              fontSize: 20),
                                         ),
                                         onPressed: () async {
-                                              await updateTripStatus(context);
+                                          await updateTripStatus(context);
                                         },
                                       ),
                                     ),
-                                      Verticalspace(12),
-                                    
+                                    Verticalspace(12),
                                   ],
                                 ),
                               );
@@ -488,54 +522,47 @@ class _OngoingtripState extends State<Ongoingtrip> {
   }
 
   Future<void> updateTripStatus(BuildContext context) async {
-       String response =
-        await requestxconroller
-            .updateOngoingTripStatus();
-      
-    DebubAssistant.printDataLine(
-        'response of update', response);
-      
+
+print(requestxconroller.ongoingtrip.value.tripstatus);
+    
+
+    String response = await requestxconroller.updateOngoingTripStatus();
+
+    DebubAssistant.printDataLine('response of update', response);
+
     //if changes
     if (currentripstatus != response) {
       //update trip status local to new valu
       setState(() {
-        currentripstatus =
-            requestxconroller
-                .ongoingtrip
-                .value
-                .tripstatus;
+        currentripstatus = requestxconroller.ongoingtrip.value.tripstatus;
       });
-      
-      if (currentripstatus ==
-          'coming') {
-        print(
-            'time ta called live update');
+
+      if (currentripstatus == 'coming') {
+        print('time ta called live update');
         //update driver location live
         getLiveLocationUpdate();
       }
-      
-      if (currentripstatus ==
-          'picked') {
-        print(
-            'time to resume live update');
+
+      if (currentripstatus == 'picked') {
+        print('time to resume live update');
         //update driver location live
         getLiveLocationUpdate();
       }
-      if (currentripstatus ==
-          'complete') {
-        DialogCollection
-            .showpaymentToCollect(
-                context);
+      if (currentripstatus == 'complete') {
+        DialogCollection.showpaymentToCollect(context);
       }
-      
-      if (currentripstatus ==
-              "coming" ||
-          currentripstatus ==
-              "picked") {
+
+      if (currentripstatus == "coming" || currentripstatus == "picked") {
         setState(() {
           setPolylines();
         });
       }
-    }
+  
+  
+  }else{
+   if (requestxconroller.ongoingtrip.value.tripstatus== 'complete' && requestxconroller.ongoingtrip.value.payed == false ) {
+        DialogCollection.showpaymentToCollect(context);
+      }
+  }
   }
 }

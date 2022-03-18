@@ -74,6 +74,14 @@ class _TripsScreenState extends State<TripsScreen>
     }
   }
 
+@override
+  void setState(VoidCallback fn) {
+    if(mounted){
+    super.setState(fn);
+
+    }
+  }
+
   void tripSetter(bool value) {
     setState(() {
       hasongointrip = value;

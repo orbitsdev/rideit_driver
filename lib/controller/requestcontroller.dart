@@ -14,6 +14,7 @@ import 'package:tricycleappdriver/controller/drivercontroller.dart';
 import 'package:tricycleappdriver/controller/mapcontroller.dart';
 import 'package:tricycleappdriver/controller/pageindexcontroller.dart';
 import 'package:tricycleappdriver/dialog/Failuredialog/failuredialog.dart';
+import 'package:tricycleappdriver/dialog/authdialog/authdialog.dart';
 import 'package:tricycleappdriver/dialog/authdialog/authenticating.dart';
 import 'package:tricycleappdriver/dialog/collectionofdialog.dart';
 import 'package:tricycleappdriver/dialog/requestdialog/completetripdialog.dart';
@@ -50,13 +51,17 @@ class Requestcontroller extends GetxController {
   var hasongingtrip = false.obs;
   var hasacceptedrequest = false.obs;
 
+  var isPaymentShowed = false.obs;
+
   var lisofunacceptedrequest = <RequestDetails>[].obs;
   var lengthofunacceptedrequest = 0.obs;
   Position? currentpostion;
 
+  String? newtripstatusvalue;
+
   var loaderoftrip = false.obs;
   Map<String, dynamic> ongoingtripdata = {};
-  
+
   //
   String? requestid;
   void confirmRequest(String? requestid) async {
@@ -318,7 +323,7 @@ class Requestcontroller extends GetxController {
     bool isChange = false;
     tripTextIsloading(true);
     String? tripstatus;
-    String? newtripstatusvalue;
+    
     // to make sur
 
     if (ongoingtrip.value.tripstatus == "prepairing") {
@@ -464,9 +469,10 @@ class Requestcontroller extends GetxController {
     return isReady;
   }
 
-  void endTrip(String requestid) async {
+  void endTrip(String requestid, BuildContext context) async {
     collecting(true);
 
+    Authdialog.showAuthProGress(context, 'Please wait...');
     //temporary value
     await ongointripreferrence.doc(requestid).update({
       'payedamount': 50,
@@ -504,10 +510,13 @@ class Requestcontroller extends GetxController {
             driverxcontroller.makeDriverOnline();
             cancelDriverLiveLocation();
 
+          
             ongoingtrip = OngoingTripDetails().obs;
             directiondetails = Directiondetails().obs;
             livedirectiondetails = Directiondetails().obs;
+            requestdetails = RequestDetails().obs;
             pageindexcontroller.updateIndex(2);
+            newtripstatusvalue = null;
             // driverxcontroller.enableLibeLocationUpdate();
             hasongingtrip(false);
 
@@ -540,7 +549,6 @@ class Requestcontroller extends GetxController {
   }
 
   Future<bool> listenToOngoingTrip() async {
-      
     bool? isTripReady;
     String? requestid;
 
@@ -561,9 +569,7 @@ class Requestcontroller extends GetxController {
       });
 
       isTripReady = true;
-     
     } else {
-      
       isTripReady = true;
     }
 
@@ -573,60 +579,52 @@ class Requestcontroller extends GetxController {
   Future<bool> checkIfHasOngoingRequest() async {
     bool hastrip = false;
 
-   
-      //check database
-      try {
-        await drivercurrentrequestaccepted.get().then((value) async {
-          if (value.docs.isNotEmpty) {
+    //check database
+    try {
+      await drivercurrentrequestaccepted.get().then((value) async {
+        if (value.docs.isNotEmpty) {
+          value.docs.forEach((element) {
+            requestid = element.id;
+          });
 
-            value.docs.forEach((element) { 
-                requestid = element.id;
-            });
-
-            hastrip = true;
-          } else {
-            hastrip = false;
-          }
-        });
-      } catch (e) {
-        hastrip = false;
-      }
-    
-
-
+          hastrip = true;
+        } else {
+          hastrip = false;
+        }
+      });
+    } catch (e) {
+      hastrip = false;
+    }
 
     return hastrip;
-
   }
 
+  Future<bool> getRequestData(BuildContext context) async {
+    bool ready = false;
 
-  Future<bool> getRequestData(BuildContext context) async{
-   bool ready = false;
+    try {
+      await requestcollecctionrefference.doc(requestid).get().then((value) {
+        requestdetails(
+            RequestDetails.fromJson(value.data() as Map<String, dynamic>));
+        requestdetails.value.request_id = requestid;
 
-    try{  
-       await requestcollecctionrefference.doc(requestid).get().then((value) {
-          requestdetails(RequestDetails.fromJson(value.data() as Map<String, dynamic>));
-          requestdetails.value.request_id = requestid;
-      
-  
-          ready = true;
-        });
-    }on SocketException {
-        Failuredialog.showInternetConnectionInfoDialog(context, 'Ops', 'NO Enternet Connecttion');
-       ready = false;
-    }on HttpException catch(e){
-       Failuredialog.showErrorDialog (context, 'Ops', e.toString());
+        ready = true;
+      });
+    } on SocketException {
+      Failuredialog.showInternetConnectionInfoDialog(
+          context, 'Ops', 'NO Enternet Connecttion');
       ready = false;
-
-    }on FormatException catch(e){
-      Failuredialog.showErrorDialog (context, 'Ops', e.toString());
+    } on HttpException catch (e) {
+      Failuredialog.showErrorDialog(context, 'Ops', e.toString());
+      ready = false;
+    } on FormatException catch (e) {
+      Failuredialog.showErrorDialog(context, 'Ops', e.toString());
       ready = false;
     }
-   
-   print("GET READY BEFRO ERETURNING");
-   print(ready);
-   return ready; 
 
+    print("GET READY BEFRO ERETURNING");
+    print(ready);
+    return ready;
   }
 
   void sendNotification(
