@@ -129,7 +129,7 @@ class _OngoingtripState extends State<Ongoingtrip> {
     ImageConfiguration imageconfiguation =
         createLocalImageConfiguration(context, size: Size(2, 2));
     BitmapDescriptor.fromAssetImage(
-            imageconfiguation, "assets/images/052car-android.png")
+            imageconfiguation, "assets/images/Motorcycle_8.png")
         .then((value) => drivermarkericon = value);
   }
 

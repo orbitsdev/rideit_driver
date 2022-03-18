@@ -152,7 +152,7 @@ void getCurrentStatusOfDriver()  async {
   Widget build(BuildContext context) {
      final ThemeData theme =  Theme.of(context);
     return Scaffold(
-    
+     
       bottomNavigationBar: MotionTabBar(
         initialSelectedTab: _pagename[pageindexcontroller.pageindex.value] as String,
         useSafeArea: true, // default: true, apply safe area wrapper
@@ -197,7 +197,7 @@ void getCurrentStatusOfDriver()  async {
         
         tabSize: 50,
         tabBarHeight: 55,
-        textStyle:TextStyle(fontSize: 12, color: TEXT_WHITE),
+        textStyle:TextStyle(fontSize: 12, color: TEXT_WHITE, fontWeight: FontWeight.w300),
         
         tabIconColor: ICON_GREY,
         tabIconSize: 28.0,
@@ -258,8 +258,8 @@ void getCurrentStatusOfDriver()  async {
            )
         ),
    
-    verticalPosition: MediaQuery.of(context).size.height* 0.88,
-    horizontalPosition: MediaQuery.of(context).size.width / 3.333,
+    verticalPosition: MediaQuery.of(context).size.height * 0.88,
+    horizontalPosition: MediaQuery.of(context).size.width / 2.933333333 ,
   ) : null  ,
 
         body:Container(

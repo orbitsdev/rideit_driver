@@ -1,376 +1,160 @@
-import 'dart:io';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/controller/authcontroller.dart';
-import 'package:tricycleappdriver/controller/drivercontroller.dart';
-import 'package:tricycleappdriver/dialog/authdialog/authenticating.dart';
-import 'package:tricycleappdriver/dialog/profiledialog/profiledialog.dart';
-import 'package:tricycleappdriver/helper/firebasehelper.dart';
-import 'package:tricycleappdriver/services/firebase_api.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart' as pathprovider;
-import 'package:path/path.dart' as path;
-import 'package:tricycleappdriver/signin_screen.dart';
-import 'package:url_launcher/link.dart';
+import 'package:tricycleappdriver/widgets/horizontalspace.dart';
+import 'package:tricycleappdriver/widgets/verticalspace.dart';
+import 'dart:math';
+
 
 class MeScreen extends StatefulWidget {
+  const MeScreen({Key? key}) : super(key: key);
   static const screenName = "/me";
 
   @override
-  State<MeScreen> createState() => _MeScreenState();
+  _MeScreenState createState() => _MeScreenState();
 }
 
 class _MeScreenState extends State<MeScreen> {
-  var driverxcontroller = Get.put(Drivercontroller());
+
+  List<Color> listofcolors = [
+    ELSA_ORANGE,
+    ELSA_BLUE_2_,
+    ELSA_GREEN,
+    ELSA_PINK,
+    ELSA_BLUE,
+    DARK_GREEN,
+    ELSA_YELLOW_TEXT,
+    ELSA_PINK_TEXT,
+    ELSA_BLUE_1_,
+    iconcolorsecondary,
+  ];
   var authxcontroller = Get.find<Authcontroller>();
-  File? myimage;
-  bool isUploading = false;
-  final ImagePicker _picker = ImagePicker();
-  String? filnametext;
-  UploadTask? task;
-  Stream? userdetails;
-  final Stream<DocumentSnapshot<Object?>> _usersStream =
-      driversusers.doc(authinstance.currentUser!.uid).snapshots();
-  Stream<QuerySnapshot<Map<String, dynamic>>> ratingsstream = ratingsreferrence
-      .doc(authinstance.currentUser!.uid)
-      .collection("ratings")
-      .snapshots();
-  @override
-  void initState() {
-    super.initState();
-    //userdetails = getUserdetails();
-  }
 
-  getUserdetails() async {
-    return await FirebaseApi.getUserDetails();
-  }
-
-  void loadingSetter(bool value) {
-    setState(() {
-      isUploading = value;
-    });
-  }
-
-  Future pickImage(ImageSource imagesource) async {
-    try {
-      final image = await ImagePicker()
-          .pickImage(source: imagesource, maxHeight: 480, imageQuality: 85);
-      if (image == null) {
-        return;
-      }
-      loadingSetter(true);
-      progressDialog("Uploading");
-      final imageTemporary = File(image.path);
-      setState(() {
-        this.myimage = imageTemporary;
-      });
-
-      final pathDir = await pathprovider.getApplicationDocumentsDirectory();
-      final fiilename =
-          '${DateTime.now().millisecond}' + path.basename(myimage!.path);
-      final saveimage = await myimage!.copy("${pathDir.path}/${fiilename}");
-      final destination = 'userimage/${fiilename}';
-
-      task = await FirebaseApi.uploadFile(destination, myimage as File);
-
-      if (task == null) return;
-      final snapshot = await task!.whenComplete(() {});
-
-      final urlDownload = await snapshot.ref.getDownloadURL();
-      FirebaseApi.updateProfile(urlDownload, destination);
-
-      setState(() {
-        filnametext = destination;
-      });
-      loadingSetter(false);
-      Get.back();
-    } on PlatformException catch (e) {
-      loadingSetter(false);
-
-      print("field to pick image");
-    }
-  }
+  Random random =  Random();
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(10),
-      child: Column(
-        children: [
-          SizedBox(
-            height: 40,
-          ),
-          Container(
-            width: double.infinity,
-
-            //color: BACKGROUND_BLACK_LIGHT_MORE_LIGHT_2,
-            child: Center(
-              child: Stack(children: [
-                StreamBuilder<DocumentSnapshot<Object?>>(
-                    stream: _usersStream,
-                    builder: (BuildContext context,
-                        AsyncSnapshot<DocumentSnapshot<Object?>> snapshot) {
-                      if (snapshot.hasError) {
-                        return Text('Something went wrong');
-                      }
-
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Text("Loading");
-                      }
-
-                      if (snapshot.data!["image_url"] == null) {
-                        return ClipOval(
-                          child: Container(
-                            color: TEXT_WHITE_2,
-                            padding: EdgeInsets.all(5),
-                            child: ClipOval(
-                              child: Image.asset(
-                                'assets.images/PngItem_1503945.png',
-                                height: 130,
-                                width: 130,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                        );
-                      }
-
-                      return ClipOval(
-                        child: Container(
-                          color: TEXT_WHITE_2,
-                          padding: EdgeInsets.all(5),
-                          child: ClipOval(
-                            child: Image.network(
-                              snapshot.data!["image_url"],
-                              height: 130,
-                              width: 130,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-                Positioned(
-                    bottom: 5,
-                    right: 5,
-                    child: IconButton(
-                        onPressed: () {
-                          Profiledialog.showSimpleDialog(context, pickImage);
-                        },
-                        icon: Icon(
-                          Icons.camera_alt,
-                        ),
-                        iconSize: 34,
-                        color: Colors.white))
-              ]),
-            ),
-          ),
-          SizedBox(
-            height: 24,
-          ),
-          Text('${authxcontroller.useracountdetails.value.name}',
-              style: Get.textTheme.bodyText1,),
-          SizedBox(
-            height: 24,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 40),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              Verticalspace(20),
               Container(
-                padding: EdgeInsets.all(8),
-                color: BACKGROUND_BLACK_LIGHT_MORE_LIGHT,
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.motorcycle,
-                          size: 24,
-                          color: TEXT_WHITE,
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Text(
-                          '200',
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w500),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 4,
-                    ),
-                    Center(
-                        child: Text('Total Trips',
-                            style: TextStyle(
-                                color: TEXT_WHITE_2,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w300))),
-                  ],
-                ),
+                width: double.infinity,
               ),
-              Container(
-                padding: EdgeInsets.all(8),
-                color: BACKGROUND_BLACK_LIGHT_MORE_LIGHT,
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.motorcycle,
-                          size: 24,
-                          color: TEXT_WHITE,
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Text(
-                          '200',
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w500),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 4,
-                    ),
-                    Center(
-                        child: Text('Total Distance Traveled',
-                            style: TextStyle(
-                                color: TEXT_WHITE_2,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w300))),
-                  ],
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.all(8),
-                color: BACKGROUND_BLACK_LIGHT_MORE_LIGHT,
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.motorcycle,
-                          size: 24,
-                          color: TEXT_WHITE,
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Text(
-                          '200',
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w500),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 4,
-                    ),
-                    Center(
-                        child: Text('Canceled Trip',
-                            style: TextStyle(
-                                color: TEXT_WHITE_2,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w300))),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 24,
-          ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
+              Stack(
                 children: [
-                  Icon(
-                    Icons.email_outlined,
-                    color: GREEN_LIGHT,
+                  ClipOval(
+                    child: Container(
+                      color: TEXT_WHITE_2,
+                      padding: EdgeInsets.all(5),
+                      child: ClipOval(
+                        child: Image.asset(
+                          'assets/images/images.jpg',
+                          height: 130,
+                          width: 130,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
                   ),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  SizedBox(
-                    width: 12,
-                  ),
-                  Expanded(
-                      child: Text(
-                          '${authxcontroller.useracountdetails.value.email}')),
+                  Positioned(
+                      bottom: 5,
+                      right: 5,
+                      child: IconButton(
+                          onPressed: () {
+                            // Profiledialog.showSimpleDialog(context, pickImage);
+                          },
+                          icon: Icon(
+                            Icons.camera_alt,
+                          ),
+                          iconSize: 34,
+                          color: Colors.white))
                 ],
               ),
-              SizedBox(
-                height: 12,
-              ),
-              Row(
-                children: [
-                  Icon(
-                    Icons.phone_android_outlined,
-                    color: GREEN_LIGHT,
+              Verticalspace(24),
+              Container(
+                margin: EdgeInsets.symmetric(
+                  horizontal: 12,
+                ),
+                width: 140,
+                height: 50,
+                decoration: const ShapeDecoration(
+                  shape: StadiumBorder(),
+                  gradient: LinearGradient(
+                    end: Alignment.bottomCenter,
+                    begin: Alignment.topCenter,
+                    colors: [
+                      ELSA_BLUE_1_,
+                      ELSA_BLUE_1_,
+                    ],
                   ),
-                  SizedBox(
-                    width: 5,
+                ),
+                child: MaterialButton(
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  shape: const StadiumBorder(),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Edit Profile', style: Get.textTheme.bodyText1!.copyWith(
+                        fontWeight: FontWeight.w400
+                      )),
+                      Horizontalspace(10),
+                      FaIcon(FontAwesomeIcons.angleRight,size: 34, color: ELSA_TEXT_WHITE,),
+                    ],
                   ),
-                  SizedBox(
-                    width: 12,
-                  ),
-                  Expanded(
-                      child: Text(
-                          '${authxcontroller.useracountdetails.value.phone}')),
-                ],
+                  onPressed: () async {},
+                ),
               ),
-              SizedBox(
-                height: 12,
-              ),
-              ElevatedButton(onPressed: (){
-                authinstance.signOut();
-                Get.offAllNamed(SigninScreen.screenName);
-              }, child: Text('SIgnout'))
-              // GestureDetector
-              // (
-              //   onTap: (){
-              //     print('called');
-              //   authinstance.signOut();
-              //   Get.offAllNamed(SigninScreen.screenName);
-              //   },
-              //   child: Text('Signout', style: Get.textTheme.bodyText2))
-            ],
-          ),
+              Verticalspace(24),
+              Text('${authxcontroller.useracountdetails.value.name}',
+                  style: Get.textTheme.headline1!.copyWith(
+                      color: ELSA_TEXT_WHITE, fontWeight: FontWeight.w300),
+                  textAlign: TextAlign.center),
+              Verticalspace(8),
+              Text('${authxcontroller.useracountdetails.value.email}',
+                  style: Get.textTheme.headline1!.copyWith(
+                      color: ELSA_TEXT_GREY,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w100),
+                  textAlign: TextAlign.center),
+              Verticalspace(16),
+              infoBuilder(
+                  FontAwesomeIcons.mobileAlt,
+                  '${authxcontroller.useracountdetails.value.phone}',
+                  ELSA_GREEN),
+              Verticalspace(8),
+              infoBuilder(
+                  FontAwesomeIcons.envelope,
+                  '${authxcontroller.useracountdetails.value.email}',
+                  ELSA_PINK),
+              Verticalspace(8),
 
-         
-          StreamBuilder<QuerySnapshot>(
-            stream: ratingsstream,
-            builder:
-                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-              if (snapshot.hasError) {
-                return Text('Something went wrong');
-              }
 
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Text("Loading");
-              }
+              Container(
 
+                height: 240,
+
+                child: AnimationLimiter(
+           child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: 20,
+            itemBuilder: (context, index) {
               return Container(
-                constraints: BoxConstraints(
-                  maxHeight: 400,
-                ),
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: snapshot.data!.docs.length,
-                  itemBuilder: (context, index) {
-                    return Container(
+                
+                margin: EdgeInsets.symmetric(vertical: 8,),
                       padding: EdgeInsets.all(8),
-                      color: BACKGROUND_BLACK,
+                      decoration: BoxDecoration(
+                      color:BACKGROUND_BLACK,
+                        borderRadius: BorderRadius.circular(containerRadius)
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -379,14 +163,15 @@ class _MeScreenState extends State<MeScreen> {
                             children: [
                               ClipOval(
                                 child: Container(
-                                  color: TEXT_WHITE_2,
-                                  padding: EdgeInsets.all(2),
+                                  color: ELSA_TEXT_WHITE,
+                                  padding: EdgeInsets.all(1),
                                   child: ClipOval(
-                                    child: Image.asset(
-                                      'assets/images/images.jpg',
-                                      height: 60,
-                                      width: 60,
-                                      fit: BoxFit.cover,
+                                    child: Container(
+                                       height: 50,
+                                          width: 50,
+                                      color: listofcolors[random.nextInt(listofcolors.length)],
+                                      padding: EdgeInsets.all(2),
+                                      child: Center(child: Text(authxcontroller.useracountdetails.value.name![0].toUpperCase(), style: Get.textTheme.headline1!.copyWith(),),),
                                     ),
                                   ),
                                 ),
@@ -406,8 +191,8 @@ class _MeScreenState extends State<MeScreen> {
                                       mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
                                         RatingBar.builder(
-                                          initialRating: snapshot.data!.docs[index]['rate'],
-                                          minRating: snapshot.data!.docs[index]['rate'],
+                                          initialRating: 5,
+                                          minRating: 5,
                                           direction: Axis.horizontal,
                                           allowHalfRating: true,
                                           itemCount: 5,
@@ -425,7 +210,7 @@ class _MeScreenState extends State<MeScreen> {
                                           width: 5,
                                         ),
                                         Text(
-                                        '${snapshot.data!.docs[index]['rate']}',
+                                        '5.0',
                                         style: Get.textTheme.bodyText1,
                                       ),
                                         
@@ -443,38 +228,53 @@ class _MeScreenState extends State<MeScreen> {
                             height: 8,
                           ),
                           
-                           Text('Nice and Very smooth transactions  '),
+                           Padding(
+                             padding: const EdgeInsets.all(8.0),
+                             child: Text('Nice and Very smooth transactions  that was the best expereince'),
+                           ),
                          
                         ],
                       ),
                     );
-                    
-                  },
-                ),
-              );
-            },
+            }),
+         ),
+              ),
+
+
+              Verticalspace(120),
+            ],
           ),
-      
-        ],
+        ),
       ),
     );
   }
 
-  builUploadStatus(UploadTask? task) {
-    return StreamBuilder<TaskSnapshot>(
-        stream: task!.snapshotEvents,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final snap = snapshot.data;
-            final progress = snap!.bytesTransferred / snap.totalBytes;
-            final percentage = (progress * 100).toStringAsFixed(0);
-            return Text(
-              "${percentage}%",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            );
-          } else {
-            return Container();
-          }
-        });
+  
+  Widget infoBuilder(IconData icon, String label, Color color) {
+    return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 34,
+                height: 34,
+                child: Center(
+                  child: FaIcon(
+                    icon,
+                    color: color,
+                  ),
+                ),
+              ),
+              Horizontalspace(16),
+              Expanded(
+                  child: Text(
+                label,
+                style: Get.textTheme.bodyText1!.copyWith(),
+              )),
+            ],
+          ),
+        ]);
   }
 }
