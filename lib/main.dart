@@ -137,7 +137,7 @@ class _TricycleappDriverState extends State<TricycleappDriver> {
     }
 
     driversusers.doc(authinstance.currentUser!.uid).update({
-      "token": token,
+      "device_token": token,
     });
     messaginginstance.subscribeToTopic("alldrivers");
     messaginginstance.subscribeToTopic("allusers");

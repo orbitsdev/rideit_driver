@@ -14,11 +14,11 @@ class Rating {
 
   factory Rating.fromJson(Map<String, dynamic> json) {
     Rating rate = Rating();
-    rate.passenger_id=  json['passenger_id'];
-    rate.comment=  json['comment'];
-    rate.created_at=  json['created_at'];
     rate.rate=  json['rate'];
+    rate.comment=  json['comment'];
+    rate.passenger_id=  json['passenger_id'];
     rate.passenger_name = json['passenger_name'];
+    rate.created_at=  json['created_at'];
     return rate;
   }
 

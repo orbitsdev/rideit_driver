@@ -122,7 +122,7 @@ class _Dashboard_screenState extends State<Dashboard_screen> {
   void makeDriverOnlineAndOffline() {
     //mapxcontroller.makeDriverOnline();
     if (driverxcontroller.isOnline.value != true) {
-      driverxcontroller.makeDriverOnline();
+      driverxcontroller.makeDriverOnline(context);
      //driverxcontroller.liveUpdateLocation();
     } else {
      driverxcontroller.makeDriverOffline();

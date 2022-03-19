@@ -246,7 +246,7 @@ void getCurrentStatusOfDriver()  async {
               });
 
               if(status){
-                driverxcontroller.makeDriverOnline();
+                driverxcontroller.makeDriverOnline(context);
               }else{
                 driverxcontroller.makeDriverOffline();
               }

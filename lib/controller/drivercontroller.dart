@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tricycleappdriver/controller/authcontroller.dart';
+import 'package:tricycleappdriver/dialog/authdialog/authdialog.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/model/ongoing_trip_details.dart';
 import 'package:tricycleappdriver/model/rating.dart';
@@ -100,16 +102,16 @@ class Drivercontroller extends GetxController {
   //   }
   // }
 
-  void makeDriverOnline() async {
+  void makeDriverOnline(BuildContext context) async {
     try {
       isOnlineLoading(true);
-
+      Authdialog.showAuthProGress(context, 'please wait');
       if (currentposition == null) {
         currentposition = await Geolocator.getCurrentPosition(
             desiredAccuracy: LocationAccuracy.high);
         latcurrentposition =
             LatLng(currentposition!.latitude, currentposition!.longitude);
-        print('called');
+       
       }
 
       try {
@@ -117,12 +119,12 @@ class Drivercontroller extends GetxController {
           'latitude': currentposition!.latitude,
           'longitude': currentposition!.longitude,
         };
-
+       String token = await messaginginstance.getToken() as String;
         await availabledriverrefference.doc(authinstance.currentUser!.uid).set(
           {
             "driver_location": driverpostion,
             "device_token":
-                authxcontroller.useracountdetails.value.device_token,
+                token,
             "status": "online"
           },
           SetOptions(merge: true),
@@ -130,11 +132,12 @@ class Drivercontroller extends GetxController {
       } on PlatformException catch (e) {
         print(e.message);
       }
-
+        Get.back();
       isOnlineLoading(false);
       isOnline(true);
     } catch (e) {
       print(e);
+      Get.back();
       isOnlineLoading(false);
       //     isOnline(false);
     }

@@ -507,7 +507,7 @@ class Requestcontroller extends GetxController {
               .then((value) async {
             collecting(false);
             Get.back();
-            driverxcontroller.makeDriverOnline();
+            driverxcontroller.makeDriverOnline(context);
             cancelDriverLiveLocation();
 
           
