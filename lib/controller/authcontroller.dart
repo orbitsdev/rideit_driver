@@ -16,7 +16,7 @@ import 'package:tricycleappdriver/verifyingemail_screen.dart';
 import 'package:twilio_phone_verify/twilio_phone_verify.dart';
 
 class Authcontroller extends GetxController {
-  
+  var hasinternet = false.obs;
   var useracountdetails = Users().obs;
   late TwilioPhoneVerify _twilioPhoneVerify;
   var isSignUpLoading = false.obs;

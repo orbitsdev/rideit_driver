@@ -10,6 +10,7 @@ import 'package:tricycleappdriver/controller/drivercontroller.dart';
 import 'package:tricycleappdriver/controller/mapcontroller.dart';
 import 'package:tricycleappdriver/controller/pageindexcontroller.dart';
 import 'package:tricycleappdriver/controller/requestcontroller.dart';
+import 'package:tricycleappdriver/dialog/collectionofdialog.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/screens/earnings_screen.dart';
 import 'package:tricycleappdriver/screens/home_screen.dart';
@@ -244,12 +245,17 @@ void getCurrentStatusOfDriver()  async {
               setState(() {
                 status = val;
               });
-
+                    if(authxcontroller.hasinternet.value){
+                      
               if(status){
                 driverxcontroller.makeDriverOnline(context);
               }else{
                 driverxcontroller.makeDriverOffline();
               }
+                    }else{
+
+                      internetinfoDialog('OPS', 'No Enternet Connection');
+                    }
 
             },
           ),

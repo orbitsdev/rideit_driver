@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/controller/authcontroller.dart';
 import 'package:tricycleappdriver/controller/drivercontroller.dart';
+import 'package:tricycleappdriver/dialog/collectionofdialog.dart';
 import 'package:tricycleappdriver/widgets/verticalspace.dart';
 
 class EditprofileScreen extends StatefulWidget {
@@ -181,6 +182,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                     );
                   }
 
+
                   return Container(
                     width: double.infinity,
                     height: 50,
@@ -202,7 +204,14 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                           style: Get.textTheme.bodyText1!
                               .copyWith(fontWeight: FontWeight.w400)),
                       onPressed: () async {
+                        if(authxcontroller.hasinternet.value){
+
                         updateProfile();
+                        }else{
+
+                            internetinfoDialog('OPS', 'No Enternet Connection');
+                        }
+                        
                       },
                     ),
                   );

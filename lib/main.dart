@@ -57,7 +57,9 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Localnotificationservice.initialize();
   try {
-    await Firebaseconfig.firebaseinitilizeapp();
+    await Firebaseconfig.firebaseinitilizeapp().then((value) {
+      
+    });
   } on FirebaseException catch (e) {
     if (e.code == 'duplicate-app') {
     } else {
@@ -89,15 +91,18 @@ class _TricycleappDriverState extends State<TricycleappDriver> {
         .onConnectivityChanged
         .listen((ConnectivityResult result) {
       if (result == ConnectivityResult.mobile) {
-
+          
           print('Connected to mobile');
+                    Get.find<Authcontroller>().hasinternet(true);
 
         // I am connected to a mobile network.
       } else if (result == ConnectivityResult.wifi) {
         // I am connected to a wifi network.
           print('Connected to wifi');
+                    Get.find<Authcontroller>().hasinternet(true);
       }else{
           print("NO ENTERNET");
+          Get.find<Authcontroller>().hasinternet(false);
 
         internetinfoDialog('OPS', 'No Enternet Connection');
       }
