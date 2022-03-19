@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
@@ -209,7 +210,14 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                         updateProfile();
                         }else{
 
-                            internetinfoDialog('OPS', 'No Enternet Connection');
+                             Fluttertoast.showToast(
+                                    msg: "No enternet connection",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.CENTER,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.black,
+                                    textColor: Colors.grey[400],
+                                    fontSize: 16.0);
                         }
                         
                       },

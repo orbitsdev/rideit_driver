@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/UI/palette.dart';
@@ -92,20 +93,39 @@ class _TricycleappDriverState extends State<TricycleappDriver> {
         .listen((ConnectivityResult result) {
       if (result == ConnectivityResult.mobile) {
           
-          print('Connected to mobile'); 
+          Fluttertoast.showToast(
+              msg: "Connected ",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.black,
+              textColor: ELSA_TEXT_GREY,
+              fontSize: 16.0); 
                     Get.find<Authcontroller>().hasinternet(true);
-            Get.snackbar( 'Online', '', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.black,animationDuration: Duration(milliseconds: 300), colorText: ELSA_GREEN, titleText: null ,  padding: EdgeInsets.all(8),);
         // I am connected to a mobile network.
       } else if (result == ConnectivityResult.wifi) {
-            Get.snackbar('Online', '', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.black,animationDuration: Duration(milliseconds: 300), colorText: ELSA_GREEN, titleText: null ,  padding: EdgeInsets.all(8),);
         // I am connected to a wifi network.
-          print('Connected to wifi');
+           Fluttertoast.showToast(
+              msg: "Connected ",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.black,
+              textColor: ELSA_GREEN,
+              fontSize: 16.0);
                     Get.find<Authcontroller>().hasinternet(true);
       }else{
-          print("NO ENTERNET");
+       
           Get.find<Authcontroller>().hasinternet(false);
 
-        internetinfoDialog('OPS', 'No Enternet Connection');
+        Fluttertoast.showToast(
+              msg: "No Enternet Connection",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.black,
+              textColor: Colors.grey[400],
+              fontSize: 16.0);
       }
       // Got a new connectivity status!
     });

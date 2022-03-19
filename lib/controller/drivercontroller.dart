@@ -1,10 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/controller/authcontroller.dart';
 import 'package:tricycleappdriver/dialog/authdialog/authdialog.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
@@ -70,48 +73,16 @@ class Drivercontroller extends GetxController {
     driverslocationstream!.cancel();
     super.dispose();
   }
-  // void makeDriverOnline() async {
-  //   try {
-  //     isOnlineLoading(true);
-
-  //     currentposition = await Geolocator.getCurrentPosition(
-  //         desiredAccuracy: LocationAccuracy.high);
-  //     // await geoFirestore.setLocation(authinstance.currentUser!.uid, GeoPoint(currentposition!.latitude, currentposition!.longitude));
-  //     //for realtimedatabase
-
-  //     Geofire.initialize("availableDrivers");
-  //     Geofire.setLocation(authinstance.currentUser!.uid,
-  //         currentposition!.latitude, currentposition!.longitude);
-
-  //     //get device token
-
-  //     String devicetoken = await messaginginstance.getToken() as String;
-
-  //     await availabledriverrefference.doc(authinstance.currentUser!.uid).set(
-  //       {"token": devicetoken, "status": "online"},
-  //     );
-
-  //     availablereference.onValue.listen((event) {});
-
-  //     isOnlineLoading(false);
-  //     isOnline(true);
-  //   } catch (e) {
-  //     print(e.toString());
-  //     isOnlineLoading(false);
-  //     isOnline(false);
-  //   }
-  // }
 
   void makeDriverOnline(BuildContext context) async {
     try {
       isOnlineLoading(true);
-      Authdialog.showAuthProGress(context, 'please wait');
+      Authdialog.showAuthProGress(context, 'Loading...');
       if (currentposition == null) {
         currentposition = await Geolocator.getCurrentPosition(
             desiredAccuracy: LocationAccuracy.high);
         latcurrentposition =
             LatLng(currentposition!.latitude, currentposition!.longitude);
-       
       }
 
       try {
@@ -119,20 +90,29 @@ class Drivercontroller extends GetxController {
           'latitude': currentposition!.latitude,
           'longitude': currentposition!.longitude,
         };
-       String token = await messaginginstance.getToken() as String;
+        String token = await messaginginstance.getToken() as String;
         await availabledriverrefference.doc(authinstance.currentUser!.uid).set(
           {
             "driver_location": driverpostion,
-            "device_token":
-                token,
+            "device_token": token,
             "status": "online"
           },
           SetOptions(merge: true),
-        );
+        ).then((value) {
+          Get.back();
+          Fluttertoast.showToast(
+              msg: "You are Online",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.black,
+              textColor: ELSA_GREEN,
+              fontSize: 16.0);
+        });
       } on PlatformException catch (e) {
         print(e.message);
       }
-        Get.back();
+      Get.back();
       isOnlineLoading(false);
       isOnline(true);
     } catch (e) {
@@ -160,26 +140,25 @@ class Drivercontroller extends GetxController {
     });
   }
 
-  void makeDriverOffline() async {
-    //availabledriverrefference.doc(authinstance.currentUser!.uid).delete();
-    //for realtimedatabse
+  void makeDriverOffline(BuildContext context) async {
+    Authdialog.showAuthProGress(context, 'Loading...');
 
-    //_________________________________________________________________________
-    // Geofire.initialize("availableDrivers");
-    // await availablereference.child(authinstance.currentUser!.uid).remove();
     await availabledriverrefference.doc(authinstance.currentUser!.uid).update({
       "status": "offline",
+    }).then((value) {
+      Get.back();
+      Fluttertoast.showToast(
+          msg: "You are Offline",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.redAccent,
+          fontSize: 16.0);
+      isOnlineLoading(false);
+      isOnline(false);
+      print("make drive offline called");
     });
-    //_________________________________________________________________________
-
-    // Geofire.removeLocation(authinstance.currentUser!.uid);
-    //availablereference.onDisconnect();
-
-    //await driverslocationstream!.cancel();
-
-    isOnlineLoading(false);
-    isOnline(false);
-    print("make drive offline called");
   }
 
   void disableLiveLocationUpdate() async {
@@ -187,13 +166,6 @@ class Drivercontroller extends GetxController {
     driverslocationstream!.pause();
     Geofire.removeLocation(authinstance.currentUser!.uid);
   }
-
-  // void enableLibeLocationUpdate() async{
-  //   var currentpositon =  await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-  //   driverslocationstream!.resume();
-  //   Geofire.setLocation(authinstance.currentUser!.uid, currentpositon.latitude, currentpositon.longitude);
-
-  // }
 
   Future<bool> updateProfile(String imageurl) async {
     bool isupdate = false;
@@ -217,7 +189,14 @@ class Drivercontroller extends GetxController {
           .doc(authinstance.currentUser!.uid)
           .update({'name': name, 'phone': email.trim()}).then((_) async {
         isupdatingloading(false);
-
+       Fluttertoast.showToast(
+                                    msg: "Update success",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.CENTER,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.black,
+                                    textColor: ELSA_GREEN,
+                                    fontSize: 16.0);
         Get.back();
       });
     } catch (e) {
@@ -241,7 +220,6 @@ class Drivercontroller extends GetxController {
         .snapshots()
         .listen((event) {
       listofRatings(event.docs.map((e) {
-
         var data = e.data() as Map<String, dynamic>;
         print(data);
         data['passenger_id'] = e.id;
@@ -251,7 +229,6 @@ class Drivercontroller extends GetxController {
 
       print('_LENGHT OF RATINGS');
       print(listofRatings.length);
-
     });
   }
 }

@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:path/path.dart';
 import 'package:tricycleappdriver/config/firebaseconfig.dart';
 import 'package:tricycleappdriver/config/mapconfig.dart';
 import 'package:tricycleappdriver/controller/authcontroller.dart';
@@ -64,7 +65,7 @@ class Requestcontroller extends GetxController {
 
   //
   String? requestid;
-  void confirmRequest(String? requestid) async {
+  void confirmRequest(BuildContext context, String? requestid) async {
     Get.back();
     progressDialog("Loading...");
     if (requestid != null) {
@@ -116,7 +117,7 @@ class Requestcontroller extends GetxController {
                     'tripstatus': 'ready',
                   }).then((value) async {
                     //make driver offline
-                    driverxcontroller.makeDriverOffline();
+                    driverxcontroller.makeDriverOffline(context);
 
                     //close loading screen
                     Get.back();

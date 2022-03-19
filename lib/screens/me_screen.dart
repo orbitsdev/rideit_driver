@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';
@@ -95,12 +96,10 @@ class _MeScreenState extends State<MeScreen> {
         await FirebaseApi.updateProfile(urlDownload, destination);
         Get.back();
         Get.back();
-      } on PlatformException catch (e) {
-       
-      }
+      } on PlatformException catch (e) {}
     } else {
-        print(authxcontroller.hasinternet.value);
-       internetinfoDialog('OPS', 'No Enternet Connection');
+      print(authxcontroller.hasinternet.value);
+      internetinfoDialog('OPS', 'No Enternet Connection');
     }
   }
 
@@ -161,14 +160,19 @@ class _MeScreenState extends State<MeScreen> {
                         right: 5,
                         child: IconButton(
                             onPressed: () {
-
-                                 if (authxcontroller.hasinternet.value) {
-                                     Profiledialog.showSimpleDialog(
-                                  context, pickImage);
-                                 }else{
-                                     internetinfoDialog('OPS', 'No Enternet Connection');
-                                 }
-                            
+                              if (authxcontroller.hasinternet.value) {
+                                Profiledialog.showSimpleDialog(
+                                    context, pickImage);
+                              } else {
+                                Fluttertoast.showToast(
+                                    msg: "No enternet connection",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.CENTER,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.black,
+                                    textColor: Colors.grey[400],
+                                    fontSize: 16.0);
+                              }
                             },
                             icon: Icon(
                               Icons.camera_alt,

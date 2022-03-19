@@ -3,7 +3,10 @@ import 'dart:typed_data';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart';
+import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:tricycleappdriver/model/users.dart';
@@ -52,6 +55,15 @@ class FirebaseApi {
           if(lastimagefile != null){
           await storage.ref(lastimagefile).delete();
           isupdate = true;    
+
+           Fluttertoast.showToast(
+                                    msg: "Updated Success",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.CENTER,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.black,
+                                    textColor: ELSA_GREEN,
+                                    fontSize: 16.0);
           }
           
         });

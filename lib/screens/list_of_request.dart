@@ -90,7 +90,7 @@ class _ListOfRequestState extends State<ListOfRequest> {
                         Text("${requestxcontroller.lisofunacceptedrequest[0].pickaddress_name}"),
                         ElevatedButton(
                             onPressed: () {
-                              requestxcontroller.confirmRequest(requestxcontroller
+                              requestxcontroller.confirmRequest(context, requestxcontroller
                                   .lisofunacceptedrequest[0].request_id);
                             },
                             child: Text('Confirm')),
@@ -144,7 +144,7 @@ class _ListOfRequestState extends State<ListOfRequest> {
                                   children: [
                                     ElevatedButton(
                                         onPressed: () {
-                                          requestxcontroller.confirmRequest(
+                                          requestxcontroller.confirmRequest(context,
                                               requestxcontroller
                                                   .lisofunacceptedrequest[index]
                                                   .request_id);

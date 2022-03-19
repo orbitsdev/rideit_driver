@@ -112,7 +112,7 @@ class Requestdialogcontent extends StatelessWidget {
                       }, child: const Text('Reject')),
                       ElevatedButton(onPressed: () async{
                       // assetaudioplayer.stop();
-                        requestxcontroller.confirmRequest(requestdetails!.request_id as String );                    
+                        requestxcontroller.confirmRequest(context, requestdetails!.request_id as String );                    
 //                          Get.back();
 
 
