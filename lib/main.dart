@@ -92,11 +92,12 @@ class _TricycleappDriverState extends State<TricycleappDriver> {
         .listen((ConnectivityResult result) {
       if (result == ConnectivityResult.mobile) {
           
-          print('Connected to mobile');
+          print('Connected to mobile'); 
                     Get.find<Authcontroller>().hasinternet(true);
-
+            Get.snackbar( 'Online', '', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.black,animationDuration: Duration(milliseconds: 300), colorText: ELSA_GREEN, titleText: null ,  padding: EdgeInsets.all(8),);
         // I am connected to a mobile network.
       } else if (result == ConnectivityResult.wifi) {
+            Get.snackbar('Online', '', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.black,animationDuration: Duration(milliseconds: 300), colorText: ELSA_GREEN, titleText: null ,  padding: EdgeInsets.all(8),);
         // I am connected to a wifi network.
           print('Connected to wifi');
                     Get.find<Authcontroller>().hasinternet(true);
