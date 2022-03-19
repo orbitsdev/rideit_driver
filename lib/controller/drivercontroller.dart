@@ -7,6 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tricycleappdriver/controller/authcontroller.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/model/ongoing_trip_details.dart';
+import 'package:tricycleappdriver/model/rating.dart';
 import 'package:tricycleappdriver/model/users.dart';
 
 class Drivercontroller extends GetxController {
@@ -21,8 +22,10 @@ class Drivercontroller extends GetxController {
   var totalsuccestrip = 0.obs;
   var canceledtrip = 0.obs;
   var totalearning = 0.obs;
-
   var authxcontroller = Get.find<Authcontroller>();
+
+  var listofRatings = <Rating>[].obs;
+
   //GeoFirestore geoFirestore =GeoFirestore(firestore.collection('availableDrivers'));
 
   void listenToAllTrip() async {
@@ -204,36 +207,48 @@ class Drivercontroller extends GetxController {
   }
 
   var isupdatingloading = false.obs;
-   updateProfileDetails(String name, String email) async {
+  updateProfileDetails(String name, String email) async {
     isupdatingloading(true);
     try {
       await driversusers
           .doc(authinstance.currentUser!.uid)
-          .update({'name': name, 'phone': email.trim()}).then((_)  async {
-          
-            
-        
-           isupdatingloading(false);
-        
-           Get.back();
-        
+          .update({'name': name, 'phone': email.trim()}).then((_) async {
+        isupdatingloading(false);
+
+        Get.back();
       });
     } catch (e) {
       isupdatingloading(false);
     }
   }
 
-  void listenToAcountUser() async{  
+  void listenToAcountUser() async {
+    driversusers.doc(authinstance.currentUser!.uid).snapshots().listen((event) {
+      var data = event.data() as Map<String, dynamic>;
 
-    print('acount user ;listening');
+      authxcontroller.useracountdetails(Users.fromJson(data));
+    });
+  }
 
-    driversusers.doc(authinstance.currentUser!.uid).snapshots().listen((event) { 
-          
-       
-         var data = event.data() as Map<String, dynamic>;
-         data['id'] = authinstance.currentUser!.uid;
-         print(data);
-            authxcontroller.useracountdetails(Users.fromJson(data)) ;
+  void listenToRatings() async {
+    print('ratings listening');
+    ratingsreferrence
+        .doc(authinstance.currentUser!.uid)
+        .collection('ratings')
+        .snapshots()
+        .listen((event) {
+      listofRatings(event.docs.map((e) {
+
+        var data = e.data() as Map<String, dynamic>;
+        print(data);
+        data['passenger_id'] = e.id;
+        print(data);
+        return Rating.fromJson(data);
+      }).toList());
+
+      print('_LENGHT OF RATINGS');
+      print(listofRatings.length);
+
     });
   }
 }

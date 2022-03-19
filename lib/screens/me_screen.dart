@@ -14,6 +14,7 @@ import 'package:tricycleappdriver/controller/authcontroller.dart';
 import 'package:tricycleappdriver/controller/drivercontroller.dart';
 import 'package:tricycleappdriver/dialog/authdialog/authdialog.dart';
 import 'package:tricycleappdriver/dialog/profiledialog/profiledialog.dart';
+import 'package:tricycleappdriver/model/rating.dart';
 import 'package:tricycleappdriver/screens/editprofile_screen.dart';
 import 'package:tricycleappdriver/services/firebase_api.dart';
 import 'package:tricycleappdriver/widgets/horizontalspace.dart';
@@ -54,6 +55,8 @@ class _MeScreenState extends State<MeScreen> {
   void initState() {
     super.initState();
     driverxcontroller.listenToAcountUser();
+    driverxcontroller.listenToRatings();
+    
   }
 
   @override
@@ -240,116 +243,28 @@ class _MeScreenState extends State<MeScreen> {
                     ELSA_PINK),
                 Container(
                   height: 270,
-                  child: AnimationLimiter(
-                    child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: 20,
-                        itemBuilder: (context, index) {
-                          return Container(
-                            margin: EdgeInsets.symmetric(
-                              vertical: 10,
-                            ),
-                            padding: EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                                color: BACKGROUND_BLACK,
-                                borderRadius:
-                                    BorderRadius.circular(containerRadius)),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    ClipOval(
-                                      child: Container(
-                                        color: ELSA_TEXT_WHITE,
-                                        padding: EdgeInsets.all(1),
-                                        child: ClipOval(
-                                          child: Container(
-                                            height: 50,
-                                            width: 50,
-                                            color: listofcolors[random
-                                                .nextInt(listofcolors.length)],
-                                            padding: EdgeInsets.all(2),
-                                            child: Center(
-                                              child: Text(
-                                                authxcontroller
-                                                    .useracountdetails
-                                                    .value
-                                                    .name![0]
-                                                    .toUpperCase(),
-                                                style: Get.textTheme.headline1!
-                                                    .copyWith(),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 12,
-                                    ),
-                                    Flexible(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'KATE KRISITNE  ',
-                                            style: Get.textTheme.bodyText1,
-                                          ),
-                                          SizedBox(
-                                            height: 4,
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              RatingBar.builder(
-                                                initialRating: 5,
-                                                minRating: 5,
-                                                direction: Axis.horizontal,
-                                                allowHalfRating: true,
-                                                itemCount: 5,
-                                                itemSize: 20,
-                                                itemPadding:
-                                                    EdgeInsets.symmetric(
-                                                        horizontal: 4.0),
-                                                itemBuilder: (context, _) =>
-                                                    Icon(
-                                                  Icons.star,
-                                                  color: Colors.amber,
-                                                ),
-                                                onRatingUpdate: (rating) {},
-                                              ),
-                                              SizedBox(
-                                                width: 5,
-                                              ),
-                                              Text(
-                                                '5.0',
-                                                style: Get.textTheme.bodyText1,
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: 8,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                      'Nice and Very smooth transactions  that was the best expereince'),
-                                ),
-                              ],
-                            ),
-                          );
-                        }),
-                  ),
+                  child:  AnimationLimiter(
+          child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: driverxcontroller.listofRatings.length,
+          itemBuilder: (context, index) {
+            return AnimationConfiguration.staggeredList(
+            position: index,
+            duration: const Duration(milliseconds: 375),
+            child: FadeInAnimation(
+              //verticalOffset: 50.0,
+              child: ScaleAnimation(
+                child:  Material(
+                color: Colors.transparent,
+                child: ratingBuilder(driverxcontroller.listofRatings[index]),
+              ),
+            ),)
+          );
+            
+            //
+          }),
+        ),
+               
                 ),
                 Verticalspace(120),
               ],
@@ -360,6 +275,106 @@ class _MeScreenState extends State<MeScreen> {
     );
   }
 
+Widget ratingBuilder(Rating rating){
+  return Container(
+                          margin: EdgeInsets.symmetric(
+                            vertical: 10,
+                          ),
+                          padding: EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                              color: BACKGROUND_BLACK,
+                              borderRadius:
+                                  BorderRadius.circular(containerRadius)),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  ClipOval(
+                                    child: Container(
+                                      color: ELSA_TEXT_WHITE,
+                                      padding: EdgeInsets.all(1),
+                                      child: ClipOval(
+                                        child: Container(
+                                          height: 50,
+                                          width: 50,
+                                          color: listofcolors[random
+                                              .nextInt(listofcolors.length)],
+                                          padding: EdgeInsets.all(2),
+                                          child: Center(
+                                            child: Text(rating.passenger_name ==  null ? 'K' :  rating.passenger_name![0].toUpperCase()  ,
+                                              style: Get.textTheme.headline1!
+                                                  .copyWith(),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 12,
+                                  ),
+                                  Flexible(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${rating.passenger_name} ',
+                                          style: Get.textTheme.bodyText1,
+                                        ),
+                                        SizedBox(
+                                          height: 4,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            RatingBar.builder(
+                                              initialRating: 5,
+                                              minRating: 5,
+                                              direction: Axis.horizontal,
+                                              allowHalfRating: true,
+                                              itemCount: 5,
+                                              itemSize: 20,
+                                              itemPadding:
+                                                  EdgeInsets.symmetric(
+                                                      horizontal: 4.0),
+                                              itemBuilder: (context, _) =>
+                                                  Icon(
+                                                Icons.star,
+                                                color: Colors.amber,
+                                              ),
+                                              onRatingUpdate: (rating) {},
+                                            ),
+                                            SizedBox(
+                                              width: 5,
+                                            ),
+                                            Text(
+                                              '${rating.rate} ',
+                                              style: Get.textTheme.bodyText1,
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 8,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                    '${rating.comment} '),
+                              ),
+                            ],
+                          ),
+                        );
+}
   Widget infoBuilder(IconData icon, String label, Color color) {
     return Column(
         mainAxisAlignment: MainAxisAlignment.center,
