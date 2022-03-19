@@ -59,6 +59,7 @@ class _HomeScreenManagerState extends State<HomeScreenManager>  with SingleTicke
  
   @override
   void initState() {
+    super.initState();
    
  WidgetsBinding.instance!.addObserver(this);
   _tabController =  TabController(
@@ -70,9 +71,10 @@ class _HomeScreenManagerState extends State<HomeScreenManager>  with SingleTicke
      cloudMessagingSetup();
       authxcontroller.checkIfAcountDetailsIsNull();   
       getCurrentStatusOfDriver();
+    
+     //  driverxcontroller.listenToAcountUser();
      // requestxcontroller.checkIfHasOngoingRequest();
 
-    super.initState();
   
   }
 
@@ -161,6 +163,7 @@ void getCurrentStatusOfDriver()  async {
 
         // optional badges, length must be same with labels
         badges: [
+        
           
           // Default Motion Badge Widget
           // const MotionBadgeWidget(

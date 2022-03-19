@@ -225,10 +225,10 @@ class Drivercontroller extends GetxController {
 
   void listenToAcountUser() async{  
 
-    print('called');
+    print('acount user ;listening');
 
     driversusers.doc(authinstance.currentUser!.uid).snapshots().listen((event) { 
-
+          
        
          var data = event.data() as Map<String, dynamic>;
          data['id'] = authinstance.currentUser!.uid;

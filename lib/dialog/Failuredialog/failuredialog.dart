@@ -4,6 +4,9 @@ import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/UI/uicolor.dart';
+import 'package:tricycleappdriver/widgets/horizontalspace.dart';
+
+import '../../widgets/verticalspace.dart';
 
 class Failuredialog {
 static void noDataDialog(BuildContext context, String title, String body){
@@ -184,6 +187,69 @@ static void showInternetConnectionInfoDialog(BuildContext context, String title,
              ),
            
          );
+        });
+  }
+
+  static void shouwUploadFailedDialog(BuildContext context){
+     showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return Dialog(
+            backgroundColor: BOTTOMNAVIGATOR_COLOR,
+            child: Container(
+              decoration: BoxDecoration(
+                  color: BOTTOMNAVIGATOR_COLOR,
+                  borderRadius:
+                      BorderRadius.all(Radius.circular(containerRadius))),
+              padding: EdgeInsets.all(20),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Verticalspace(12),
+                    Text(
+                      'Failed?',
+                      style: Get.textTheme.headline1!.copyWith(
+                        color: ELSA_TEXT_WHITE,
+                        fontWeight: FontWeight.w600
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    Verticalspace(16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center, children: [
+                     Container(
+                        height: 50,
+                        decoration: const ShapeDecoration(
+                          shape: StadiumBorder(),
+                          gradient: LinearGradient(
+                            end: Alignment.bottomCenter,
+                            begin: Alignment.topCenter,
+                            colors: [
+                              ELSA_BLUE_1_,
+                              ELSA_BLUE_1_,
+                            ],
+                          ),
+                        ),
+                        child: MaterialButton(
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          shape: const StadiumBorder(),
+                          child: Text('Ok',
+                              style: Get.textTheme.bodyText1!
+                                  .copyWith(fontWeight: FontWeight.w400)),
+                          onPressed: () async {
+                           Get.back();
+                          },
+                        ),
+                      ),
+                      Horizontalspace(10),
+                      
+                    ]),
+                  ]),
+            ),
+          );
         });
   }
 }
