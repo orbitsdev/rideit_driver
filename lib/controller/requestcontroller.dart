@@ -109,7 +109,9 @@ class Requestcontroller extends GetxController {
                   .doc(requestid)
                   .set({'status': 'accepted'}).then((_) async {
                 Get.back();
+                // close lisscreen
                 Get.back();
+
                 //get direction and ongoingtripdetails local
                 Authdialog.showAuthProGress(context, 'Prepairing trip ...');
                 var isOngoingReady =
@@ -688,7 +690,7 @@ class Requestcontroller extends GetxController {
 
   void cancelOngoingTrip(BuildContext context) async {
     
-    Authdialog.showAuthProGress(context, 'Canceling...');
+    Authdialog.showAuthProGress(context, 'Please wait...');
 
     try {
       await ongointripreferrence.doc(requestid).update({
@@ -730,7 +732,7 @@ class Requestcontroller extends GetxController {
               .doc(requestid)
               .delete()
               .then((value) async {
-                              
+
               await ongointripreferrence.doc(requestid).delete().then((value) async{
                       collecting(false);
             Get.back();
@@ -745,6 +747,7 @@ class Requestcontroller extends GetxController {
             newtripstatusvalue = null;
             // driverxcontroller.enableLibeLocationUpdate();
             hasongingtrip(false);
+
             hasacceptedrequest(false);
             Future.delayed(Duration(milliseconds: 300), () {
               Get.offNamedUntil(HomeScreenManager.screenName, (route) => false);

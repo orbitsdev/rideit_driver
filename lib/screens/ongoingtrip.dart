@@ -477,7 +477,7 @@ class _OngoingtripState extends State<Ongoingtrip> {
                                       ),
                                     ),
                                     Verticalspace(16),
-
+                                    if( requestxconroller.ongoingtrip.value .tripstatus != "prepairing" &&  requestxconroller.ongoingtrip.value .tripstatus != "complete" )
                                     Container(
                                       margin: EdgeInsets.symmetric(
                                         horizontal: 12,

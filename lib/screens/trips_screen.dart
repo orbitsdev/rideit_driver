@@ -43,8 +43,8 @@ class _TripsScreenState extends State<TripsScreen>
   bool isdepencycalled = false;
   @override
   void didChangeDependencies() {
-    getOngoinTripDataIfHasRequqest(context);
     super.didChangeDependencies();
+    getOngoinTripDataIfHasRequqest(context);
   }
 
 
@@ -101,7 +101,8 @@ class _TripsScreenState extends State<TripsScreen>
     return Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,
-        child: Column(children: [
+        child:
+         Column(children: [
           Container(
             padding: EdgeInsets.only(top: 40),
             decoration: BoxDecoration(
@@ -181,6 +182,7 @@ class _TripsScreenState extends State<TripsScreen>
             ),
           ),
         ]),
+       
       ),
     );
   }
@@ -225,6 +227,8 @@ class _TripsScreenState extends State<TripsScreen>
   }
 
   Widget noDataBuilder() {
+
+    
     return Container(
       height: MediaQuery.of(context).size.height,
       child: Column(
@@ -311,7 +315,7 @@ class _TripsScreenState extends State<TripsScreen>
                                     style: TextStyle(color: Colors.amber[300])),
                                 TextSpan(
                                     text:
-                                        '${driverxcontroller.totalearning}.00'),
+                                        '10.00'),
                               ],
                             ),
                           ),
