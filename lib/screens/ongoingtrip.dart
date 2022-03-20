@@ -176,9 +176,20 @@ class _OngoingtripState extends State<Ongoingtrip> {
     });
   }
 
-  void _caneraBoundRoute(LatLng bound_sw, LatLng bound_ne) {
-    newgooglemapcontroller!.animateCamera(CameraUpdate.newLatLngBounds(
-        LatLngBounds(southwest: bound_sw, northeast: bound_ne), 50));
+  void _caneraBoundRoute(LatLng? bound_sw, LatLng? bound_ne) {
+    print('Camerabound');
+    print(bound_sw);
+    print(bound_ne);
+
+    try{
+      newgooglemapcontroller!.animateCamera(CameraUpdate.newLatLngBounds(
+        LatLngBounds(southwest: bound_sw as LatLng, northeast: bound_ne as LatLng), 50));
+    }catch(e){
+        print(e);
+    }
+   
+
+   
   }
 
   void setPolylines() {
@@ -199,8 +210,8 @@ class _OngoingtripState extends State<Ongoingtrip> {
       );
 
       _caneraBoundRoute(
-          requestxconroller.directiondetails.value.bound_sw as LatLng,
-          requestxconroller.directiondetails.value.bound_ne as LatLng);
+          requestxconroller.directiondetails.value.bound_sw ,
+          requestxconroller.directiondetails.value.bound_ne );
     }
   }
 

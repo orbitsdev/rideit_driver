@@ -33,11 +33,11 @@ static const screenName = '/homescreencontroller';
 
 class _HomeScreenManagerState extends State<HomeScreenManager>  with SingleTickerProviderStateMixin,  WidgetsBindingObserver{
 
-    var authxcontroller = Get.find<Authcontroller>();
-    var mapxcontroller = Get.find<Mapcontroller>();
-    var pageindexcontroller = Get.find<Pageindexcontroller>();
-    var driverxcontroller = Get.find<Drivercontroller>();
-    var requestxcontroller = Get.find<Requestcontroller>();
+    var authxcontroller = Get.put(Authcontroller());
+    var mapxcontroller = Get.put(Mapcontroller());
+    var pageindexcontroller = Get.put(Pageindexcontroller());
+    var driverxcontroller = Get.put(Drivercontroller());
+    var requestxcontroller = Get.put(Requestcontroller());
     Color colorwhite = HexColor("#fbfefb");
     Color iconcolor = HexColor("#2F2191");
     Color iconcolorsecondary = HexColor("#594DAF");
