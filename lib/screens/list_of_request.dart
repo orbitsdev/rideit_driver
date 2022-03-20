@@ -51,16 +51,30 @@ class _ListOfRequestState extends State<ListOfRequest> {
                                         .copyWith(fontWeight: FontWeight.w600)),
                                 Verticalspace(5),
                                 Row(children: [
-                                  Container(
-                                    height: 34,
-                                    width: 34,
-                                    child: Center(
-                                      child: FaIcon(
-                                        FontAwesomeIcons.mapMarkerAlt,
-                                        color: ELSA_PINK,
-                                      ),
-                                    ),
-                                  ),
+                                 ClipOval(
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  //
+                                                  gradient: LinearGradient(
+                                                    begin: Alignment.topCenter,
+                                                    end: Alignment.bottomLeft,
+                                                    colors: [
+                                                      ELSA_PINK_TEXT,
+                                                      ELSA_PINK_TEXT,
+                                                    ],
+                                                  ),
+                                                ),
+                                                width: 30,
+                                                height: 30,
+                                                child: Center(
+                                                    child: Text(
+                                                  'FR',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w300),
+                                                )),
+                                              ),
+                                            ),
                                   Horizontalspace(4),
                                   Expanded(
                                     child: Text(
@@ -140,7 +154,7 @@ class _ListOfRequestState extends State<ListOfRequest> {
                           Expanded(
                             child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  primary: Colors.redAccent,
+                                  primary: PINK_1,
                                 ),
                                 onPressed: () {},
                                 child: Text('View Location')),
@@ -271,7 +285,7 @@ class _ListOfRequestState extends State<ListOfRequest> {
                                             // ),
                                             Flexible(
                                               child: Text(
-                                                'Kalawas 2 Isulan SUltan Kudarat THe deprament of education',
+                                                '278 Kalawas 2 Isulan SUltan Kudarat ',
                                                 style: Get.textTheme.bodyText1!
                                                     .copyWith(
                                                   fontWeight: FontWeight.w100,
@@ -285,16 +299,43 @@ class _ListOfRequestState extends State<ListOfRequest> {
                                     ),
                                   ),
                                 ),
-                                Row(
+
+                                Column(
                                   children: [
-                                    Column(children: [
-                                     IconButton(onPressed: (){}, icon: FaIcon(FontAwesomeIcons.checkCircle, size: 34, color: ELSA_GREEN,)),
-                                    Text('Accept', style: TextStyle(fontSize: 12, color: Colors.grey[400], fontWeight: FontWeight.w100))
-                                    ] ),
-                                    Column(children: [
-                                     IconButton(onPressed: (){}, icon: FaIcon(FontAwesomeIcons.mapMarkedAlt, size: 34, color: ELSA_BLUE,)),
-                                    Text('View', style: TextStyle(fontSize: 12, color: Colors.grey[400], fontWeight: FontWeight.w100))
-                                    ] ),
+                                    Row(
+                                      children: [
+                                            GestureDetector(
+                                              onTap: (){
+                                                print('accepte');
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.all(2),
+                                                child: Column(children: [
+                                                  FaIcon(FontAwesomeIcons.checkCircle, size: 34, color: ELSA_GREEN),
+                                                Text('Accept', style: TextStyle(fontSize: 12, color: Colors.grey[400], fontWeight: FontWeight.w100))
+                                                ] ),
+                                              ),
+                                            ),
+                                            Horizontalspace(8),
+                                            GestureDetector(
+                                              onTap: (){
+                                                print('view');
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.all(2),
+                                                child: Column(children: [
+                                                  FaIcon(FontAwesomeIcons.mapMarkedAlt, size: 34, color: ELSA_BLUE),
+                                                Text('View', style: TextStyle(fontSize: 12, color: Colors.grey[400], fontWeight: FontWeight.w100))
+                                                ] ),
+                                              ),
+                                            ),
+                                       
+
+                                        
+                                      ],
+                                    ),
+                                    Verticalspace(8),
+                                    Text('New Request'.toUpperCase(), style: TextStyle(fontSize: 12, color: DARK_GREEN, fontWeight: FontWeight.w400) )
                                   ],
                                 )
                               ],
