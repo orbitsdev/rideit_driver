@@ -231,4 +231,18 @@ class Drivercontroller extends GetxController {
       print(listofRatings.length);
     });
   }
+
+
+  void deleteAcceptedRequest(String requestid) async{
+   await drivercurrentrequestaccepted.doc(requestid).delete().then((value) {
+      Fluttertoast.showToast(
+              msg: "Has accepted request but request found",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.redAccent,
+              textColor: Colors.grey[400],
+              fontSize: 16.0);
+   });
+  }
 }

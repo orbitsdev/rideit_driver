@@ -62,14 +62,10 @@ class Requestcontroller extends GetxController {
   var loaderoftrip = false.obs;
   Map<String, dynamic> ongoingtripdata = {};
 
-
-
   //
   var hasacceptedrequest = false.obs;
   String? requestid;
-  void confirmRequest(BuildContext context, String? requestid) async { 
-    Get.back();
-
+  void confirmRequest(BuildContext context, String? requestid) async {
     hasacceptedrequest(true);
     Authdialog.showAuthProGress(context, 'Please wait...');
     if (requestid != null) {
@@ -112,10 +108,11 @@ class Requestcontroller extends GetxController {
               await drivercurrentrequestaccepted
                   .doc(requestid)
                   .set({'status': 'accepted'}).then((_) async {
-                    Get.back();
+                Get.back();
                 //get direction and ongoingtripdetails local
                 Authdialog.showAuthProGress(context, 'Prepairing trip ...');
-                var isOngoingReady = await getDirectionAndCreateOngoingTrip(requestid);
+                var isOngoingReady =
+                    await getDirectionAndCreateOngoingTrip(requestid);
 
                 if (isOngoingReady) {
                   await requestcollecctionrefference.doc(requestid).update({
@@ -126,10 +123,9 @@ class Requestcontroller extends GetxController {
                     Get.back();
 
                     //close loading screen
-                   
 
                     //update page to trip para pag back mo malakat ka sa trip screen
-                    pageindexcontroller.updateIndex(2);
+                    pageindexcontroller.updateIndex(1);
 
                     //after 300 milliseconds lakat ka sa ongoing trip screen
 
@@ -332,7 +328,7 @@ class Requestcontroller extends GetxController {
     bool isChange = false;
     tripTextIsloading(true);
     String? tripstatus;
-    
+
     // to make sur
 
     if (ongoingtrip.value.tripstatus == "prepairing") {
@@ -519,7 +515,6 @@ class Requestcontroller extends GetxController {
             driverxcontroller.makeDriverOnline(context);
             cancelDriverLiveLocation();
 
-          
             ongoingtrip = OngoingTripDetails().obs;
             directiondetails = Directiondetails().obs;
             livedirectiondetails = Directiondetails().obs;
@@ -605,6 +600,9 @@ class Requestcontroller extends GetxController {
       hastrip = false;
     }
 
+    print('HAS TRIP BEFOR ERETURNING');
+    print(hastrip);
+
     return hastrip;
   }
 
@@ -613,11 +611,17 @@ class Requestcontroller extends GetxController {
 
     try {
       await requestcollecctionrefference.doc(requestid).get().then((value) {
-        requestdetails(
-            RequestDetails.fromJson(value.data() as Map<String, dynamic>));
-        requestdetails.value.request_id = requestid;
 
-        ready = true;
+        if (value.exists) {
+          requestdetails(RequestDetails.fromJson(value.data() as Map<String, dynamic>));
+          requestdetails.value.request_id = requestid;
+          ready = true;
+          
+        }else{
+           ready = false;
+           driverxcontroller.deleteAcceptedRequest(requestid as String);
+        }
+
       });
     } on SocketException {
       Failuredialog.showInternetConnectionInfoDialog(
@@ -680,28 +684,24 @@ class Requestcontroller extends GetxController {
     }
   }
 
-  void cancelOngoingTrip (BuildContext context) async{
+  void cancelOngoingTrip(BuildContext context) async {
+    Authdialog.showAuthProGress(context, 'Please wait...');
 
-   Authdialog.showAuthProGress(context, 'Please wait...');
-  
-  try{
-
-    await ongointripreferrence.doc(requestid).update({
-      'payedamount': 0,
-      'tripstatus': 'canceled',
-      'payed': true,
-    });
-  }catch(e){
-    print(e);
-  }
+    try {
+      await ongointripreferrence.doc(requestid).update({
+        'payedamount': 0,
+        'tripstatus': 'canceled',
+        'payed': true,
+      });
+    } catch (e) {
+      print(e);
+    }
 
 //update variable local to be safe
     ongoingtrip.value.payedamount = 0;
     ongoingtrip.value.tripstatus = 'canceled';
     ongoingtrip.value.payed = true;
     Map<String, dynamic> triphistorydata = ongoingtrip.value.toJson();
-
-   
 
     await drivertriphistoryreferrence
         .doc(authinstance.currentUser!.uid)
@@ -727,7 +727,6 @@ class Requestcontroller extends GetxController {
             driverxcontroller.makeDriverOnline(context);
             cancelDriverLiveLocation();
 
-          
             ongoingtrip = OngoingTripDetails().obs;
             directiondetails = Directiondetails().obs;
             livedirectiondetails = Directiondetails().obs;
