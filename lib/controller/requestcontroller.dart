@@ -122,8 +122,8 @@ class Requestcontroller extends GetxController {
                     'tripstatus': 'ready',
                   }).then((value) async {
                     //make driver offline
-                    driverxcontroller.makeDriverOffline(context);
                     Get.back();
+                  driverxcontroller.makeDriverOffline(context);
 
                     //close loading screen
 
@@ -525,6 +525,7 @@ class Requestcontroller extends GetxController {
             requestdetails = RequestDetails().obs;
             pageindexcontroller.updateIndex(1);
             newtripstatusvalue = null;
+          
             // driverxcontroller.enableLibeLocationUpdate();
             hasongingtrip(false);
 

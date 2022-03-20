@@ -219,7 +219,7 @@ void getCurrentStatusOfDriver()  async {
       ),
 
   //     floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: requestxcontroller.ongoingtrip.value.request_id == null?  GFFloatingWidget(
+      floatingActionButton: requestxcontroller.ongoingtrip.value.drop_location_id == null?  GFFloatingWidget(
        
        child: GFIconBadge(
               
