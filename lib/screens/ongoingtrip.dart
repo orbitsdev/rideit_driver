@@ -404,57 +404,30 @@ class _OngoingtripState extends State<Ongoingtrip> {
                                       thickness: 1,
                                       color: LIGHT_CONTAINER,
                                     ),
-                                    Container(
-                                      width: double.infinity,
-                                      child: Text(
-                                        requestxconroller.ongoingtrip.value
-                                                    .tripstatus ==
-                                                "prepairing"
-                                            ? 'Press the button if you are ready'
-                                            : requestxconroller.ongoingtrip
-                                                        .value.tripstatus ==
-                                                    "coming"
-                                                ? 'Press the button when you already arrived'
-                                                : requestxconroller.ongoingtrip
-                                                            .value.tripstatus ==
-                                                        "arrived"
-                                                    ? 'Wait for the customer and start the trip if ready'
-                                                    : '',
-                                        style: TextStyle(
-                                            color: ELSA_GREEN,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w300),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                    //   if (requestxconroller .ongoingtrip.value.tripstatus ==   "coming" || requestxconroller .ongoingtrip.value.tripstatus ==   "picked" )
-                                    //  GestureDetector(
-                                    //   onTap: () async {
-
-                                    //        requestxconroller.launchMapsUrl(
-                                    //             requestxconroller
-                                    //                 .ongoingtrip
-                                    //                 .value
-                                    //                 .pick_location_id as String,
-                                    //             requestxconroller
-                                    //                 .ongoingtrip
-                                    //                 .value
-                                    //                 .drop_location_id as String,
-                                    //             requestxconroller
-                                    //                 .ongoingtrip
-                                    //                 .value
-                                    //                 .drop_location as LatLng);
-
-                                    //   },
-                                    //   child: Row(
-                                    //     children: [
-                                    //       Image.asset('assets/images/icons8-google-maps-48.png' , height: 34 ,width: 34,),
-                                    //       Text('Google Map', )
-
-                                    //     ],
-
+                                    // Container(
+                                    //   width: double.infinity,
+                                    //   child: Text(
+                                    //     requestxconroller.ongoingtrip.value
+                                    //                 .tripstatus ==
+                                    //             "prepairing"
+                                    //         ? 'Press the button if you are ready'
+                                    //         : requestxconroller.ongoingtrip
+                                    //                     .value.tripstatus ==
+                                    //                 "coming"
+                                    //             ? 'Press the button when you already arrived'
+                                    //             : requestxconroller.ongoingtrip
+                                    //                         .value.tripstatus ==
+                                    //                     "arrived"
+                                    //                 ? 'Wait for the customer and start the trip if ready'
+                                    //                 : '',
+                                    //     style: TextStyle(
+                                    //         color: ELSA_GREEN,
+                                    //         fontSize: 14,
+                                    //         fontWeight: FontWeight.w300),
+                                    //     textAlign: TextAlign.center,
                                     //   ),
                                     // ),
+                                    
                                     Verticalspace(16),
 
                                     Container(
@@ -462,9 +435,9 @@ class _OngoingtripState extends State<Ongoingtrip> {
                                         horizontal: 12,
                                       ),
                                       width: double.infinity,
-                                      height: 60,
-                                      decoration: const ShapeDecoration(
-                                        shape: StadiumBorder(),
+                                      height: 50,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(Radius.circular(8)),
                                         gradient: LinearGradient(
                                           end: Alignment.bottomCenter,
                                           begin: Alignment.topCenter,
@@ -501,6 +474,42 @@ class _OngoingtripState extends State<Ongoingtrip> {
                                         onPressed: () async {
                                           await updateTripStatus(context);
                                         },
+                                      ),
+                                    ),
+                                    Verticalspace(16),
+
+                                    Container(
+                                      margin: EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                      ),
+                                      width: double.infinity,
+                                      height: 50,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                                        gradient: LinearGradient(
+                                          end: Alignment.bottomCenter,
+                                          begin: Alignment.topCenter,
+                                          colors: [
+                                            Colors.red,
+                                            Colors.red
+                                          ],
+                                        ),
+                                      ),
+                                      child: MaterialButton(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        shape: const StadiumBorder(),
+                                        child: Text('Cancel'.toUpperCase(),
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20),
+                                        ),
+                                        onPressed: () async {
+                                        
+                                          DialogCollection.showCancelCOnfirmaation(context);
+                                        }
+                                        
+                                        ,
                                       ),
                                     ),
                                     Verticalspace(12),

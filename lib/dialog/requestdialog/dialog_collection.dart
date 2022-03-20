@@ -6,6 +6,7 @@ import 'package:slide_to_confirm/slide_to_confirm.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/controller/requestcontroller.dart';
 import 'package:tricycleappdriver/model/ongoing_trip_details.dart';
+import 'package:tricycleappdriver/widgets/horizontalspace.dart';
 import 'package:tricycleappdriver/widgets/verticalspace.dart';
 
 class DialogCollection {
@@ -54,6 +55,95 @@ class DialogCollection {
                 ]),
               ),
             
+          );
+        });
+  }
+
+  static void showCancelCOnfirmaation(BuildContext context) {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return Dialog(
+            backgroundColor: BOTTOMNAVIGATOR_COLOR,
+            child: Container(
+              decoration: BoxDecoration(
+                  color: BOTTOMNAVIGATOR_COLOR,
+                  borderRadius:
+                      BorderRadius.all(Radius.circular(containerRadius))),
+              padding: EdgeInsets.all(20),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Verticalspace(12),
+                    Text(
+                      'Are you sure do you want to cancel the trip?',
+                      style: Get.textTheme.headline1!.copyWith(
+                        color: ELSA_TEXT_WHITE,
+                        fontWeight: FontWeight.w600
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    Verticalspace(16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center, children: [
+                      Container(
+                        height: 50,
+                        decoration: const ShapeDecoration(
+                          shape: StadiumBorder(),
+                          gradient: LinearGradient(
+                            end: Alignment.bottomCenter,
+                            begin: Alignment.topCenter,
+                            colors: [
+                              ELSA_BLUE_1_,
+                              ELSA_BLUE_1_,
+                            ],
+                          ),
+                        ),
+                        child: MaterialButton(
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          shape: const StadiumBorder(),
+                          child: Text('Yes',
+                              style: Get.textTheme.bodyText1!
+                                  .copyWith(fontWeight: FontWeight.w400)),
+                          onPressed: () async {
+
+                            
+                              Get.find<Requestcontroller>().cancelOngoingTrip(context);
+                          },
+                        ),
+                      ),
+                      Horizontalspace(10),
+                      Container(
+                        height: 50,
+                        decoration: const ShapeDecoration(
+                          shape: StadiumBorder(),
+                          gradient: LinearGradient(
+                            end: Alignment.bottomCenter,
+                            begin: Alignment.topCenter,
+                            colors: [
+                              ELSA_BLUE_1_,
+                              ELSA_BLUE_1_,
+                            ],
+                          ),
+                        ),
+                        child: MaterialButton(
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          shape: const StadiumBorder(),
+                          child: Text('No',
+                              style: Get.textTheme.bodyText1!
+                                  .copyWith(fontWeight: FontWeight.w400)),
+                          onPressed: () async {
+                           Get.back();
+                          },
+                        ),
+                      ),
+                    ]),
+                  ]),
+            ),
           );
         });
   }

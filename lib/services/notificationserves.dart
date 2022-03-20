@@ -58,8 +58,12 @@ class Notificationserves {
   }
 
   void processRequest(Map<String, dynamic> recieverequest) {
-    UnAcceptedRequest unacceptedrequest = UnAcceptedRequest.fromJson(recieverequest);
-        Get.off(()=> ListOfRequest(unacceptedrequest:unacceptedrequest ,) ); 
+
+    if(requestcontroller.ongoingtrip.value.request_id == null){
+         UnAcceptedRequest unacceptedrequest = UnAcceptedRequest.fromJson(recieverequest);
+        Get.off(()=> ListOfRequest() ); 
+    }
+   
    
   }
 }

@@ -1,186 +1,310 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:get/get_connect/http/src/request/request.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-
-import 'package:tricycleappdriver/controller/requestcontroller.dart';
-import 'package:tricycleappdriver/helper/firebasehelper.dart';
-import 'package:tricycleappdriver/home_screen_manager.dart';
-import 'package:tricycleappdriver/model/request_details.dart';
-import 'package:tricycleappdriver/model/un_accepted_request.dart';
-import 'package:tricycleappdriver/screens/map/map_request_controller.dart';
-import 'package:tricycleappdriver/screens/map/request_map_screen.dart';
+import 'package:tricycleappdriver/UI/constant.dart';
+import 'package:tricycleappdriver/widgets/horizontalspace.dart';
+import 'package:tricycleappdriver/widgets/verticalspace.dart';
 
 class ListOfRequest extends StatefulWidget {
-  UnAcceptedRequest? unacceptedrequest;
-  ListOfRequest({
-    Key? key,
-    this.unacceptedrequest,
-  }) : super(key: key);
-
-  static const screenName = '/listofequest';
-
+  static const screenName = '/lisofscreen';
   @override
   _ListOfRequestState createState() => _ListOfRequestState();
 }
 
 class _ListOfRequestState extends State<ListOfRequest> {
-  var requestxcontroller = Get.put(Requestcontroller());
-  var maprequestxcontroller = Get.put(MapRequestController());
-  RequestDetails? requestoaccept;
-  @override
-  void initState() {
-    listenToUnAccepteRequest();
-    super.initState();
-  }
-
-  void listenToUnAccepteRequest() async {
-
-    requestcollecctionrefference
-        .where('status', isEqualTo: 'pending')
-        .snapshots()
-        .listen((querySnapShot) {
-
-      requestxcontroller.lisofunacceptedrequest(querySnapShot.docs.map((e) {
-        var request = RequestDetails.fromJson(e.data() as Map<String, dynamic>);
-        request.request_id = e.id;
-        return request;
-      }).toList());
-
-      if (requestxcontroller.lisofunacceptedrequest.length == 0 &&
-          requestxcontroller.hasongingtrip == false) {
-           Get.offNamed(HomeScreenManager.screenName);
-      }
-
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading:
+            IconButton(onPressed: () {}, icon: FaIcon(FontAwesomeIcons.times)),
+      ),
       body: SingleChildScrollView(
-        child: Obx(() {
-          if (requestxcontroller.lisofunacceptedrequest.length > 0) {
-            return Column(
-              
-              
+        child: Container(
+            padding: EdgeInsets.all(20),
+            child: Column(
               children: [
-              
                 Container(
-        
-                  width: double.infinity,
-                  color: Colors.grey[200],
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text("${requestxcontroller.lisofunacceptedrequest[0].request_id }"),
-                        Text("${requestxcontroller.lisofunacceptedrequest[0].actualmarker_position }", style: TextStyle(fontWeight: FontWeight.w700)),
-                        Text("${requestxcontroller.lisofunacceptedrequest[0].drop_location_id }"),
-                        Text("${requestxcontroller.lisofunacceptedrequest[0].drop_location }", style: TextStyle(fontWeight: FontWeight.w700),),
-                        Text("${requestxcontroller.lisofunacceptedrequest[0].dropddress_name}"),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text("${requestxcontroller.lisofunacceptedrequest[0].pick_location_id }"),
-                        Text("${requestxcontroller.lisofunacceptedrequest[0].pick_location }"),
-                        Text("${requestxcontroller.lisofunacceptedrequest[0].pickaddress_name}"),
-                        ElevatedButton(
-                            onPressed: () {
-                              requestxcontroller.confirmRequest(context, requestxcontroller
-                                  .lisofunacceptedrequest[0].request_id);
-                            },
-                            child: Text('Confirm')),
-                             ElevatedButton(
-                                          onPressed: () async{
-
-                                            if(requestxcontroller.lisofunacceptedrequest[0].drop_location_id ==  maprequestxcontroller.requestdroplocatioinid){
-                                                  Get.to(()=> RequestMapScreen(), fullscreenDialog: true);
-                                            }else{
-                                              var response =  await maprequestxcontroller.getDirection(requestxcontroller.lisofunacceptedrequest[0].pick_location_id as String,requestxcontroller.lisofunacceptedrequest[0].drop_location_id as String, requestxcontroller.lisofunacceptedrequest[0].actualmarker_position as LatLng);
-                                            if(response){
-                                            
-
-                                                print(maprequestxcontroller.requestmapdetails.value.polylines_encoded);
-                                              print('wazap');
-                                              Get.to(()=> RequestMapScreen(), fullscreenDialog: true);
-
-                                            }else{
-                                              print('ohn now');
-                                            }
-
-                                            }
-
-                                            
-
-                                          
-
-                                          }, child: Text('View')),
-                            
-                      ],
-                    ),
-                  ),
-                ),
-                ListView.builder(
-                    //reverse: true,
-                    shrinkWrap: true,
-                    itemCount: requestxcontroller.lisofunacceptedrequest.length,
-                    itemBuilder: (context, index) {
-                      if (index == 0) {
-                        return Container(
-                          height: 0,
-                        );
-                      } else {
-                        return Container(
-                          color: Colors.blueAccent,
-                          child: Padding(
-                            padding: const EdgeInsets.all(20.0),
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                      color: LIGHT_CONTAINER,
+                      borderRadius: BorderRadius.all(Radius.circular(12))),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          ClipOval(
+                            child: Container(
+                              height: 50,
+                              width: 50,
+                              child: Image.asset('assets/images/images.jpg'),
+                            ),
+                          ),
+                          Horizontalspace(8),
+                          Expanded(
                             child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Row(
-                                  children: [
-                                    ElevatedButton(
-                                        onPressed: () {
-                                          requestxcontroller.confirmRequest(context,
-                                              requestxcontroller
-                                                  .lisofunacceptedrequest[index]
-                                                  .request_id);
-                                        },
-                                        child: Text('Confirm')),
-                                    ElevatedButton(
-                                        onPressed: () {},
-                                        child: Text('Reject')),
-                                   
-                                    ElevatedButton(
-                                        onPressed: () {
-
-
-                                        }, child: Text('View')),
-                                  ],
-                                ),
-                                Text(requestxcontroller
-                                    .lisofunacceptedrequest[index]
-                                    .dropddress_name as String),
-                                SizedBox(
-                                  height: 12,
-                                ),
-                                Text(requestxcontroller
-                                    .lisofunacceptedrequest[index]
-                                    .pickaddress_name as String),
+                                Text('Kristine Teruel',
+                                    style: Get.textTheme.bodyText1!
+                                        .copyWith(fontWeight: FontWeight.w600)),
+                                Verticalspace(5),
+                                Row(children: [
+                                  Container(
+                                    height: 34,
+                                    width: 34,
+                                    child: Center(
+                                      child: FaIcon(
+                                        FontAwesomeIcons.mapMarkerAlt,
+                                        color: ELSA_PINK,
+                                      ),
+                                    ),
+                                  ),
+                                  Horizontalspace(4),
+                                  Expanded(
+                                    child: Text(
+                                      'Kalawas 2 Isulan SUltan Kudarat THe deprament of education',
+                                      style: Get.textTheme.bodyText1!.copyWith(
+                                        fontWeight: FontWeight.w100,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                ])
                               ],
                             ),
                           ),
-                        );
-                      }
-                    })
+                        ],
+                      ),
+                      Verticalspace(12),
+                      Container(
+                        decoration: BoxDecoration(
+                            color: BOTTOMNAVIGATOR_COLOR,
+                            borderRadius: BorderRadius.circular(12)),
+                        padding: EdgeInsets.all(12),
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    height: 34,
+                                    width: 34,
+                                    child: Center(
+                                      child: FaIcon(
+                                        FontAwesomeIcons.mapPin,
+                                        color: ELSA_GREEN,
+                                      ),
+                                    ),
+                                  ),
+                                  Horizontalspace(12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Drop Location',
+                                          style: Get.textTheme.bodyText1!
+                                              .copyWith(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w100),
+                                        ),
+                                        Verticalspace(8),
+                                        Text(
+                                          'Kalawas 2 Isulan SUltan Kudarat THe deprament of education',
+                                          style: Get.textTheme.bodyText1!
+                                              .copyWith(),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ]),
+                      ),
+                      Verticalspace(12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  primary: DARK_GREEN,
+                                ),
+                                onPressed: () {},
+                                child: Text('Accept')),
+                          ),
+                          Horizontalspace(24),
+                          Expanded(
+                            child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.redAccent,
+                                ),
+                                onPressed: () {},
+                                child: Text('View Location')),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Verticalspace(12),
+                Container(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height,
+                  ),
+                  child: AnimationLimiter(
+                    child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: 20,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            padding: EdgeInsets.all(10),
+                            margin: EdgeInsets.symmetric(vertical: 8),
+                            decoration: BoxDecoration(
+                                color: LIGHT_CONTAINER,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(12))),
+                            child: Row(
+                              children: [
+                                // ClipOval(
+                                //   child: Container(
+                                //     height: 50,
+                                //     width: 50,
+                                //     child:
+                                //         Image.asset('assets/images/images.jpg'),
+                                //   ),
+                                // ),
+                                Horizontalspace(12),
+                                Expanded(
+                                  child: Container(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Text('Kristine Teruel',
+                                            style: Get.textTheme.bodyText1!
+                                                .copyWith(
+                                                    fontWeight:
+                                                        FontWeight.w600)),
+                                        Verticalspace(4),
+                                        Row(
+                                          children: [
+                                            ClipOval(
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  //
+                                                  gradient: LinearGradient(
+                                                    begin: Alignment.topCenter,
+                                                    end: Alignment.bottomLeft,
+                                                    colors: [
+                                                      ELSA_PURPLE_2_,
+                                                      ELSA_PURPLE_1_,
+                                                    ],
+                                                  ),
+                                                ),
+                                                width: 30,
+                                                height: 30,
+                                                child: Center(
+                                                    child: Text(
+                                                  'FR',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w300),
+                                                )),
+                                              ),
+                                            ),
+                                            Horizontalspace(5),
+                                            // Container(
+                                            //   width: 30,
+                                            //    padding: EdgeInsets.all(5),
+                                            //   child: Center(child: FaIcon(FontAwesomeIcons.mapMarkerAlt, color: ELSA_PINK,)),
+                                            // ),
+                                            Flexible(
+                                              child: Text(
+                                                'Kalawas 2 Isulan SUltan Kudarat THe deprament of education',
+                                                style: Get.textTheme.bodyText1!
+                                                    .copyWith(
+                                                  fontWeight: FontWeight.w100,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Verticalspace(6),
+                                        Row(
+                                          children: [
+                                            ClipOval(
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  //
+                                                  gradient: LinearGradient(
+                                                    begin: Alignment.topCenter,
+                                                    end: Alignment.bottomLeft,
+                                                    colors: [
+                                                      ELSA_BLUE_2_,
+                                                        ELSA_BLUE_1_,
+                                                    ],
+                                                  ),
+                                                ),
+                                                width: 30,
+                                                height: 30,
+                                                child: Center(
+                                                    child: Text(
+                                                  'TO',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w300),
+                                                )),
+                                              ),
+                                            ),
+                                            Horizontalspace(5),
+                                            // Container(
+                                            //   width: 30,
+                                            //    padding: EdgeInsets.all(5),
+                                            //   child: Center(child: FaIcon(FontAwesomeIcons.mapMarkerAlt, color: ELSA_PINK,)),
+                                            // ),
+                                            Flexible(
+                                              child: Text(
+                                                'Kalawas 2 Isulan SUltan Kudarat THe deprament of education',
+                                                style: Get.textTheme.bodyText1!
+                                                    .copyWith(
+                                                  fontWeight: FontWeight.w100,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Column(children: [
+                                     IconButton(onPressed: (){}, icon: FaIcon(FontAwesomeIcons.checkCircle, size: 34, color: ELSA_GREEN,)),
+                                    Text('Accept', style: TextStyle(fontSize: 12, color: Colors.grey[400], fontWeight: FontWeight.w100))
+                                    ] ),
+                                    Column(children: [
+                                     IconButton(onPressed: (){}, icon: FaIcon(FontAwesomeIcons.mapMarkedAlt, size: 34, color: ELSA_BLUE,)),
+                                    Text('View', style: TextStyle(fontSize: 12, color: Colors.grey[400], fontWeight: FontWeight.w100))
+                                    ] ),
+                                  ],
+                                )
+                              ],
+                            ),
+                          );
+                        }),
+                  ),
+                ),
               ],
-            );
-          }
-          return Container();
-        }),
+            )),
       ),
     );
   }

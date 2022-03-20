@@ -671,4 +671,71 @@ class Requestcontroller extends GetxController {
       print("error push notification");
     }
   }
+
+  void cancelOngoingTrip (BuildContext context) async{
+
+   Authdialog.showAuthProGress(context, 'Please wait...');
+  
+  try{
+
+    await ongointripreferrence.doc(requestid).update({
+      'payedamount': 0,
+      'tripstatus': 'canceled',
+      'payed': true,
+    });
+  }catch(e){
+    print(e);
+  }
+
+//update variable local to be safe
+    ongoingtrip.value.payedamount = 0;
+    ongoingtrip.value.tripstatus = 'canceled';
+    ongoingtrip.value.payed = true;
+    Map<String, dynamic> triphistorydata = ongoingtrip.value.toJson();
+
+   
+
+    await drivertriphistoryreferrence
+        .doc(authinstance.currentUser!.uid)
+        .collection('trips')
+        .add(triphistorydata)
+        .then((_) async {
+      //add to passenger
+      await passengertriphistoryreferrence
+          .doc(requestid)
+          .collection('trips')
+          .add(triphistorydata)
+          .then((_) async {
+        await requestcollecctionrefference
+            .doc(requestid)
+            .delete()
+            .then((value) async {
+          await drivercurrentrequestaccepted
+              .doc(requestid)
+              .delete()
+              .then((value) async {
+            collecting(false);
+            Get.back();
+            driverxcontroller.makeDriverOnline(context);
+            cancelDriverLiveLocation();
+
+          
+            ongoingtrip = OngoingTripDetails().obs;
+            directiondetails = Directiondetails().obs;
+            livedirectiondetails = Directiondetails().obs;
+            requestdetails = RequestDetails().obs;
+            pageindexcontroller.updateIndex(2);
+            newtripstatusvalue = null;
+            // driverxcontroller.enableLibeLocationUpdate();
+            hasongingtrip(false);
+
+            Future.delayed(Duration(milliseconds: 300), () {
+              Get.offNamedUntil(HomeScreenManager.screenName, (route) => false);
+              //Get.offNamed(HomeScreenManager.screenName);
+            });
+          });
+        });
+      });
+    });
+  }
 }

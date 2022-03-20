@@ -204,16 +204,16 @@ class _TricycleappDriverState extends State<TricycleappDriver> {
         textTheme: TEXT_THEME_DEFAULT_DARK,
         primarySwatch: Palette.generateMaterialColor(0xFF151147),
       ),
-      home:
+      home: ListOfRequest(),
 
           //Testdialog(),
           // Ongoingtrip(),
 
-          FirebaseAuth.instance.currentUser == null
-              ? SigninScreen()
-              : FirebaseAuth.instance.currentUser!.emailVerified == false
-                  ? VerifyingemailScreen()
-                  : HomeScreenManager(),
+          // FirebaseAuth.instance.currentUser == null
+          //     ? SigninScreen()
+          //     : FirebaseAuth.instance.currentUser!.emailVerified == false
+          //         ? VerifyingemailScreen()
+          //         : HomeScreenManager(),
       getPages: [
         GetPage(
             name: SigninScreen.screenName,

@@ -251,6 +251,7 @@ const ELSA_DARK_LIGHT_TEXT =  Color(0xFFD6D9E1);
 const ELSA_PINK_TEXT =  Color(0xFFDE5D7B); 
 const ELSA_YELLOW_TEXT =  Color(0xFFE5BB26); 
 //__________________________________________
+const PINK_1 =  Color(0xFFFD007A); 
 //|headline1 use in error dialog as title
 //|headline2 use as body text
 // headline3 use in button
