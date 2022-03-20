@@ -690,7 +690,7 @@ class Requestcontroller extends GetxController {
   }
 
   void cancelOngoingTrip(BuildContext context) async {
-    if(driverslocationstream!=  null){
+    if(driverslocationstream!=null ){
 driverslocationstream!.cancel();
     }
     
