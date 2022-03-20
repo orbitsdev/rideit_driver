@@ -19,8 +19,6 @@ import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/home_screen_manager.dart';
 import 'package:tricycleappdriver/screens/complete_screen.dart';
 
-
-
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:tricycleappdriver/widgets/verticalspace.dart';
 
@@ -70,11 +68,9 @@ class _OngoingtripState extends State<Ongoingtrip> {
     super.initState();
 
     isTripDetailsReady();
-  
+
     //isTripDetailsReady();
   }
-
-
 
   void boundCamera() {
     var bound_sw = requestxconroller.directiondetails.value.bound_sw as LatLng;
@@ -90,8 +86,6 @@ class _OngoingtripState extends State<Ongoingtrip> {
     var istripready = await requestxconroller.listenToOngoingTrip();
 
     if (istripready) {
-      
-    
       currentripstatus = requestxconroller.ongoingtrip.value.tripstatus;
       print('payed==');
       print(requestxconroller.ongoingtrip.value.payed);
@@ -142,10 +136,11 @@ class _OngoingtripState extends State<Ongoingtrip> {
       position: requestxconroller.ongoingtrip.value.pick_location as LatLng,
     );
 
-    dropmarker =   Marker(
+    dropmarker = Marker(
       markerId: MarkerId("dropmarker"),
-      position:requestxconroller.ongoingtrip.value.actualmarker_position as LatLng,
-       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+      position:
+          requestxconroller.ongoingtrip.value.actualmarker_position as LatLng,
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
     );
 
     //circle
@@ -181,15 +176,14 @@ class _OngoingtripState extends State<Ongoingtrip> {
     print(bound_sw);
     print(bound_ne);
 
-    try{
+    try {
       newgooglemapcontroller!.animateCamera(CameraUpdate.newLatLngBounds(
-        LatLngBounds(southwest: bound_sw as LatLng, northeast: bound_ne as LatLng), 50));
-    }catch(e){
-        print(e);
+          LatLngBounds(
+              southwest: bound_sw as LatLng, northeast: bound_ne as LatLng),
+          50));
+    } catch (e) {
+      print(e);
     }
-   
-
-   
   }
 
   void setPolylines() {
@@ -209,9 +203,8 @@ class _OngoingtripState extends State<Ongoingtrip> {
                 .toList()),
       );
 
-      _caneraBoundRoute(
-          requestxconroller.directiondetails.value.bound_sw ,
-          requestxconroller.directiondetails.value.bound_ne );
+      _caneraBoundRoute(requestxconroller.directiondetails.value.bound_sw,
+          requestxconroller.directiondetails.value.bound_ne);
     }
   }
 
@@ -277,31 +270,26 @@ class _OngoingtripState extends State<Ongoingtrip> {
     if (driverlocationstream != null) {
       driverlocationstream!.cancel();
     }
-    super.dispose();  
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-
-
-
-    
     createCustomDriverMarker();
-        
+
     return Scaffold(
       appBar: AppBar(
         actions: [
-
           IconButton(
-              onPressed: () {
-                boundCamera();
-              },
-              icon: FaIcon(FontAwesomeIcons.mapMarked),)
+            onPressed: () {
+              boundCamera();
+            },
+            icon: FaIcon(FontAwesomeIcons.mapMarked),
+          )
         ],
         leading: IconButton(
             onPressed: () {
               Get.off(() => HomeScreenManager());
-              
             },
             icon: FaIcon(FontAwesomeIcons.times)),
       ),
@@ -379,10 +367,7 @@ class _OngoingtripState extends State<Ongoingtrip> {
                                     Text(
                                       'From',
                                       style: Get.theme.textTheme.bodyText1!
-                                          .copyWith(
-                                            color: Colors.purpleAccent
-                                          ),
-                                          
+                                          .copyWith(color: Colors.purpleAccent),
                                     ),
                                     Verticalspace(4),
                                     Text(
@@ -397,9 +382,7 @@ class _OngoingtripState extends State<Ongoingtrip> {
                                     Text(
                                       'To',
                                       style: Get.theme.textTheme.bodyText1!
-                                          .copyWith(
-                                            color: Colors.redAccent
-                                          ),
+                                          .copyWith(color: Colors.redAccent),
                                     ),
                                     Verticalspace(4),
                                     Text(
@@ -438,7 +421,7 @@ class _OngoingtripState extends State<Ongoingtrip> {
                                     //     textAlign: TextAlign.center,
                                     //   ),
                                     // ),
-                                    
+
                                     Verticalspace(16),
 
                                     Container(
@@ -448,7 +431,8 @@ class _OngoingtripState extends State<Ongoingtrip> {
                                       width: double.infinity,
                                       height: 50,
                                       decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(8)),
                                         gradient: LinearGradient(
                                           end: Alignment.bottomCenter,
                                           begin: Alignment.topCenter,
@@ -488,41 +472,44 @@ class _OngoingtripState extends State<Ongoingtrip> {
                                       ),
                                     ),
                                     Verticalspace(16),
-                                    if( requestxconroller.ongoingtrip.value .tripstatus != "prepairing" &&  requestxconroller.ongoingtrip.value .tripstatus != "complete" )
-                                    Container(
-                                      margin: EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                      ),
-                                      width: double.infinity,
-                                      height: 50,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(Radius.circular(8)),
-                                        gradient: LinearGradient(
-                                          end: Alignment.bottomCenter,
-                                          begin: Alignment.topCenter,
-                                          colors: [
-                                            Colors.red,
-                                            Colors.red
-                                          ],
+                                    if (requestxconroller
+                                                .ongoingtrip.value.tripstatus !=
+                                            "prepairing" &&
+                                        requestxconroller
+                                                .ongoingtrip.value.tripstatus !=
+                                            "complete")
+                                      Container(
+                                        margin: EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                        ),
+                                        width: double.infinity,
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(8)),
+                                          gradient: LinearGradient(
+                                            end: Alignment.bottomCenter,
+                                            begin: Alignment.topCenter,
+                                            colors: [Colors.red, Colors.red],
+                                          ),
+                                        ),
+                                        child: MaterialButton(
+                                          materialTapTargetSize:
+                                              MaterialTapTargetSize.shrinkWrap,
+                                          shape: const StadiumBorder(),
+                                          child: Text(
+                                            'Cancel'.toUpperCase(),
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 20),
+                                          ),
+                                          onPressed: () async {
+                                            DialogCollection
+                                                .showCancelCOnfirmaation(
+                                                    context);
+                                          },
                                         ),
                                       ),
-                                      child: MaterialButton(
-                                        materialTapTargetSize:
-                                            MaterialTapTargetSize.shrinkWrap,
-                                        shape: const StadiumBorder(),
-                                        child: Text('Cancel'.toUpperCase(),
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 20),
-                                        ),
-                                        onPressed: () async {
-                                        
-                                          DialogCollection.showCancelCOnfirmaation(context);
-                                        }
-                                        
-                                        ,
-                                      ),
-                                    ),
                                     Verticalspace(12),
                                   ],
                                 ),
@@ -542,9 +529,7 @@ class _OngoingtripState extends State<Ongoingtrip> {
   }
 
   Future<void> updateTripStatus(BuildContext context) async {
-
-print(requestxconroller.ongoingtrip.value.tripstatus);
-    
+    print(requestxconroller.ongoingtrip.value.tripstatus);
 
     String response = await requestxconroller.updateOngoingTripStatus();
 
@@ -569,6 +554,9 @@ print(requestxconroller.ongoingtrip.value.tripstatus);
         getLiveLocationUpdate();
       }
       if (currentripstatus == 'complete') {
+        if (driverslocationstream != null) {
+          driverslocationstream!.cancel();
+        }
         DialogCollection.showpaymentToCollect(context);
       }
 
@@ -577,12 +565,11 @@ print(requestxconroller.ongoingtrip.value.tripstatus);
           setPolylines();
         });
       }
-  
-  
-  }else{
-   if (requestxconroller.ongoingtrip.value.tripstatus== 'complete' && requestxconroller.ongoingtrip.value.payed == false ) {
+    } else {
+      if (requestxconroller.ongoingtrip.value.tripstatus == 'complete' &&
+          requestxconroller.ongoingtrip.value.payed == false) {
         DialogCollection.showpaymentToCollect(context);
       }
-  }
+    }
   }
 }

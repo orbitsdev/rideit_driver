@@ -690,6 +690,9 @@ class Requestcontroller extends GetxController {
   }
 
   void cancelOngoingTrip(BuildContext context) async {
+    if(driverslocationstream!=  null){
+driverslocationstream!.cancel();
+    }
     
     Authdialog.showAuthProGress(context, 'Please wait...');
 
