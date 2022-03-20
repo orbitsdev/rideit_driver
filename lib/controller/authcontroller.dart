@@ -209,7 +209,7 @@ class Authcontroller extends GetxController {
           mailverified = authinstance.currentUser!.emailVerified;
 
           if (mailverified == false) {
-           // await sendVerification();
+            await sendVerification();
            Get.back();
             Future.delayed(Duration(milliseconds: 300),
                 () => Get.offNamed(VerifyingemailScreen.screenName));

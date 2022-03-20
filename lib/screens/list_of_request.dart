@@ -66,11 +66,10 @@ class _ListOfRequestState extends State<ListOfRequest> {
           request.actualmarker_position
               as LatLng);
       if (response) {
-        print(mapxcontroller.requestmapdetails.value.polylines_encoded);
-        print('wazap');
+       
         Get.to(() => RequestMapScreen(request: request,), fullscreenDialog: true);
       } else {
-        print('ohn now');
+      
       }
     }
   }
