@@ -229,34 +229,34 @@ class _ListOfRequestState extends State<ListOfRequest> {
                       //               .lisofunacceptedrequest[0].request_id);
                       //     },
                       //     child: Text('Confirm')),
-                      // ElevatedButton(
-                      //     onPressed: () async {
-                      //       if (requestxcontroller
-                      //               .lisofunacceptedrequest[0].drop_location_id ==
-                      //           maprequestxcontroller.requestdroplocatioinid) {
-                      //         Get.to(() => RequestMapScreen(),
-                      //             fullscreenDialog: true);
-                      //       } else {
-                      //         var response =
-                      //             await maprequestxcontroller.getDirection(
-                      //                 requestxcontroller.lisofunacceptedrequest[0]
-                      //                     .pick_location_id as String,
-                      //                 requestxcontroller.lisofunacceptedrequest[0]
-                      //                     .drop_location_id as String,
-                      //                 requestxcontroller.lisofunacceptedrequest[0]
-                      //                     .actualmarker_position as LatLng);
-                      //         if (response) {
-                      //           print(maprequestxcontroller
-                      //               .requestmapdetails.value.polylines_encoded);
-                      //           print('wazap');
-                      //           Get.to(() => RequestMapScreen(),
-                      //               fullscreenDialog: true);
-                      //         } else {
-                      //           print('ohn now');
-                      //         }
-                      //       }
-                      //     },
-                      //     child: Text('View')),
+                      ElevatedButton(
+                          onPressed: () async {
+                            if (requestxcontroller
+                                    .lisofunacceptedrequest[0].drop_location_id ==
+                                maprequestxcontroller.requestdroplocatioinid) {
+                              Get.to(() => RequestMapScreen(),
+                                  fullscreenDialog: true);
+                            } else {
+                              var response =
+                                  await maprequestxcontroller.getDirection(
+                                      requestxcontroller.lisofunacceptedrequest[0]
+                                          .pick_location_id as String,
+                                      requestxcontroller.lisofunacceptedrequest[0]
+                                          .drop_location_id as String,
+                                      requestxcontroller.lisofunacceptedrequest[0]
+                                          .actualmarker_position as LatLng);
+                              if (response) {
+                                print(maprequestxcontroller
+                                    .requestmapdetails.value.polylines_encoded);
+                                print('wazap');
+                                Get.to(() => RequestMapScreen(),
+                                    fullscreenDialog: true);
+                              } else {
+                                print('ohn now');
+                              }
+                            }
+                          },
+                          child: Text('View')),
                     ],
                   ),
                 ),

@@ -2,7 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:lottie/lottie.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
+import 'package:tricycleappdriver/controller/requestcontroller.dart';
+import 'package:tricycleappdriver/helper/firebasehelper.dart';
+import 'package:tricycleappdriver/home_screen_manager.dart';
+import 'package:tricycleappdriver/model/request_details.dart';
+import 'package:tricycleappdriver/screens/map/map_request_controller.dart';
+import 'package:tricycleappdriver/screens/map/request_map_screen.dart';
 import 'package:tricycleappdriver/widgets/horizontalspace.dart';
 import 'package:tricycleappdriver/widgets/verticalspace.dart';
 
@@ -13,339 +21,470 @@ class ListOfRequest extends StatefulWidget {
 }
 
 class _ListOfRequestState extends State<ListOfRequest> {
+  var requestxcontroller = Get.put(Requestcontroller());
+  var mapxcontroller = Get.put(MapRequestController());
+
+  @override
+  void initState() {
+    super.initState();
+
+    listenToUnAccepteRequest();
+  }
+
+  void listenToUnAccepteRequest() async {
+    requestcollecctionrefference
+        .where('status', isEqualTo: 'pending')
+        .snapshots()
+        .listen((querySnapShot) {
+      requestxcontroller.lisofunacceptedrequest(querySnapShot.docs.map((e) {
+        var request = RequestDetails.fromJson(e.data() as Map<String, dynamic>);
+        request.request_id = e.id;
+        return request;
+      }).toList());
+
+      print('lenght of of unaccepred rtequest');
+      print(requestxcontroller.lisofunacceptedrequest.length);
+    });
+  }
+
+  void viewRequestDirection(RequestDetails request) async {
+    if (request.drop_location_id ==  mapxcontroller.requestdroplocatioinid) {
+      Get.to(() => RequestMapScreen(request: request,), fullscreenDialog: true);
+    } else {
+      var response = await mapxcontroller.getDirection(
+          request.pick_location_id
+              as String,
+          request.drop_location_id
+              as String,
+          request.actualmarker_position
+              as LatLng);
+      if (response) {
+        print(mapxcontroller.requestmapdetails.value.polylines_encoded);
+        print('wazap');
+        Get.to(() => RequestMapScreen(request: request,), fullscreenDialog: true);
+      } else {
+        print('ohn now');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading:
-            IconButton(onPressed: () {}, icon: FaIcon(FontAwesomeIcons.times)),
+            IconButton(onPressed: () {
+              
+            //Get.off(()=> HomeScreenManager());
+            Get.back();
+            }, icon: FaIcon(FontAwesomeIcons.times)),
       ),
       body: SingleChildScrollView(
         child: Container(
-            padding: EdgeInsets.all(20),
-            child: Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      color: LIGHT_CONTAINER,
-                      borderRadius: BorderRadius.all(Radius.circular(12))),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          ClipOval(
-                            child: Container(
-                              height: 50,
-                              width: 50,
-                              child: Image.asset('assets/images/images.jpg'),
+          padding: EdgeInsets.all(20),
+          child: Obx(() {
+            if (requestxcontroller.lisofunacceptedrequest.length == 0) {
+              return noDataBuilder();
+            } else {
+              return Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        color: LIGHT_CONTAINER,
+                        borderRadius: BorderRadius.all(Radius.circular(12))),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            ClipOval(
+                              child: Container(
+                                height: 50,
+                                width: 50,
+                                child: Image.asset('assets/images/images.jpg'),
+                              ),
                             ),
-                          ),
-                          Horizontalspace(8),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Kristine Teruel',
-                                    style: Get.textTheme.bodyText1!
-                                        .copyWith(fontWeight: FontWeight.w600)),
-                                Verticalspace(5),
-                                Row(children: [
-                                 ClipOval(
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                  //
-                                                  gradient: LinearGradient(
-                                                    begin: Alignment.topCenter,
-                                                    end: Alignment.bottomLeft,
-                                                    colors: [
-                                                      ELSA_PINK_TEXT,
-                                                      ELSA_PINK_TEXT,
-                                                    ],
-                                                  ),
-                                                ),
-                                                width: 30,
-                                                height: 30,
-                                                child: Center(
-                                                    child: Text(
-                                                  'FR',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w300),
-                                                )),
-                                              ),
-                                            ),
-                                  Horizontalspace(4),
-                                  Expanded(
-                                    child: Text(
-                                      'Kalawas 2 Isulan SUltan Kudarat THe deprament of education',
-                                      style: Get.textTheme.bodyText1!.copyWith(
-                                        fontWeight: FontWeight.w100,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ),
-                                ])
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      Verticalspace(12),
-                      Container(
-                        decoration: BoxDecoration(
-                            color: BOTTOMNAVIGATOR_COLOR,
-                            borderRadius: BorderRadius.circular(12)),
-                        padding: EdgeInsets.all(12),
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
+                            Horizontalspace(8),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Container(
-                                    height: 34,
-                                    width: 34,
-                                    child: Center(
-                                      child: FaIcon(
-                                        FontAwesomeIcons.mapPin,
-                                        color: ELSA_GREEN,
+                                  Text(
+                                      '${requestxcontroller.lisofunacceptedrequest[0].passenger_name}',
+                                      style: Get.textTheme.bodyText1!.copyWith(
+                                          fontWeight: FontWeight.w600)),
+                                  Verticalspace(5),
+                                  Row(children: [
+                                    ClipOval(
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          //
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomLeft,
+                                            colors: [
+                                              ELSA_PINK_TEXT,
+                                              ELSA_PINK_TEXT,
+                                            ],
+                                          ),
+                                        ),
+                                        width: 30,
+                                        height: 30,
+                                        child: Center(
+                                            child: Text(
+                                          'FR',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w300),
+                                        )),
                                       ),
                                     ),
-                                  ),
-                                  Horizontalspace(12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Drop Location',
-                                          style: Get.textTheme.bodyText1!
-                                              .copyWith(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w100),
+                                    Horizontalspace(4),
+                                    Expanded(
+                                      child: Text(
+                                        '${requestxcontroller.lisofunacceptedrequest[0].pickaddress_name}',
+                                        style:
+                                            Get.textTheme.bodyText1!.copyWith(
+                                          fontWeight: FontWeight.w100,
+                                          fontSize: 12,
                                         ),
-                                        Verticalspace(8),
-                                        Text(
-                                          'Kalawas 2 Isulan SUltan Kudarat THe deprament of education',
-                                          style: Get.textTheme.bodyText1!
-                                              .copyWith(),
-                                        ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
+                                  ])
                                 ],
                               ),
-                            ]),
-                      ),
-                      Verticalspace(12),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Expanded(
-                            child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  primary: DARK_GREEN,
-                                ),
-                                onPressed: () {},
-                                child: Text('Accept')),
-                          ),
-                          Horizontalspace(24),
-                          Expanded(
-                            child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  primary: PINK_1,
-                                ),
-                                onPressed: () {},
-                                child: Text('View Location')),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                Verticalspace(12),
-                Container(
-                  constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height,
-                  ),
-                  child: AnimationLimiter(
-                    child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: 20,
-                        itemBuilder: (context, index) {
-                          return Container(
-                            padding: EdgeInsets.all(10),
-                            margin: EdgeInsets.symmetric(vertical: 8),
-                            decoration: BoxDecoration(
-                                color: LIGHT_CONTAINER,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(12))),
-                            child: Row(
+                            ),
+                          ],
+                        ),
+                        Verticalspace(12),
+                        Container(
+                          decoration: BoxDecoration(
+                              color: BOTTOMNAVIGATOR_COLOR,
+                              borderRadius: BorderRadius.circular(12)),
+                          padding: EdgeInsets.all(12),
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // ClipOval(
-                                //   child: Container(
-                                //     height: 50,
-                                //     width: 50,
-                                //     child:
-                                //         Image.asset('assets/images/images.jpg'),
-                                //   ),
-                                // ),
-                                Horizontalspace(12),
-                                Expanded(
-                                  child: Container(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Text('Kristine Teruel',
+                                Row(
+                                  children: [
+                                    Container(
+                                      height: 34,
+                                      width: 34,
+                                      child: Center(
+                                        child: FaIcon(
+                                          FontAwesomeIcons.mapPin,
+                                          color: ELSA_GREEN,
+                                        ),
+                                      ),
+                                    ),
+                                    Horizontalspace(12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Drop Location',
                                             style: Get.textTheme.bodyText1!
                                                 .copyWith(
+                                                    fontSize: 12,
                                                     fontWeight:
-                                                        FontWeight.w600)),
-                                        Verticalspace(4),
-                                        Row(
-                                          children: [
-                                            ClipOval(
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                  //
-                                                  gradient: LinearGradient(
-                                                    begin: Alignment.topCenter,
-                                                    end: Alignment.bottomLeft,
-                                                    colors: [
-                                                      ELSA_PURPLE_2_,
-                                                      ELSA_PURPLE_1_,
-                                                    ],
-                                                  ),
-                                                ),
-                                                width: 30,
-                                                height: 30,
-                                                child: Center(
-                                                    child: Text(
-                                                  'FR',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w300),
-                                                )),
-                                              ),
-                                            ),
-                                            Horizontalspace(5),
-                                            // Container(
-                                            //   width: 30,
-                                            //    padding: EdgeInsets.all(5),
-                                            //   child: Center(child: FaIcon(FontAwesomeIcons.mapMarkerAlt, color: ELSA_PINK,)),
-                                            // ),
-                                            Flexible(
-                                              child: Text(
-                                                'Kalawas 2 Isulan SUltan Kudarat THe deprament of education',
-                                                style: Get.textTheme.bodyText1!
-                                                    .copyWith(
-                                                  fontWeight: FontWeight.w100,
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        Verticalspace(6),
-                                        Row(
-                                          children: [
-                                            ClipOval(
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                  //
-                                                  gradient: LinearGradient(
-                                                    begin: Alignment.topCenter,
-                                                    end: Alignment.bottomLeft,
-                                                    colors: [
-                                                      ELSA_BLUE_2_,
-                                                        ELSA_BLUE_1_,
-                                                    ],
-                                                  ),
-                                                ),
-                                                width: 30,
-                                                height: 30,
-                                                child: Center(
-                                                    child: Text(
-                                                  'TO',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w300),
-                                                )),
-                                              ),
-                                            ),
-                                            Horizontalspace(5),
-                                            // Container(
-                                            //   width: 30,
-                                            //    padding: EdgeInsets.all(5),
-                                            //   child: Center(child: FaIcon(FontAwesomeIcons.mapMarkerAlt, color: ELSA_PINK,)),
-                                            // ),
-                                            Flexible(
-                                              child: Text(
-                                                '278 Kalawas 2 Isulan SUltan Kudarat ',
-                                                style: Get.textTheme.bodyText1!
-                                                    .copyWith(
-                                                  fontWeight: FontWeight.w100,
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
+                                                        FontWeight.w100),
+                                          ),
+                                          Verticalspace(8),
+                                          Text(
+                                            '${requestxcontroller.lisofunacceptedrequest[0].dropddress_name}',
+                                            style: Get.textTheme.bodyText1!
+                                                .copyWith(),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ),
-
-                                Column(
-                                  children: [
-                                    Row(
-                                      children: [
-                                            GestureDetector(
-                                              onTap: (){
-                                                print('accepte');
-                                              },
-                                              child: Container(
-                                                padding: EdgeInsets.all(2),
-                                                child: Column(children: [
-                                                  FaIcon(FontAwesomeIcons.checkCircle, size: 34, color: ELSA_GREEN),
-                                                Text('Accept', style: TextStyle(fontSize: 12, color: Colors.grey[400], fontWeight: FontWeight.w100))
-                                                ] ),
-                                              ),
-                                            ),
-                                            Horizontalspace(8),
-                                            GestureDetector(
-                                              onTap: (){
-                                                print('view');
-                                              },
-                                              child: Container(
-                                                padding: EdgeInsets.all(2),
-                                                child: Column(children: [
-                                                  FaIcon(FontAwesomeIcons.mapMarkedAlt, size: 34, color: ELSA_BLUE),
-                                                Text('View', style: TextStyle(fontSize: 12, color: Colors.grey[400], fontWeight: FontWeight.w100))
-                                                ] ),
-                                              ),
-                                            ),
-                                       
-
-                                        
-                                      ],
-                                    ),
-                                    Verticalspace(8),
-                                    Text('New Request'.toUpperCase(), style: TextStyle(fontSize: 12, color: DARK_GREEN, fontWeight: FontWeight.w400) )
                                   ],
-                                )
-                              ],
+                                ),
+                              ]),
+                        ),
+                        Verticalspace(12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    primary: DARK_GREEN,
+                                  ),
+                                  onPressed: () {
+                                 requestxcontroller.confirmRequest(context, requestxcontroller.lisofunacceptedrequest[0].request_id);
+                                  },
+                                  child: Text('Accept')),
                             ),
-                          );
-                        }),
+                            Horizontalspace(24),
+                            Expanded(
+                              child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    primary: PINK_1,
+                                  ),
+                                  onPressed: () async {
+                                    viewRequestDirection(requestxcontroller.lisofunacceptedrequest[0]);
+                                  },
+                                  child: Text('View Location')),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            )),
+                  Verticalspace(12),
+                  if (requestxcontroller.lisofunacceptedrequest.length > 0)
+                    Container(
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height,
+                      ),
+                      child: AnimationLimiter(
+                        child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: requestxcontroller
+                                .lisofunacceptedrequest.length,
+                            itemBuilder: (context, index) {
+                              if (index < 0) {
+                                return Container(
+                                  height: 0,
+                                );
+                              } else {
+                                return Container(
+                                  padding: EdgeInsets.all(10),
+                                  margin: EdgeInsets.symmetric(vertical: 8),
+                                  decoration: BoxDecoration(
+                                      color: LIGHT_CONTAINER,
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(12))),
+                                  child: Row(
+                                    children: [
+                                      Horizontalspace(12),
+                                      Expanded(
+                                        child: Container(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                  '${requestxcontroller.lisofunacceptedrequest[index].passenger_name}',
+                                                  style: Get
+                                                      .textTheme.bodyText1!
+                                                      .copyWith(
+                                                          fontWeight:
+                                                              FontWeight.w600)),
+                                              Verticalspace(4),
+                                              Row(
+                                                children: [
+                                                  ClipOval(
+                                                    child: Container(
+                                                      decoration: BoxDecoration(
+                                                        //
+                                                        gradient:
+                                                            LinearGradient(
+                                                          begin: Alignment
+                                                              .topCenter,
+                                                          end: Alignment
+                                                              .bottomLeft,
+                                                          colors: [
+                                                            ELSA_PURPLE_2_,
+                                                            ELSA_PURPLE_1_,
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      width: 30,
+                                                      height: 30,
+                                                      child: Center(
+                                                          child: Text(
+                                                        'FR',
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w300),
+                                                      )),
+                                                    ),
+                                                  ),
+                                                  Horizontalspace(5),
+                                                  // Container(
+                                                  //   width: 30,
+                                                  //    padding: EdgeInsets.all(5),
+                                                  //   child: Center(child: FaIcon(FontAwesomeIcons.mapMarkerAlt, color: ELSA_PINK,)),
+                                                  // ),
+                                                  Flexible(
+                                                    child: Text(
+                                                      '${requestxcontroller.lisofunacceptedrequest[index].pickaddress_name}',
+                                                      style: Get
+                                                          .textTheme.bodyText1!
+                                                          .copyWith(
+                                                        fontWeight:
+                                                            FontWeight.w100,
+                                                        fontSize: 12,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              Verticalspace(6),
+                                              Row(
+                                                children: [
+                                                  ClipOval(
+                                                    child: Container(
+                                                      decoration: BoxDecoration(
+                                                        //
+                                                        gradient:
+                                                            LinearGradient(
+                                                          begin: Alignment
+                                                              .topCenter,
+                                                          end: Alignment
+                                                              .bottomLeft,
+                                                          colors: [
+                                                            ELSA_BLUE_2_,
+                                                            ELSA_BLUE_1_,
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      width: 30,
+                                                      height: 30,
+                                                      child: Center(
+                                                          child: Text(
+                                                        'TO',
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w300),
+                                                      )),
+                                                    ),
+                                                  ),
+                                                  Horizontalspace(5),
+                                                  // Container(
+                                                  //   width: 30,
+                                                  //    padding: EdgeInsets.all(5),
+                                                  //   child: Center(child: FaIcon(FontAwesomeIcons.mapMarkerAlt, color: ELSA_PINK,)),
+                                                  // ),
+                                                  Flexible(
+                                                    child: Text(
+                                                      '${requestxcontroller.lisofunacceptedrequest[index].dropddress_name}',
+                                                      style: Get
+                                                          .textTheme.bodyText1!
+                                                          .copyWith(
+                                                        fontWeight:
+                                                            FontWeight.w100,
+                                                        fontSize: 12,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              GestureDetector(
+                                                onTap: () {
+                                                 requestxcontroller.confirmRequest(context, requestxcontroller.lisofunacceptedrequest[index].request_id);
+                                                },
+                                                child: Container(
+                                                  padding: EdgeInsets.all(2),
+                                                  child: Column(children: [
+                                                    FaIcon(
+                                                        FontAwesomeIcons
+                                                            .checkCircle,
+                                                        size: 34,
+                                                        color: ELSA_GREEN),
+                                                    Text('Accept',
+                                                        style: TextStyle(
+                                                            fontSize: 12,
+                                                            color: Colors
+                                                                .grey[400],
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w100))
+                                                  ]),
+                                                ),
+                                              ),
+                                              Horizontalspace(8),
+                                              GestureDetector(
+                                                onTap: () {
+                                                 viewRequestDirection(requestxcontroller.lisofunacceptedrequest[index]);
+                                                },
+                                                child: Container(
+                                                  padding: EdgeInsets.all(2),
+                                                  child: Column(children: [
+                                                    FaIcon(
+                                                        FontAwesomeIcons
+                                                            .mapMarkedAlt,
+                                                        size: 34,
+                                                        color: ELSA_BLUE),
+                                                    Text('View',
+                                                        style: TextStyle(
+                                                            fontSize: 12,
+                                                            color: Colors
+                                                                .grey[400],
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w100))
+                                                  ]),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Verticalspace(8),
+                                          Text('New Request'.toUpperCase(),
+                                              style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: DARK_GREEN,
+                                                  fontWeight: FontWeight.w400))
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                );
+                              }
+                            }),
+                      ),
+                    ),
+                ],
+              );
+            }
+          }),
+        ),
+      ),
+    );
+  }
+
+  Widget noDataBuilder() {
+    return Container(
+      height: MediaQuery.of(context).size.height,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Lottie.asset(
+            'assets/images/66528-qntm.json',
+          ),
+          Text('No request yet',
+              style: Get.textTheme.headline1!.copyWith(
+                  color: ELSA_TEXT_GREY,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800)),
+          Verticalspace(8),
+          Container(
+            width: MediaQuery.of(context).size.width * 0.5,
+            child: Text(
+              'Just chill while waiting customers request',
+              textAlign: TextAlign.center,
+              style: Get.theme.textTheme.bodyText1!.copyWith(
+                color: ELSA_TEXT_GREY,
+              ),
+            ),
+          ),
+          Verticalspace(100),
+        ],
       ),
     );
   }

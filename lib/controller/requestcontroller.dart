@@ -50,7 +50,6 @@ class Requestcontroller extends GetxController {
   var buttontext = "";
   var tripTextIsloading = false.obs;
   var hasongingtrip = false.obs;
-  var hasacceptedrequest = false.obs;
 
   var isPaymentShowed = false.obs;
 
@@ -63,11 +62,16 @@ class Requestcontroller extends GetxController {
   var loaderoftrip = false.obs;
   Map<String, dynamic> ongoingtripdata = {};
 
+
+
   //
+  var hasacceptedrequest = false.obs;
   String? requestid;
-  void confirmRequest(BuildContext context, String? requestid) async {
+  void confirmRequest(BuildContext context, String? requestid) async { 
     Get.back();
-    progressDialog("Loading...");
+
+    hasacceptedrequest(true);
+    Authdialog.showAuthProGress(context, 'Please wait...');
     if (requestid != null) {
       await requestcollecctionrefference
           .doc(requestid)
@@ -108,9 +112,10 @@ class Requestcontroller extends GetxController {
               await drivercurrentrequestaccepted
                   .doc(requestid)
                   .set({'status': 'accepted'}).then((_) async {
+                    Get.back();
                 //get direction and ongoingtripdetails local
-                var isOngoingReady =
-                    await getDirectionAndCreateOngoingTrip(requestid);
+                Authdialog.showAuthProGress(context, 'Prepairing trip ...');
+                var isOngoingReady = await getDirectionAndCreateOngoingTrip(requestid);
 
                 if (isOngoingReady) {
                   await requestcollecctionrefference.doc(requestid).update({
@@ -118,9 +123,10 @@ class Requestcontroller extends GetxController {
                   }).then((value) async {
                     //make driver offline
                     driverxcontroller.makeDriverOffline(context);
+                    Get.back();
 
                     //close loading screen
-                    Get.back();
+                   
 
                     //update page to trip para pag back mo malakat ka sa trip screen
                     pageindexcontroller.updateIndex(2);
@@ -143,10 +149,12 @@ class Requestcontroller extends GetxController {
               // driverxcontroller.disableLiveLocationUpdate();
             });
           } else {
+            hasacceptedrequest(false);
             Get.back();
             infoDialog('Request already accepted by other driver');
           }
         } else {
+          hasacceptedrequest(false);
           Get.back();
           infoDialog('Request Has been canceled');
         }

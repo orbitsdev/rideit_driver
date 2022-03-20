@@ -3,12 +3,23 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+import 'package:tricycleappdriver/UI/constant.dart';
+import 'package:tricycleappdriver/model/request_details.dart';
 import 'package:tricycleappdriver/screens/map/map_request_controller.dart';
 
 class RequestMapScreen extends StatefulWidget {
   
   
+  RequestDetails? request;
+  RequestMapScreen({
+    Key? key,
+    this.request,
+  }) : super(key: key);
   static const String screenName = "/requestmap";
+  
+
+
   @override
   _RequestMapScreenState createState() => _RequestMapScreenState();
 }
@@ -21,6 +32,10 @@ var maprequestcontroller = Get.put(MapRequestController());
   Set<Marker> markerSet = {};
   Set<Polyline> polylineSet = {};
   Set<Circle> circleSet = {};
+  Marker? pickupmarker;
+  Marker? dropmarker;
+  Circle? pickcircle;
+  Circle? dropcircle;
   double mappadding = 0;
   CameraPosition? cameraPosition;
 
@@ -53,9 +68,52 @@ var maprequestcontroller = Get.put(MapRequestController());
 @override
   void initState() {
     super.initState();
+   setTripMarkers();
    setPolylines();
      
 
+  }
+
+
+void setTripMarkers() async {
+    pickupmarker = Marker(
+      markerId: MarkerId("pickmarker"),
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet),
+      position: widget.request!.pick_location as LatLng,
+    );
+
+    dropmarker =   Marker(
+      markerId: MarkerId("dropmarker"),
+      position:widget.request!.actualmarker_position as LatLng,
+       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+    );
+
+    //circle
+
+    pickcircle = Circle(
+        zIndex: 1,
+        fillColor: Colors.purpleAccent.withOpacity(0.5),
+        center: widget.request!.pick_location as LatLng,
+        strokeWidth: 1,
+        radius: 26,
+        strokeColor: Colors.purpleAccent,
+        circleId: CircleId("pickcicrcle"));
+
+    dropcircle = Circle(
+        fillColor: Colors.redAccent.withOpacity(0.5),
+        center:
+            widget.request!.actualmarker_position as LatLng,
+        strokeWidth: 1,
+        radius: 26,
+        strokeColor: Colors.redAccent,
+        circleId: CircleId("dropcircle"));
+
+    setState(() {
+      markerSet.add(pickupmarker as Marker);
+      markerSet.add(dropmarker as Marker);
+      circleSet.add(pickcircle as Circle);
+      circleSet.add(dropcircle as Circle);
+    });
   }
 
 int _polylincecounter = 1;
@@ -75,7 +133,7 @@ void setPolylines() async {
             jointType: JointType.mitered,
             endCap: Cap.roundCap,
             startCap: Cap.roundCap,
-            color: Colors.deepPurple,
+            color: ELSA_GREEN,
             points: maprequestcontroller.requestmapdetails.value.polylines_encoded!
                 .map((e) => LatLng(e.latitude, e.longitude))
                 .toList()),
@@ -119,6 +177,7 @@ void _caneraBoundRoute(LatLng bound_sw, LatLng bound_ne) {
               if (!googlemapcontrollercompleter.isCompleted) {
                 googlemapcontrollercompleter.complete(mapcontroller);
                 newgooglemapcontroller = mapcontroller;
+                 newgooglemapcontroller!.setMapStyle(mapdarktheme);
                _caneraBoundRoute(
           maprequestcontroller.requestmapdetails.value.bound_sw as LatLng,
           maprequestcontroller.requestmapdetails.value.bound_ne as LatLng);

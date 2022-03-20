@@ -29,14 +29,11 @@ class Notificationserves {
     });
     //forground
     FirebaseMessaging.onMessage.listen((message) {
-
-      
       if (message.notification != null) {
         print('fourground____________');
         print(message.data);
         print(message.data["recieve_request"]);
         processRequest(jsonDecode(message.data["recieve_request"]));
-
       }
       //Localnotificationservice.display(message);
     });
@@ -52,18 +49,18 @@ class Notificationserves {
         print('background_______________');
         print(message.data["recieve_request"]);
         processRequest(jsonDecode(message.data["recieve_request"]));
-
       }
     });
   }
 
   void processRequest(Map<String, dynamic> recieverequest) {
-
-    if(requestcontroller.ongoingtrip.value.request_id == null){
-         UnAcceptedRequest unacceptedrequest = UnAcceptedRequest.fromJson(recieverequest);
-        Get.off(()=> ListOfRequest() ); 
+    // check if naka click nya button sang acceo
+    if (requestcontroller.hasacceptedrequest.value == false) {
+      if (requestcontroller.ongoingtrip.value.request_id == null) {
+        UnAcceptedRequest unacceptedrequest =
+            UnAcceptedRequest.fromJson(recieverequest);
+        Get.to(() => ListOfRequest());
+      }
     }
-   
-   
   }
 }
