@@ -6,7 +6,7 @@ import 'package:tricycleappdriver/widgets/verticalspace.dart';
 import '../../widgets/elsabutton.dart';
 
 class InfoDialog {
-  static void noDataDialog(BuildContext context) {
+  static void noDataDialog(BuildContext context, String message) {
     showDialog(
         barrierDismissible: false,
         context: context,
@@ -30,7 +30,7 @@ class InfoDialog {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                          'If you press the phone number it will redirect you to the dial number ☺️ ', style: TextStyle(fontSize: 14, color: LIGHT_CONTAINER, fontWeight: FontWeight.w300),),
+                          message, style: TextStyle(fontSize: 14, color: LIGHT_CONTAINER, fontWeight: FontWeight.w300),),
                           Verticalspace(8),
                       Container(
                         margin: EdgeInsets.symmetric(

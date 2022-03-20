@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -159,7 +160,9 @@ void _caneraBoundRoute(LatLng bound_sw, LatLng bound_ne) {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Title'),
+        leading: IconButton(onPressed: (){
+            Get.back();
+        }, icon: FaIcon(FontAwesomeIcons.times)),
       ),
       body:  GoogleMap(
             padding: EdgeInsets.only(bottom: mappadding),

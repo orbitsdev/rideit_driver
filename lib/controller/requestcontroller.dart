@@ -109,6 +109,7 @@ class Requestcontroller extends GetxController {
                   .doc(requestid)
                   .set({'status': 'accepted'}).then((_) async {
                 Get.back();
+                Get.back();
                 //get direction and ongoingtripdetails local
                 Authdialog.showAuthProGress(context, 'Prepairing trip ...');
                 var isOngoingReady =
@@ -475,6 +476,7 @@ class Requestcontroller extends GetxController {
   }
 
   void endTrip(String requestid, BuildContext context) async {
+    hasacceptedrequest(false);
     collecting(true);
 
     Authdialog.showAuthProGress(context, 'Please wait...');
@@ -519,7 +521,7 @@ class Requestcontroller extends GetxController {
             directiondetails = Directiondetails().obs;
             livedirectiondetails = Directiondetails().obs;
             requestdetails = RequestDetails().obs;
-            pageindexcontroller.updateIndex(2);
+            pageindexcontroller.updateIndex(1);
             newtripstatusvalue = null;
             // driverxcontroller.enableLibeLocationUpdate();
             hasongingtrip(false);
@@ -685,7 +687,8 @@ class Requestcontroller extends GetxController {
   }
 
   void cancelOngoingTrip(BuildContext context) async {
-    Authdialog.showAuthProGress(context, 'Please wait...');
+    
+    Authdialog.showAuthProGress(context, 'Canceling...');
 
     try {
       await ongointripreferrence.doc(requestid).update({
@@ -694,7 +697,10 @@ class Requestcontroller extends GetxController {
         'payed': true,
       });
     } catch (e) {
+      
+      
       print(e);
+
     }
 
 //update variable local to be safe
@@ -709,20 +715,24 @@ class Requestcontroller extends GetxController {
         .add(triphistorydata)
         .then((_) async {
       //add to passenger
+      print('hsitory1 store');
       await passengertriphistoryreferrence
           .doc(requestid)
           .collection('trips')
           .add(triphistorydata)
           .then((_) async {
+                  print('hsitory2 store');
         await requestcollecctionrefference
             .doc(requestid)
             .delete()
-            .then((value) async {
+            .then((_) async {
           await drivercurrentrequestaccepted
               .doc(requestid)
               .delete()
               .then((value) async {
-            collecting(false);
+                              
+              await ongointripreferrence.doc(requestid).delete().then((value) async{
+                      collecting(false);
             Get.back();
             driverxcontroller.makeDriverOnline(context);
             cancelDriverLiveLocation();
@@ -731,15 +741,18 @@ class Requestcontroller extends GetxController {
             directiondetails = Directiondetails().obs;
             livedirectiondetails = Directiondetails().obs;
             requestdetails = RequestDetails().obs;
-            pageindexcontroller.updateIndex(2);
+            pageindexcontroller.updateIndex(1);
             newtripstatusvalue = null;
             // driverxcontroller.enableLibeLocationUpdate();
             hasongingtrip(false);
-
+            hasacceptedrequest(false);
             Future.delayed(Duration(milliseconds: 300), () {
               Get.offNamedUntil(HomeScreenManager.screenName, (route) => false);
               //Get.offNamed(HomeScreenManager.screenName);
             });
+              });  
+
+          
           });
         });
       });

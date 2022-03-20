@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:lottie/lottie.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/controller/requestcontroller.dart';
+import 'package:tricycleappdriver/dialog/infodialog.dart/info_dialog.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/home_screen_manager.dart';
 import 'package:tricycleappdriver/model/request_details.dart';
@@ -41,10 +42,16 @@ class _ListOfRequestState extends State<ListOfRequest> {
         request.request_id = e.id;
         return request;
       }).toList());
+      
 
+      
       print('lenght of of unaccepred rtequest');
       print(requestxcontroller.lisofunacceptedrequest.length);
     });
+  }
+
+  void exitThisScreen(){
+      Get.back();  
   }
 
   void viewRequestDirection(RequestDetails request) async {
@@ -72,6 +79,12 @@ class _ListOfRequestState extends State<ListOfRequest> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+      actions: [
+        IconButton(onPressed: (){
+
+               InfoDialog.noDataDialog(context,'You can only access this screen when there is a new request from the passenger. So dont close it. If you dont want to accept any request. Then make sure your acount is offline. ☺️');
+        }, icon: FaIcon(FontAwesomeIcons.exclamationCircle, color: ELSA_BLUE,))
+      ],
         leading:
             IconButton(onPressed: () {
               

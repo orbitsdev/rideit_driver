@@ -357,7 +357,7 @@ class _TripsScreenState extends State<TripsScreen>
                             child: InkWell(
                               splashColor: Colors.red, // Splash color
                               onTap: () {
-                                InfoDialog.noDataDialog(context);
+                                InfoDialog.noDataDialog(context,'If you press the phone number it will redirect you to the dial number ☺️');
 
                               },
                               child: Container(
