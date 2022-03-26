@@ -5,14 +5,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
+import 'package:tricycleappdriver/controller/mapcontroller.dart';
 import 'package:tricycleappdriver/controller/requestcontroller.dart';
+import 'package:tricycleappdriver/controller/requestdatacontroller.dart';
 import 'package:tricycleappdriver/dialog/requestdialog/requestdialog.dart';
 import 'package:tricycleappdriver/model/un_accepted_request.dart';
 import 'package:tricycleappdriver/screens/list_of_request.dart';
 import 'package:tricycleappdriver/services/localnotificationservice.dart';
 
 class Notificationserves {
-  var requestcontroller = Get.find<Requestcontroller>();
+  var requestcontroller = Get.find<Requestdatacontroller>();
 
   Future initialize() async {
     FirebaseMessaging.instance.getInitialMessage().then((message) {
@@ -54,13 +56,13 @@ class Notificationserves {
   }
 
   void processRequest(Map<String, dynamic> recieverequest) {
-    // check if naka click nya button sang acceo
-    if (requestcontroller.hasacceptedrequest.value == false) {
-      if (requestcontroller.ongoingtrip.value.request_id == null) {
+  
+ 
+      if (requestcontroller.monitorrequestdetails.value.request_id == null) {
         UnAcceptedRequest unacceptedrequest =
             UnAcceptedRequest.fromJson(recieverequest);
         Get.to(() => ListOfRequest());
       }
-    }
+    
   }
 }

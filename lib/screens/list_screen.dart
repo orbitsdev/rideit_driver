@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 
 import 'package:tricycleappdriver/model/ongoing_trip_details.dart';
@@ -53,7 +54,7 @@ class ListScreen extends StatelessWidget {
                         statuscolor: ELSA_GREEN,
                         picklocation: '${collection![index].pickaddress_name}',
                         droplocation: '${collection![index].dropddress_name}',
-                        date: '${collection![index].created_at}'))),
+                        date:   DateFormat.yMMMMd().format(DateTime.parse('${collection![index].created_at}')) ))),
               ),
             ),
           );

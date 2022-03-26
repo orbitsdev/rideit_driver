@@ -5,12 +5,13 @@ import 'package:get/get.dart';
 import 'package:slide_to_confirm/slide_to_confirm.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/controller/requestcontroller.dart';
+import 'package:tricycleappdriver/controller/requestdatacontroller.dart';
 import 'package:tricycleappdriver/model/ongoing_trip_details.dart';
 import 'package:tricycleappdriver/widgets/horizontalspace.dart';
 import 'package:tricycleappdriver/widgets/verticalspace.dart';
 
 class DialogCollection {
-  static var requestcontroller = Get.find<Requestcontroller>();
+  static var requestcontroller = Get.find<Requestdatacontroller>();
 
   static void showpaymentToCollect(BuildContext context) {
     showDialog(
@@ -36,9 +37,9 @@ class DialogCollection {
                   SizedBox(
                     height: 12,
                   ),
-                  Text('amount to be payed'.toUpperCase(), style: Get.textTheme.bodyText1!.copyWith(color: ELSA_TEXT_WHITE, fontSize: 14, fontWeight: FontWeight.w100)),
+                  Text('Total amount to collect'.toUpperCase(), style: Get.textTheme.bodyText1!.copyWith(color: ELSA_TEXT_WHITE, fontSize: 14, fontWeight: FontWeight.w100)),
                   Verticalspace(6),
-                  Text('₱ 10.00', style: Get.textTheme.headline1!.copyWith(color: ELSA_TEXT_WHITE, fontSize: 34),),
+                  Text('${requestcontroller.ongoingtrip.value.fee}', style: Get.textTheme.headline1!.copyWith(color: ELSA_TEXT_WHITE, fontSize: 34),),
                   Verticalspace(16),
                  // FaIcon(FontAwesomeIcons.moneyBill, color: Colors.amber[400], size: 34,),
               
@@ -147,4 +148,6 @@ class DialogCollection {
           );
         });
   }
+
+  
 }

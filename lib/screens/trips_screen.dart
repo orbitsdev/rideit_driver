@@ -5,6 +5,7 @@ import 'package:lottie/lottie.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/controller/drivercontroller.dart';
 import 'package:tricycleappdriver/controller/requestcontroller.dart';
+import 'package:tricycleappdriver/controller/requestdatacontroller.dart';
 import 'package:tricycleappdriver/dialog/infodialog.dart/info_dialog.dart';
 import 'package:tricycleappdriver/screens/ongoingtrip.dart';
 import 'package:tricycleappdriver/screens/tripdetails_screen.dart';
@@ -28,7 +29,7 @@ class TripsScreen extends StatefulWidget {
 class _TripsScreenState extends State<TripsScreen>
     with SingleTickerProviderStateMixin {
   late TabController tabController;
-  var requestxcontroller = Get.find<Requestcontroller>();
+  var requestxcontroller = Get.find<Requestdatacontroller>();
   var driverxcontroller = Get.find<Drivercontroller>();
   bool hasongointrip = false;
   bool loadingrequest = true;
@@ -38,15 +39,12 @@ class _TripsScreenState extends State<TripsScreen>
     super.initState();
     tabController = TabController(length: 2, vsync: this);
     this.tabController.addListener(() => setState(() {}));
+    Future.delayed(Duration.zero,(){
+         getOngoinTripDataIfHasRequqest(context);
+    });
   }
 
-  bool isdepencycalled = false;
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    getOngoinTripDataIfHasRequqest(context);
-  }
-
+  
 
   
   void getOngoinTripDataIfHasRequqest(BuildContext context) async {
@@ -315,7 +313,7 @@ class _TripsScreenState extends State<TripsScreen>
                                     style: TextStyle(color: Colors.amber[300])),
                                 TextSpan(
                                     text:
-                                        '10.00'),
+                                        '${requestxcontroller.requestdetails.value.fee}.00'),
                               ],
                             ),
                           ),
@@ -430,7 +428,7 @@ class _TripsScreenState extends State<TripsScreen>
             Elsabutton(
                 label: 'View',
                 function: () {
-                  Get.toNamed(Ongoingtrip.screenName);
+                  Get.to(()=> Ongoingtrip(),);
                 }),
             Verticalspace(120),
           ],

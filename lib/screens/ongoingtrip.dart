@@ -1,194 +1,157 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animarker/flutter_map_marker_animation.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:maps_toolkit/maps_toolkit.dart' as toolkit;
 import 'package:tricycleappdriver/UI/constant.dart';
-import 'package:tricycleappdriver/assistant/debub_assistant.dart';
 import 'package:tricycleappdriver/assistant/mapkitassistant.dart';
-import 'package:tricycleappdriver/controller/drivercontroller.dart';
-import 'package:tricycleappdriver/controller/requestcontroller.dart';
+import 'package:tricycleappdriver/controller/requestdatacontroller.dart';
 import 'package:tricycleappdriver/dialog/authdialog/authdialog.dart';
-import 'package:tricycleappdriver/dialog/requestdialog/completetripdialog.dart';
 import 'package:tricycleappdriver/dialog/requestdialog/dialog_collection.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/home_screen_manager.dart';
-import 'package:tricycleappdriver/screens/complete_screen.dart';
-
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:tricycleappdriver/widgets/horizontalspace.dart';
 import 'package:tricycleappdriver/widgets/verticalspace.dart';
 
 class Ongoingtrip extends StatefulWidget {
-  static const screenName = "/ongoingtrip";
-
+  const Ongoingtrip({Key? key}) : super(key: key);
+  static const String screenName = "/ongointrip";
   @override
-  State<Ongoingtrip> createState() => _OngoingtripState();
+  _OngoingtripState createState() => _OngoingtripState();
 }
 
 class _OngoingtripState extends State<Ongoingtrip> {
-  var requestxconroller = Get.find<Requestcontroller>();
-  var driverxcontroller = Get.put(Drivercontroller());
-
-  double mappadding = 0;
-  Completer<GoogleMapController> googlemapcontrollercompleter = Completer();
+  var requestxcontroller = Get.find<Requestdatacontroller>();
+  Completer<GoogleMapController> _controller = Completer();
   GoogleMapController? newgooglemapcontroller;
-  Set<Marker> markerSet = {};
-  Set<Polyline> polylineSet = {};
-  Set<Circle> circleSet = {};
-  Marker? pickupmarker;
-  Marker? dropmarker;
-  Circle? pickcircle;
-  Circle? dropcircle;
-  CameraPosition? cameraposition;
-  BitmapDescriptor? drivermarkericon;
-  Position? driverposition;
-  LatLng? driverlatlingposition;
-  String durationText = "";
-  String testpostion = "";
-  String? currentripstatus;
-
-  var spinkit = SpinKitWave(
-    color: Colors.white,
-    size: 50.0,
-  );
-
-  var isTripReady = true;
+  
+  
 
   static final CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(37.42796133580664, -122.085749655962),
-    zoom: 17.4746,
+    zoom: 14.4746,
   );
+
+
+  Marker? startingMrker;
+  Marker? destinationMarker;
+  Marker? driverMarker;
+  Circle? startingCircle;
+  Circle? destinationCircle;
+  Set<Marker> markerSet = {};
+  Set<Circle> circleSet = {};
+  Set<Polyline> polylineSet = {};
+  LatLng? driverpostion;
+    BitmapDescriptor? drivermarkericon;
+
+
+  bool isMapReady = false;
+  bool hastrip = false;
 
   @override
   void initState() {
+    Future.delayed(Duration.zero).then((value){
+      SchedulerBinding.instance!.addPostFrameCallback((_){
+
+        listenToOngoingTrip(context);
+      });
+    });
     super.initState();
 
-    isTripDetailsReady();
-
-    //isTripDetailsReady();
   }
 
-  void boundCamera() {
-    var bound_sw = requestxconroller.directiondetails.value.bound_sw as LatLng;
-    var bound_ne = requestxconroller.directiondetails.value.bound_ne as LatLng;
 
-    newgooglemapcontroller!.animateCamera(CameraUpdate.newLatLngBounds(
-        LatLngBounds(southwest: bound_sw, northeast: bound_ne), 45));
-  }
-
-  void isTripDetailsReady() async {
-    requestxconroller.loaderoftrip(true);
-    print('caaled');
-    var istripready = await requestxconroller.listenToOngoingTrip();
-
-    if (istripready) {
-      currentripstatus = requestxconroller.ongoingtrip.value.tripstatus;
-      print('payed==');
-      print(requestxconroller.ongoingtrip.value.payed);
-
-      //set map ready
-      setTripMapIsready(istripready);
-      //set markder
-      setTripMarkers();
-      //draw lout
-      setPolylines();
-
-      requestxconroller.loaderoftrip(false);
-      if (requestxconroller.ongoingtrip.value.tripstatus == "coming" ||
-          requestxconroller.ongoingtrip.value.tripstatus == "picked") {
-        getLiveLocationUpdate();
-      }
-    }
-  }
-
-  @override
-  void setState(VoidCallback fn) {
-    if (mounted) {
-      super.setState(fn);
-    }
-    // TODO: implement setState
-  }
-
-  void setTripMapIsready(bool value) {
+  
+  void setSuccesMap() {
     setState(() {
-      isTripReady = value;
+      isMapReady = true;
+      hastrip = true;
     });
   }
 
-  void createCustomDriverMarker() {
-    ImageConfiguration imageconfiguation =
-        createLocalImageConfiguration(context, size: Size(2, 2));
-    BitmapDescriptor.fromAssetImage(
-            imageconfiguation, "assets/images/Motorcycle_8.png")
-        .then((value) => drivermarkericon = value);
+  void setFailedMap() {
+    setState(() {
+      isMapReady = true;
+      hastrip = false;
+    });
   }
 
-  int _polylincecounter = 1;
+  void listenToOngoingTrip(BuildContext context) async {
+    var response = await requestxcontroller.checkOngoingTripDetails(context);
+    print(response);
 
-  void setTripMarkers() async {
-    pickupmarker = Marker(
-      markerId: MarkerId("pickmarker"),
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet),
-      position: requestxconroller.ongoingtrip.value.pick_location as LatLng,
-    );
+    if (response) {
+   setSuccesMap();
+   setMarker();
+   setPolyline();
+    } else {
+     setFailedMap();
+    }
+  }
 
-    dropmarker = Marker(
-      markerId: MarkerId("dropmarker"),
-      position:
-          requestxconroller.ongoingtrip.value.actualmarker_position as LatLng,
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-    );
 
-    //circle
+  void setMarker(){
+   // print(requestxcontroller.ongoingtrip.value.pick_location);
+    print(requestxcontroller.ongoingtrip.value.drop_location);
+    print(requestxcontroller.ongoingtrip.value.dropddress_name);
 
-    pickcircle = Circle(
+  startingMrker = Marker(
+    markerId: MarkerId('startingmarker'),
+    position: requestxcontroller.ongoingtrip.value.pick_location as LatLng,
+    icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet),
+  );
+ destinationMarker = Marker(
+    markerId: MarkerId('destinationmarker'),
+    position: requestxcontroller.ongoingtrip.value.actualmarker_position as LatLng,
+    icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+  );
+
+  startingCircle =  Circle(
         zIndex: 1,
         fillColor: Colors.purpleAccent.withOpacity(0.5),
-        center: requestxconroller.ongoingtrip.value.pick_location as LatLng,
+        center: requestxcontroller.ongoingtrip.value.pick_location as LatLng,
         strokeWidth: 1,
         radius: 26,
         strokeColor: Colors.purpleAccent,
-        circleId: CircleId("pickcicrcle"));
+        circleId: CircleId("startingcircle"));
 
-    dropcircle = Circle(
+ 
+
+
+  destinationCircle =  Circle(
         fillColor: Colors.redAccent.withOpacity(0.5),
-        center:
-            requestxconroller.ongoingtrip.value.actualmarker_position as LatLng,
+        center:   requestxcontroller.ongoingtrip.value.actualmarker_position as LatLng,
         strokeWidth: 1,
         radius: 26,
         strokeColor: Colors.redAccent,
-        circleId: CircleId("dropcircle"));
+        circleId: CircleId("destination"));
 
+    
     setState(() {
-      markerSet.add(pickupmarker as Marker);
-      markerSet.add(dropmarker as Marker);
-      circleSet.add(pickcircle as Circle);
-      circleSet.add(dropcircle as Circle);
+      markerSet.add(startingMrker as Marker);
+      markerSet.add(destinationMarker as Marker);
+      circleSet.add(startingCircle as Circle);
+      circleSet.add(destinationCircle as Circle);
+
     });
-  }
 
-  void _caneraBoundRoute(LatLng? bound_sw, LatLng? bound_ne) {
-    print('Camerabound');
-    print(bound_sw);
-    print(bound_ne);
+}
 
-    try {
-      newgooglemapcontroller!.animateCamera(CameraUpdate.newLatLngBounds(
-          LatLngBounds(
-              southwest: bound_sw as LatLng, northeast: bound_ne as LatLng),
-          50));
-    } catch (e) {
-      print(e);
-    }
-  }
 
-  void setPolylines() {
-    if (requestxconroller.directiondetails.value.polylines_encoded != null) {
+
+int _polylincecounter = 1;
+
+  void setPolyline(){
+    if (requestxcontroller.directiondetails.value.polylines_encoded != null) {
+
+      print('_WAZAP DJDJS Jo');
+      print( requestxcontroller.directiondetails.value.polylines_encoded);
       String polylineIdVal = "polyline_id${_polylincecounter}";
+      setState(() {
+        
       polylineSet.clear();
       polylineSet.add(
         Polyline(
@@ -198,378 +161,432 @@ class _OngoingtripState extends State<Ongoingtrip> {
             endCap: Cap.roundCap,
             startCap: Cap.roundCap,
             color: ELSA_GREEN,
-            points: requestxconroller.directiondetails.value.polylines_encoded!
+            points: requestxcontroller.directiondetails.value.polylines_encoded!
                 .map((e) => LatLng(e.latitude, e.longitude))
                 .toList()),
       );
+      });
+      
 
-      _caneraBoundRoute(requestxconroller.directiondetails.value.bound_sw,
-          requestxconroller.directiondetails.value.bound_ne);
+     
     }
   }
 
-  setisTripReady(bool value) {
-    setState(() {
-      isTripReady = value;
-    });
+  void _caneraBoundRoute(LatLng? bound_sw, LatLng? bound_ne) {
+
+    print('bound');
+    print(bound_sw);
+    print(bound_ne);
+   
+    try {
+      newgooglemapcontroller!.animateCamera(CameraUpdate.newLatLngBounds(
+          LatLngBounds(
+              southwest: bound_sw as LatLng, northeast: bound_ne as LatLng),
+          80));
+    } catch (e) {
+      print(e);
+    }
   }
 
-  void getLiveLocationUpdate() {
-    DebubAssistant.printDataLine('live location called', 'test');
+
+  void updateTripStaus(BuildContext context) async{
+
+    var response = await requestxcontroller.updateTripStaus(context);
+      if(response != "check"){
+        
+        if(response == "coming" || response == "travelling"){
+           await updatePolyline();
+           getLiveLocationUpdate();
+        }
+
+         if (requestxcontroller.ongoingtrip.value.tripstatus == 'complete' &&
+          requestxcontroller.ongoingtrip.value.payed == false) {
+            DialogCollection.showpaymentToCollect(context);
+          }
+
+
+      }else{
+        if (requestxcontroller.ongoingtrip.value.tripstatus == 'complete' &&
+          requestxcontroller.ongoingtrip.value.payed == false) {
+            DialogCollection.showpaymentToCollect(context);
+        }
+
+      }
+    print('UPDATE RESPONSE');
+    print(response);
+  }
+
+  Future<void> updatePolyline() async{
+     setPolyline();
+  }
+
+  @override
+  void setState(VoidCallback fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
+
+void createCustomDriverMarker() {
+    ImageConfiguration imageconfiguation =
+        createLocalImageConfiguration(context, size: Size(2, 2));
+    BitmapDescriptor.fromAssetImage(
+            imageconfiguation, "assets/images/Motorcycle_8.png")
+        .then((value) => drivermarkericon = value);
+  }
+ void getLiveLocationUpdate() {
+   
     LatLng oldpostion = LatLng(0, 0);
 
-    driverlocationstream =
-        Geolocator.getPositionStream().listen((Position position) async {
-      driverposition = position;
-      LatLng latlingpostion =
-          LatLng(driverposition!.latitude, driverposition!.longitude);
-      var rot = Mapkitassistant.getMarkerRotation(
+    driverlocationstream = Geolocator.getPositionStream().listen((Position position) async {
+        
+
+        LatLng driverpositionlat = LatLng(position.latitude, position.longitude);
+
+    
+        var rot = Mapkitassistant.getMarkerRotation(
           oldpostion.latitude,
           oldpostion.longitude,
-          latlingpostion.latitude,
-          latlingpostion.longitude);
-      Marker movingDriverMarker = Marker(
+          driverpositionlat.latitude,
+          driverpositionlat.longitude);
+          
+          Marker movingDriverMarker = Marker(
         markerId: MarkerId("drivermarker"),
-        position: latlingpostion,
+        position: driverpositionlat,
         rotation: rot,
         anchor: Offset(0.5, 0.5),
         icon: drivermarkericon as BitmapDescriptor,
         infoWindow: InfoWindow(title: "current Location"),
+
+        
+        
       );
-
-      setState(() {
-        CameraPosition camerapostion =
-            CameraPosition(target: latlingpostion, zoom: 17);
-        newgooglemapcontroller!
+        setState(() {
+             CameraPosition camerapostion =
+            CameraPosition(target: driverpositionlat, zoom: 17);  newgooglemapcontroller!
             .animateCamera(CameraUpdate.newCameraPosition(camerapostion));
-        // newgooglemapcontroller!
-        //     .moveCamera(CameraUpdate.newCameraPosition(camerapostion));
-        markerSet
-            .removeWhere((marker) => marker.markerId.value == "drivermarker");
+        // newgooglemapcontroller! .moveCamera(CameraUpdate.newCameraPosition(camerapostion));
+        markerSet .removeWhere((marker) => marker.markerId.value == "drivermarker");
         markerSet.add(movingDriverMarker);
-      });
+        });
 
-      requestxconroller.getNewTripDirection(latlingpostion,
-          requestxconroller.ongoingtrip.value.drop_location as LatLng);
 
-      setState(() {
-        //testpostion = requestxconroller.testpositiono;
-        durationText =
-            requestxconroller.directiondetails.value.durationText as String;
-      });
+        oldpostion = driverpositionlat;
+          requestxcontroller.updateDriverTripPosition(driverpositionlat, requestxcontroller.ongoingtrip.value.request_id as String);
 
-      oldpostion = latlingpostion;
-      requestxconroller.updateDriverTripPosition(latlingpostion,
-          requestxconroller.ongoingtrip.value.request_id as String);
+      // driverposition = position;
+      // LatLng latlingpostion =  LatLng(driverposition!.latitude, driverposition!.longitude);
+
+      // var rot = Mapkitassistant.getMarkerRotation(
+      //     oldpostion.latitude,
+      //     oldpostion.longitude,
+      //     latlingpostion.latitude,
+      //     latlingpostion.longitude);
+
+      // Marker movingDriverMarker = Marker(
+      //   markerId: MarkerId("drivermarker"),
+      //   position: latlingpostion,
+      //   rotation: rot,
+      //   anchor: Offset(0.5, 0.5),
+      //   icon: drivermarkericon as BitmapDescriptor,
+      //   infoWindow: InfoWindow(title: "current Location"),
+      // );
+
+      // setState(() {
+      //   CameraPosition camerapostion =
+      //       CameraPosition(target: latlingpostion, zoom: 17);  newgooglemapcontroller!
+      //       .animateCamera(CameraUpdate.newCameraPosition(camerapostion));
+      //   // newgooglemapcontroller! .moveCamera(CameraUpdate.newCameraPosition(camerapostion));
+      //   markerSet .removeWhere((marker) => marker.markerId.value == "drivermarker");
+      //   markerSet.add(movingDriverMarker);
+      // });
+
+      // requestxconroller.getNewTripDirectionforLive( latlingpostion,  requestxconroller.ongoingtrip.value.drop_location as LatLng);
+      // oldpostion = latlingpostion;
+      // requestxconroller.updateDriverTripPosition(latlingpostion, requestxconroller.ongoingtrip.value.request_id as String);
+
     });
   }
 
   @override
-  void dispose() {
-    // TODO: implement dispose
-    if (driverlocationstream != null) {
-      driverlocationstream!.cancel();
-    }
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    createCustomDriverMarker();
-
+     createCustomDriverMarker();
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          IconButton(
-            onPressed: () {
-              boundCamera();
-            },
-            icon: FaIcon(FontAwesomeIcons.mapMarked),
-          )
-        ],
-        leading: IconButton(
-            onPressed: () {
-              Get.off(() => HomeScreenManager());
-            },
-            icon: FaIcon(FontAwesomeIcons.times)),
+        leading:
+            IconButton(onPressed: () {
+              Get.off(()=> HomeScreenManager());
+            }, icon: FaIcon(FontAwesomeIcons.times)),
       ),
-      body: isTripReady == false
+      body: isMapReady == false
           ? Container(
               child: Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(
+                  color: ELSA_BLUE_2_,
+                ),
               ),
             )
-          : Stack(
-              children: [
-                GoogleMap(
-                  padding: EdgeInsets.only(bottom: mappadding),
-                  initialCameraPosition: _kGooglePlex,
-                  mapType: MapType.normal,
-                  polylines: polylineSet,
-                  myLocationEnabled: true,
-                  myLocationButtonEnabled: true,
-                  markers: markerSet,
-                  circles: circleSet,
-                  compassEnabled: true,
-                  mapToolbarEnabled: true,
-                  zoomGesturesEnabled: true,
-                  onMapCreated: (GoogleMapController mapcontroller) {
-                    if (!googlemapcontrollercompleter.isCompleted) {
-                      googlemapcontrollercompleter.complete(mapcontroller);
-                      newgooglemapcontroller = mapcontroller;
-                      newgooglemapcontroller!.setMapStyle(mapdarktheme);
-                      // setTripMarkers();
-                      // setPolylines();
-                      // getallDetails();
-
-                      // getLiveLocationUpdate();
-                    }
-                  },
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  left: 0,
-                  child: SingleChildScrollView(
-                    child: Container(
-                      // width: MediaQuery.of(context).size.width,
-                      constraints: BoxConstraints(
-                        maxHeight: 300,
+          : hastrip == false
+              ? Container(
+                  child: Center(
+                    child: Text('No data', style: TextStyle(color: Colors.red)),
+                  ),
+                )
+              : Column(
+                  children: [
+                    Expanded(
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          GoogleMap(
+                            mapType: MapType.normal,
+                            initialCameraPosition: _kGooglePlex,
+                            myLocationButtonEnabled: true,
+                            myLocationEnabled: true,
+                            zoomControlsEnabled: true,
+                            zoomGesturesEnabled: true,
+                            markers: markerSet,
+                            polylines: polylineSet,
+                            circles: circleSet,
+                            onMapCreated: (GoogleMapController controller) {
+                              if (!_controller.isCompleted)
+                                _controller.complete(controller);
+                              newgooglemapcontroller = controller;
+                              newgooglemapcontroller!.setMapStyle(mapdarktheme);
+                               _caneraBoundRoute(requestxcontroller.directiondetails.value.bound_sw,
+                                 requestxcontroller.directiondetails.value.bound_ne);
+                            },
+                          ),
+                        ],
                       ),
+                    ),
+                    Container(
+                      constraints:
+                          BoxConstraints(minHeight: 200, maxHeight: 300),
+                      padding: EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                          color: BACKGROUND_BOTTOM,
-                          borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(15),
-                              topRight: Radius.circular(15))),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 10),
-                        child: Obx(() {
-                          if (requestxconroller.tripTextIsloading.value) {
-                            return Center(
-                              child: spinkit,
-                            );
-                          } else {
-                            if (requestxconroller
-                                    .ongoingtrip.value.request_id !=
-                                null) {
-                              return SingleChildScrollView(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    if (durationText != "")
-                                      Text(durationText,
-                                          style: Get.theme.textTheme.headline5),
-                                    Verticalspace(8),
+                        gradient: LinearGradient(
+                                colors: [
+                                  BACKGROUND_TOP,
+                                  BACKGROUND_CEENTER,
+                                  BACKGROUND_BOTTOM,
+                                ],
+                                end: Alignment.bottomCenter,
+                                begin: Alignment.topCenter,
+                              ),
+                              
+                      ),
+                      child: SingleChildScrollView(
+                          child: Obx((){
+                            return Column(
+                        children: [
+                         
+                          Container(
+                            margin: EdgeInsets.symmetric(
+                              vertical: 1,
+                            ),
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: LIGHT_CONTAINER,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(8)),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'From',
+                                  style: Get.textTheme.bodyText1!
+                                      .copyWith(fontWeight: FontWeight.w100),
+                                ),
+                                Horizontalspace(8),
+                                Flexible(
+                                    child: Text(
+                                  '${requestxcontroller.ongoingtrip.value.pickaddress_name}',
+                                  textAlign: TextAlign.right,
+                                )),
+                              ],
+                            ),
+                          ),
+                          Verticalspace(8),
+                          Container(
+                            margin: EdgeInsets.symmetric(
+                              vertical: 1,
+                            ),
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: LIGHT_CONTAINER,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(8)),
+                            ),
 
-                                    Text(
-                                      'From',
-                                      style: Get.theme.textTheme.bodyText1!
-                                          .copyWith(color: Colors.purpleAccent),
-                                    ),
-                                    Verticalspace(4),
-                                    Text(
-                                      '${requestxconroller.ongoingtrip.value.pickaddress_name}',
-                                      style: Get.theme.textTheme.bodyText1!
-                                          .copyWith(
-                                        fontWeight: FontWeight.w100,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                    Verticalspace(8),
-                                    Text(
-                                      'To',
-                                      style: Get.theme.textTheme.bodyText1!
-                                          .copyWith(color: Colors.redAccent),
-                                    ),
-                                    Verticalspace(4),
-                                    Text(
-                                      '${requestxconroller.ongoingtrip.value.dropddress_name}',
-                                      style: Get.theme.textTheme.bodyText1!
-                                          .copyWith(
-                                        fontWeight: FontWeight.w200,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                    Verticalspace(8),
-                                    Divider(
-                                      thickness: 1,
-                                      color: LIGHT_CONTAINER,
-                                    ),
-                                    // Container(
-                                    //   width: double.infinity,
-                                    //   child: Text(
-                                    //     requestxconroller.ongoingtrip.value
-                                    //                 .tripstatus ==
-                                    //             "prepairing"
-                                    //         ? 'Press the button if you are ready'
-                                    //         : requestxconroller.ongoingtrip
-                                    //                     .value.tripstatus ==
-                                    //                 "coming"
-                                    //             ? 'Press the button when you already arrived'
-                                    //             : requestxconroller.ongoingtrip
-                                    //                         .value.tripstatus ==
-                                    //                     "arrived"
-                                    //                 ? 'Wait for the customer and start the trip if ready'
-                                    //                 : '',
-                                    //     style: TextStyle(
-                                    //         color: ELSA_GREEN,
-                                    //         fontSize: 14,
-                                    //         fontWeight: FontWeight.w300),
-                                    //     textAlign: TextAlign.center,
-                                    //   ),
-                                    // ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'To',
+                                  style: Get.textTheme.bodyText1!
+                                      .copyWith(fontWeight: FontWeight.w100),
+                                ),
+                                Horizontalspace(8),
+                                Flexible(
+                                    child: Text(
+                                  '${requestxcontroller.ongoingtrip.value.dropddress_name}',
+                                  textAlign: TextAlign.right,
+                                )),
+                              ],
+                            ),
+                          ),
+                          Verticalspace(8),
+                          Container(
+                           
+                            padding: EdgeInsets.symmetric(
+                              vertical: 12,
+                            ),
+                            child: Center(
+                              child: Text(
+                                requestxcontroller.ongoingtrip.value.tripstatus == "prepairing"
+                                          ? 'Click the button if you are ready'.toUpperCase()
+                                          :requestxcontroller.ongoingtrip.value.tripstatus == "coming"
+                                          ?'Arrived'.toUpperCase()
+                                          :requestxcontroller.ongoingtrip.value.tripstatus == "arrived"
+                                          ? 'Click the button if you arrived'.toUpperCase()
+                                          :requestxcontroller.ongoingtrip.value.tripstatus == "travelling"
+                              
+                                          ?'Click the button to end trip'.toUpperCase()
+                                          :requestxcontroller.ongoingtrip.value.tripstatus == "complete"
+                                          ?'Cick the button to show fee'.toUpperCase()
+                                          :'Cick the button '.toUpperCase(),
+                                style: Get.textTheme.bodyText1!
+                                    .copyWith(color: ELSA_TEXT_GREY),
+                              ),
+                            ),
+                          ),
+                          Verticalspace(12),
+                          Container(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                              if(requestxcontroller.ongoingtrip.value.tripstatus != "complete")
+                              Container(
+                                      
 
-                                    Verticalspace(16),
-
-                                    Container(
-                                      margin: EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                      ),
-                                      width: double.infinity,
-                                      height: 50,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(8)),
-                                        gradient: LinearGradient(
-                                          end: Alignment.bottomCenter,
-                                          begin: Alignment.topCenter,
-                                          colors: [
-                                            ELSA_BLUE_1_,
-                                            ELSA_BLUE_1_,
-                                          ],
-                                        ),
-                                      ),
-                                      child: MaterialButton(
-                                        materialTapTargetSize:
-                                            MaterialTapTargetSize.shrinkWrap,
-                                        shape: const StadiumBorder(),
-                                        child: Text(
-                                          requestxconroller.ongoingtrip.value
-                                                      .tripstatus ==
-                                                  "prepairing"
-                                              ? 'LET\'S GO'
-                                              : requestxconroller.ongoingtrip
-                                                          .value.tripstatus ==
-                                                      "coming"
-                                                  ? 'ARRIVED'
-                                                  : requestxconroller
-                                                              .ongoingtrip
-                                                              .value
-                                                              .tripstatus ==
-                                                          "arrived"
-                                                      ? 'STAR TRIP'
-                                                      : 'END TRIP',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 20),
-                                        ),
-                                        onPressed: () async {
-                                          await updateTripStatus(context);
-                                        },
-                                      ),
-                                    ),
-                                    Verticalspace(16),
-                                    if (requestxconroller
-                                                .ongoingtrip.value.tripstatus !=
-                                            "prepairing" &&
-                                        requestxconroller
-                                                .ongoingtrip.value.tripstatus !=
-                                            "complete")
-                                      Container(
-                                        margin: EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                        ),
-                                        width: double.infinity,
-                                        height: 50,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(8)),
+                                            height: 60,
+                                        decoration: const ShapeDecoration(
+                                          shape: StadiumBorder(),
                                           gradient: LinearGradient(
                                             end: Alignment.bottomCenter,
                                             begin: Alignment.topCenter,
-                                            colors: [Colors.red, Colors.red],
+                                            colors: [
+                                                ELSA_PINK,
+                                                PINK_1  ,
+                                            ],
                                           ),
                                         ),
                                         child: MaterialButton(
                                           materialTapTargetSize:
                                               MaterialTapTargetSize.shrinkWrap,
                                           shape: const StadiumBorder(),
-                                          child: Text(
-                                            'Cancel'.toUpperCase(),
+                                          child:  Text(
+                                            'CANCEL '
+                                           ,
                                             style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 20),
+                                                color: Colors.white, fontSize: 20),
                                           ),
-                                          onPressed: () async {
-                                            DialogCollection
-                                                .showCancelCOnfirmaation(
-                                                    context);
-                                          },
+                                          onPressed: () async{
+                                              Authdialog.showConfirmationDialog(context, 'Are you sure do you want to cancel the trip ?', cancelTrip );
+                                          },  
                                         ),
                                       ),
-                                    Verticalspace(12),
-                                  ],
-                                ),
-                              );
-                            } else {
-                              return Container(child: spinkit);
-                            }
-                          }
-                        }),
-                      ),
-                    ),
-                  ),
+                                // GestureDetector(
+                                //   onTap: (){
+                                //     requestxcontroller.cancelOngoingTrip(requestxcontroller.ongoingtrip.value.request_id as String, context);
+                                //   },
+                                //   child: Container(
+                                //     width: 120,
+                                //     padding: EdgeInsets.all(8),
+                                //     decoration: BoxDecoration(
+                                //       color: ELSA_PINK,
+                                //       borderRadius:
+                                //           BorderRadius.all(Radius.circular(8)),
+                                //     ),
+                                //     child: Center(
+                                //       child: Text(
+                                //          'CANCEL'
+                                            
+                                //            ,
+                                //         style: TextStyle(
+                                //             color: Colors.white, fontSize: 20),
+                                //       ),
+                                //     ),
+                                //   ),
+                                // ),
+                                if(requestxcontroller.ongoingtrip.value.tripstatus != "complete")
+                                Horizontalspace(24),
+                              
+                                Expanded(
+                                  child: requestxcontroller.updating.value?Container(
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        color: ELSA_BLUE_2_,
+                                      ),
+                                    ),
+                                  ) : Container(
+                                        
+                                       
+                                            height: 60,
+                                        decoration: const ShapeDecoration(
+                                          shape: StadiumBorder(),
+                                          gradient: LinearGradient(
+                                            end: Alignment.bottomCenter,
+                                            begin: Alignment.topCenter,
+                                            colors: [
+                                                ELSA_BLUE_2_,
+                                                ELSA_BLUE_1_,
+                                            ],
+                                          ),
+                                        ),
+                                        child: MaterialButton(
+                                          materialTapTargetSize:
+                                              MaterialTapTargetSize.shrinkWrap,
+                                          shape: const StadiumBorder(),
+                                          child:  Text(
+                                            requestxcontroller.ongoingtrip.value.tripstatus == "prepairing"
+                                          ? 'ready'.toUpperCase()
+                                          :requestxcontroller.ongoingtrip.value.tripstatus == "coming"
+                                          ?'Arrived'.toUpperCase()
+                                          :requestxcontroller.ongoingtrip.value.tripstatus == "arrived"
+                                          ? 'LET\'s go'.toUpperCase()
+                                          :requestxcontroller.ongoingtrip.value.tripstatus == "travelling"
+                                          ?'End Trip'.toUpperCase()
+                                          :'Check'.toUpperCase()
+                                           ,
+                                            style: TextStyle(
+                                                color: Colors.white, fontSize: 20),
+                                          ),
+                                          onPressed: () async{
+                                              updateTripStaus(context);
+                                          },  
+                                        ),
+                                      ),
+                                )
+                              ],
+                            ),
+                          ),
+                          // ElevatedButton(onPressed: (){
+                          //     Authdialog.showAuthProGress(context,'DASDAS');
+                          // }, child: Text('test')),
+                          Verticalspace(12),
+                        ],
+                            );
+                          }), 
+                    ),)
+                  ],
                 ),
-              ],
-            ),
     );
   }
 
-  Future<void> updateTripStatus(BuildContext context) async {
-    print(requestxconroller.ongoingtrip.value.tripstatus);
-
-    String response = await requestxconroller.updateOngoingTripStatus();
-
-    DebubAssistant.printDataLine('response of update', response);
-
-    //if changes
-    if (currentripstatus != response) {
-      //update trip status local to new valu
-      setState(() {
-        currentripstatus = requestxconroller.ongoingtrip.value.tripstatus;
-      });
-
-      if (currentripstatus == 'coming') {
-        print('time ta called live update');
-        //update driver location live
-        getLiveLocationUpdate();
-      }
-
-      if (currentripstatus == 'picked') {
-        print('time to resume live update');
-        //update driver location live
-        getLiveLocationUpdate();
-      }
-      if (currentripstatus == 'complete') {
-        if (driverslocationstream != null) {
-          driverslocationstream!.cancel();
-        }
-        DialogCollection.showpaymentToCollect(context);
-      }
-
-      if (currentripstatus == "coming" || currentripstatus == "picked") {
-        setState(() {
-          setPolylines();
-        });
-      }
-    } else {
-      if (requestxconroller.ongoingtrip.value.tripstatus == 'complete' &&
-          requestxconroller.ongoingtrip.value.payed == false) {
-        DialogCollection.showpaymentToCollect(context);
-      }
-    }
+  void cancelTrip() {
+    requestxcontroller.cancelOngoingTrip(requestxcontroller.ongoingtrip.value.request_id as String, context);
   }
 }

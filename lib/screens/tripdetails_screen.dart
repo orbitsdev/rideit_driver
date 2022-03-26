@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 
 import 'package:tricycleappdriver/model/ongoing_trip_details.dart';
@@ -36,21 +37,22 @@ class TripdetailsScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
             
-             columnBuilder('Name', '${trip!.passenger_name}'),
+             columnBuilder('Passenger name', '${trip!.passenger_name}'),
              Verticalspace(12),
-             columnBuilder('Phone', '${trip!.driver_phone}'),
-             Verticalspace(12),
+
+
             seperator(),
              columnBuilder('Pickup address', '${trip!.pickaddress_name}'),
              Verticalspace(12),
              columnBuilder('Drop address', '${trip!.dropddress_name}'),
              Verticalspace(12),
              seperator(),
-             columnBuilder('Total Amount Collected', '${trip!.payedamount}'),
+             columnBuilder('Total Amount Collected', '₱ ${trip!.fee}.00'),
+
              Verticalspace(12),
              columnBuilder('Trip Status', '${trip!.tripstatus}'),
              Verticalspace(12),
-             columnBuilder('Date', '${trip!.created_at}'),
+             columnBuilder('Date',  DateFormat.yMMMMd().format(DateTime.parse('${trip!.created_at}'))),
              Verticalspace(12),
              
             ],

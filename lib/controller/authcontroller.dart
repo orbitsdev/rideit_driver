@@ -9,6 +9,7 @@ import 'package:tricycleappdriver/constant.dart';
 import 'package:tricycleappdriver/dialog/Failuredialog/failuredialog.dart';
 import 'package:tricycleappdriver/dialog/authdialog/authdialog.dart';
 import 'package:tricycleappdriver/dialog/authdialog/authenticating.dart';
+import 'package:tricycleappdriver/dialog/infodialog/infodialog.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/home_screen_manager.dart';
 import 'package:tricycleappdriver/model/users.dart';
@@ -43,7 +44,10 @@ class Authcontroller extends GetxController {
   }
 
   void createUser(String name, String phone, String email, String password,
-      BuildContext context) async { 
+      BuildContext context) async {
+
+  String defaultimage = 'https://firebasestorage.googleapis.com/v0/b/tricyleapp-f8fff.appspot.com/o/passengerusers%2Fdefaultprofile.jpg?alt=media&token=7b691d04-8406-45c7-9182-fb13f600ae4a';   
+
 
     Permissioncontroller.instance.geolocationServicePermission();
       
@@ -53,10 +57,7 @@ class Authcontroller extends GetxController {
     gemail = email.trim();
     gpassword = password.trim();
 
-    print(gname);
-    print(gphone);
-    print(gemail);
-    print(gpassword);
+   
 
     try {
       isSignUpLoading(true);
@@ -73,7 +74,8 @@ class Authcontroller extends GetxController {
           "name": gname as String,
           "email": gemail as String,
           "phone": gphone as String,
-          "image_url": null,
+          "image_url": defaultimage,
+           "image_file": null,
           'device_token': devicetoken,
 
         };
@@ -144,10 +146,9 @@ class Authcontroller extends GetxController {
     } else {
       isSignUpLoading(false);
       isCodeSent(false);
-      print('______from twiilio');
-      print(twilioResponse.statusCode);
+     
       notificationDialog(context, twilioResponse.errorMessage.toString());
-      print(twilioResponse.errorMessage);
+   
     }
   }
 
@@ -270,6 +271,7 @@ class Authcontroller extends GetxController {
         useracountdetails(Users.fromJson(querySnapshot.data() as Map<String, dynamic>));
         useracountdetails.value.id = authinstance.currentUser!.uid;
           
+          
 
            await getDeviceToken();
        
@@ -289,8 +291,9 @@ class Authcontroller extends GetxController {
     try {
       final user = authinstance.currentUser;
       await user!.sendEmailVerification();
-    } catch (e) {
-      print(e.toString());
+    }
+     catch (e) {
+       Infodialog.showInfoToastCenter(e.toString());
     }
   }
 
@@ -306,7 +309,7 @@ class Authcontroller extends GetxController {
     await driversusers.doc(authinstance.currentUser!.uid).update({
       "device_token": devicetoken
     });
-    print('device token updated');
+   
   }
   
 

@@ -214,7 +214,9 @@ class _TricycleappDriverState extends State<TricycleappDriver> {
               ? SigninScreen()
               : FirebaseAuth.instance.currentUser!.emailVerified == false
                   ? VerifyingemailScreen()
-                  : HomeScreenManager(),
+                  : 
+                  //Ongoingtrip(),
+                 HomeScreenManager(),
       getPages: [
         GetPage(
             name: SigninScreen.screenName,

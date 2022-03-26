@@ -10,6 +10,7 @@ import 'package:tricycleappdriver/controller/drivercontroller.dart';
 import 'package:tricycleappdriver/controller/mapcontroller.dart';
 import 'package:tricycleappdriver/controller/pageindexcontroller.dart';
 import 'package:tricycleappdriver/controller/requestcontroller.dart';
+import 'package:tricycleappdriver/controller/requestdatacontroller.dart';
 import 'package:tricycleappdriver/dialog/collectionofdialog.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/screens/earnings_screen.dart';
@@ -37,7 +38,7 @@ class _HomeScreenManagerState extends State<HomeScreenManager>  with SingleTicke
     var mapxcontroller = Get.put(Mapcontroller());
     var pageindexcontroller = Get.put(Pageindexcontroller());
     var driverxcontroller = Get.put(Drivercontroller());
-    var requestxcontroller = Get.put(Requestcontroller());
+    var requestxcontroller = Get.put(Requestdatacontroller());
     Color colorwhite = HexColor("#fbfefb");
     Color iconcolor = HexColor("#2F2191");
     Color iconcolorsecondary = HexColor("#594DAF");
@@ -60,8 +61,11 @@ class _HomeScreenManagerState extends State<HomeScreenManager>  with SingleTicke
  
   @override
   void initState() {
-    super.initState();
-   
+      super.initState();
+Future.delayed(Duration.zero).then((value){
+    requestxcontroller.checkOngoingTripDetails(context);
+  
+});
  WidgetsBinding.instance!.addObserver(this);
   _tabController =  TabController(
     initialIndex: pageindexcontroller.pageindex.value,
@@ -69,14 +73,23 @@ class _HomeScreenManagerState extends State<HomeScreenManager>  with SingleTicke
     vsync: this 
     );
   
-     cloudMessagingSetup();
+      cloudMessagingSetup();
       authxcontroller.checkIfAcountDetailsIsNull();   
       getCurrentStatusOfDriver();
-    
-     //  driverxcontroller.listenToAcountUser();
-     // requestxcontroller.checkIfHasOngoingRequest();
+      //driverxcontroller.listenToAcountUser();
+        requestxcontroller.monitorOngingTrip();
 
-  
+   
+
+  }
+
+
+  void iscurrentLocationIsEmpty() async {
+
+      if(driverxcontroller.latcurrentposition == null){
+        driverxcontroller.getCurentDirection();
+      }
+
   }
 
   void cloudMessagingSetup() async{
@@ -219,7 +232,7 @@ void getCurrentStatusOfDriver()  async {
       ),
 
   //     floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: requestxcontroller.ongoingtrip.value.drop_location_id == null?  GFFloatingWidget(
+      floatingActionButton: requestxcontroller.monitorrequestdetails.value.drop_location_id == null ?  GFFloatingWidget(
        
        child: GFIconBadge(
               
@@ -269,7 +282,7 @@ void getCurrentStatusOfDriver()  async {
    
     verticalPosition: MediaQuery.of(context).size.height * 0.88,
     horizontalPosition: MediaQuery.of(context).size.width / 2.933333333 ,
-  ) : null  ,
+  ) : Container(),
 
         body:Container(
           decoration: BoxDecoration(

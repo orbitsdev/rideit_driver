@@ -5,8 +5,11 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:lottie/lottie.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
+import 'package:tricycleappdriver/controller/authcontroller.dart';
 import 'package:tricycleappdriver/controller/requestcontroller.dart';
+import 'package:tricycleappdriver/controller/requestdatacontroller.dart';
 import 'package:tricycleappdriver/dialog/infodialog.dart/info_dialog.dart';
+import 'package:tricycleappdriver/dialog/infodialog/infodialog.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/home_screen_manager.dart';
 import 'package:tricycleappdriver/model/request_details.dart';
@@ -22,8 +25,10 @@ class ListOfRequest extends StatefulWidget {
 }
 
 class _ListOfRequestState extends State<ListOfRequest> {
-  var requestxcontroller = Get.put(Requestcontroller());
+  var requestxcontroller = Get.put(Requestdatacontroller());
+  var authxcontroller = Get.put(Authcontroller());
   var mapxcontroller = Get.put(MapRequestController());
+  
 
   @override
   void initState() {
@@ -33,17 +38,24 @@ class _ListOfRequestState extends State<ListOfRequest> {
   }
 
   void listenToUnAccepteRequest() async {
+    
     requestcollecctionrefference
         .where('status', isEqualTo: 'pending')
         .snapshots()
         .listen((querySnapShot) {
+
+      
+
       requestxcontroller.lisofunacceptedrequest(querySnapShot.docs.map((e) {
         var request = RequestDetails.fromJson(e.data() as Map<String, dynamic>);
         request.request_id = e.id;
         return request;
       }).toList());
       
+      if(querySnapShot.docs.length == 0  && requestxcontroller.ongoingtrip.value.drop_location_id ==  null){
+        Get.back();
 
+      }
       
       print('lenght of of unaccepred rtequest');
       print(requestxcontroller.lisofunacceptedrequest.length);
@@ -113,7 +125,7 @@ class _ListOfRequestState extends State<ListOfRequest> {
                               child: Container(
                                 height: 50,
                                 width: 50,
-                                child: Image.asset('assets/images/images.jpg'),
+                                child: Image.network('${requestxcontroller.lisofunacceptedrequest[0].passenger_image_url}', fit: BoxFit.cover,),
                               ),
                             ),
                             Horizontalspace(8),
@@ -225,7 +237,17 @@ class _ListOfRequestState extends State<ListOfRequest> {
                                     primary: DARK_GREEN,
                                   ),
                                   onPressed: () {
-                                 requestxcontroller.confirmRequest(context, requestxcontroller.lisofunacceptedrequest[0].request_id);
+                                    if(authxcontroller.hasinternet.value){
+                                       if(requestxcontroller.ongoingtrip.value.drop_location_id == null){
+
+                                        requestxcontroller.confirmRequest(context, requestxcontroller.lisofunacceptedrequest[0].request_id);
+                                    }else{
+                                        Infodialog.showInfoToastCenter('You can oly accep request once at a time');
+                                    }
+                                    }else{
+                                      Infodialog.showInfoToastCenter('No internet');
+                                    }
+                                   
                                   },
                                   child: Text('Accept')),
                             ),
@@ -280,13 +302,27 @@ class _ListOfRequestState extends State<ListOfRequest> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.start,
                                             children: [
-                                              Text(
-                                                  '${requestxcontroller.lisofunacceptedrequest[index].passenger_name}',
-                                                  style: Get
-                                                      .textTheme.bodyText1!
-                                                      .copyWith(
-                                                          fontWeight:
-                                                              FontWeight.w600)),
+                                              
+                                              Row(
+                                                children: [
+                                                   ClipOval(
+                              child: Container(
+                                height: 50,
+                                width: 50,
+                                child: Image.network('${requestxcontroller.lisofunacceptedrequest[0].passenger_image_url}', fit: BoxFit.cover,),
+                              ),
+                            ),Horizontalspace(8),
+                                                  Flexible(
+                                                    child: Text(
+                                                        '${requestxcontroller.lisofunacceptedrequest[index].passenger_name} ',
+                                                        style: Get
+                                                            .textTheme.bodyText1!
+                                                            .copyWith(
+                                                                fontWeight:
+                                                                    FontWeight.w600)),
+                                                  ),
+                                                ],
+                                              ),
                                               Verticalspace(4),
                                               Row(
                                                 children: [

@@ -10,6 +10,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/controller/authcontroller.dart';
 import 'package:tricycleappdriver/dialog/authdialog/authdialog.dart';
+import 'package:tricycleappdriver/dialog/infodialog/infodialog.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/model/ongoing_trip_details.dart';
 import 'package:tricycleappdriver/model/rating.dart';
@@ -55,8 +56,7 @@ class Drivercontroller extends GetxController {
       totalearning(listofsuccesstrip.fold(
           0,
           (prev, trip) =>
-              int.parse(prev.toString()) +
-              int.parse(trip.payedamount.toString())));
+              int.parse(prev.toString()) + int.parse(trip.fee.toString())));
 
       totalsuccestrip(listofsuccesstrip.length);
       canceledtrip(listofcanceledtrip.length);
@@ -79,10 +79,7 @@ class Drivercontroller extends GetxController {
       isOnlineLoading(true);
       Authdialog.showAuthProGress(context, 'Loading...');
       if (currentposition == null) {
-        currentposition = await Geolocator.getCurrentPosition(
-            desiredAccuracy: LocationAccuracy.high);
-        latcurrentposition =
-            LatLng(currentposition!.latitude, currentposition!.longitude);
+        await getCurentDirection();
       }
 
       try {
@@ -110,13 +107,14 @@ class Drivercontroller extends GetxController {
               fontSize: 16.0);
         });
       } on PlatformException catch (e) {
-        print(e.message);
+        print('MAKE DJD DSDSDDSD');
+        Infodialog.showInfoToastCenter(e.toString());
       }
       Get.back();
       isOnlineLoading(false);
       isOnline(true);
     } catch (e) {
-      print(e);
+     Infodialog.showInfoToastCenter(e.toString());
       Get.back();
       isOnlineLoading(false);
       //     isOnline(false);
@@ -124,14 +122,6 @@ class Drivercontroller extends GetxController {
   }
 
   void liveUpdateLocation() async {
-    // driverslocationstream = Geolocator.getPositionStream().listen((position) async{
-    //   currentposition = position ;
-
-    //   await geoFirestore.setLocation(authinstance.currentUser!.uid, GeoPoint(currentposition!.latitude, currentposition!.longitude));
-
-    //  });
-
-    //realtimedatabse
     driverslocationstream =
         Geolocator.getPositionStream().listen((position) async {
       currentposition = position;
@@ -157,7 +147,6 @@ class Drivercontroller extends GetxController {
           fontSize: 16.0);
       isOnlineLoading(false);
       isOnline(false);
-      print("make drive offline called");
     });
   }
 
@@ -189,14 +178,14 @@ class Drivercontroller extends GetxController {
           .doc(authinstance.currentUser!.uid)
           .update({'name': name, 'phone': email.trim()}).then((_) async {
         isupdatingloading(false);
-       Fluttertoast.showToast(
-                                    msg: "Update success",
-                                    toastLength: Toast.LENGTH_SHORT,
-                                    gravity: ToastGravity.CENTER,
-                                    timeInSecForIosWeb: 1,
-                                    backgroundColor: Colors.black,
-                                    textColor: ELSA_GREEN,
-                                    fontSize: 16.0);
+        Fluttertoast.showToast(
+            msg: "Update success",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.black,
+            textColor: ELSA_GREEN,
+            fontSize: 16.0);
         Get.back();
       });
     } catch (e) {
@@ -232,17 +221,28 @@ class Drivercontroller extends GetxController {
     });
   }
 
-
-  void deleteAcceptedRequest(String requestid) async{
-   await drivercurrentrequestaccepted.doc(requestid).delete().then((value) {
+  void deleteAcceptedRequest(String requestid) async {
+    await drivercurrentrequestaccepted.doc(requestid).delete().then((value) {
       Fluttertoast.showToast(
-              msg: "Has accepted request but request found",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.CENTER,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.redAccent,
-              textColor: Colors.grey[400],
-              fontSize: 16.0);
-   });
+          msg: "Has accepted request but request found",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.redAccent,
+          textColor: Colors.grey[400],
+          fontSize: 16.0);
+    });
+  }
+
+  Future<void> getCurentDirection() async {
+    try {
+      
+      currentposition = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      latcurrentposition =
+          LatLng(currentposition!.latitude, currentposition!.longitude);
+    } catch (e) {
+      Infodialog.showInfoToastCenter(e.toString());
+    }
   }
 }
