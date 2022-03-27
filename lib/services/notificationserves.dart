@@ -5,9 +5,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
+import 'package:tricycleappdriver/controller/drivercontroller.dart';
 import 'package:tricycleappdriver/controller/mapcontroller.dart';
-import 'package:tricycleappdriver/controller/requestcontroller.dart';
+
 import 'package:tricycleappdriver/controller/requestdatacontroller.dart';
+import 'package:tricycleappdriver/dialog/infodialog/infodialog.dart';
 import 'package:tricycleappdriver/dialog/requestdialog/requestdialog.dart';
 import 'package:tricycleappdriver/model/un_accepted_request.dart';
 import 'package:tricycleappdriver/screens/list_of_request.dart';
@@ -15,6 +17,7 @@ import 'package:tricycleappdriver/services/localnotificationservice.dart';
 
 class Notificationserves {
   var requestcontroller = Get.find<Requestdatacontroller>();
+  var driverxcontroller = Get.find<Drivercontroller>();
 
   Future initialize() async {
     FirebaseMessaging.instance.getInitialMessage().then((message) {
@@ -23,7 +26,8 @@ class Notificationserves {
 
         print(message.data);
         print(message.data["recieve_request"]);
-        processRequest(jsonDecode(message.data["recieve_request"]));
+        print(requestcontroller.hasacceptedrequest.value);
+        //(jsonDecode(message.data["recieve_request"]));
 
         //showRequestDialog(message.data['recieve_request']);
 
@@ -34,8 +38,8 @@ class Notificationserves {
       if (message.notification != null) {
         print('fourground____________');
         print(message.data);
-        print(message.data["recieve_request"]);
-        processRequest(jsonDecode(message.data["recieve_request"]));
+     
+       gotoScreenOfunacceptedRequest( jsonDecode(message.data["recieve_request"]));
       }
       //Localnotificationservice.display(message);
     });
@@ -46,23 +50,32 @@ class Notificationserves {
         /// print('______from push notificaion backround ');
         /// print(message.data["request_id"]);
 
-        /// print(message.data);
         print('background____________');
         print('background_______________');
         print(message.data["recieve_request"]);
-        processRequest(jsonDecode(message.data["recieve_request"]));
+
+        gotoScreenOfunacceptedRequest( jsonDecode(message.data["recieve_request"]));
       }
     });
   }
 
-  void processRequest(Map<String, dynamic> recieverequest) {
-  
- 
-      if (requestcontroller.monitorrequestdetails.value.request_id == null) {
-        UnAcceptedRequest unacceptedrequest =
-            UnAcceptedRequest.fromJson(recieverequest);
-        Get.to(() => ListOfRequest());
-      }
-    
+  void gotoScreenOfunacceptedRequest(Map<String, dynamic> recieverequest) {
+
+      print(driverxcontroller.isOnline.value);
+    if(driverxcontroller.isOnline.value){
+
+    if (requestcontroller.hasacceptedrequest.value == false) {
+      UnAcceptedRequest unacceptedrequest =  UnAcceptedRequest.fromJson(recieverequest);
+      Get.to(() => ListOfRequest());
+    } else {
+ //    requestcontroller.monitorunacceptedrequest();
+      Infodialog.showInfoToastCenter( 'New request coming');
+    }
+
+    }else{
+      Infodialog.showInfoToastCenter(driverxcontroller.isOnline.value.toString());
+
+    }
+   
   }
 }

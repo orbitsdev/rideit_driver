@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tricycleappdriver/config/mapconfig.dart';
+import 'package:tricycleappdriver/dialog/authdialog/authdialog.dart';
 import 'package:tricycleappdriver/dialog/authdialog/authenticating.dart';
 import 'package:tricycleappdriver/model/directiondetails.dart';
 import 'package:tricycleappdriver/services/mapservices.dart';
@@ -12,12 +14,10 @@ class MapRequestController extends GetxController {
   var requestmapdetails = Directiondetails().obs;
   String? requestdroplocatioinid;
 
- Future<bool> getDirection(String pickuplocationid, String droplocationid,
+ Future<bool> getDirection(BuildContext context, String pickuplocationid, String droplocationid,
       LatLng actularmarkerpostion) async {
-        print('get direction');
-        print(pickuplocationid);
-        print(actularmarkerpostion);
-        progressDialog('Wait..');
+     
+        Authdialog.showAuthProGress(context, 'Getting Direction');
     String url =
         "https://maps.googleapis.com/maps/api/directions/json?origin=place_id:${pickuplocationid}&destination=${actularmarkerpostion.latitude},${actularmarkerpostion.longitude}&mode=walking&key=${Mapconfig.GOOGLEMAP_API_KEY}";
     //   String url =  "https://maps.googleapis.com/maps/api/directions/json?origin=place_id:${pickuplocationid}&destination=place_id:${droplocationid}&mode=walking&key=${Mapconfig.GOOGLEMAP_API_KEY}";
@@ -30,8 +30,8 @@ class MapRequestController extends GetxController {
         var newdirectiondetails = Directiondetails.fromJason(response);
         requestmapdetails(newdirectiondetails);
         requestdroplocatioinid = droplocationid;
-        print('kkkkkkkkkkkkk');
-        print(response);
+    
+   
 
         Get.back();
         return true;

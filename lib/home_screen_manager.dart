@@ -9,7 +9,6 @@ import 'package:tricycleappdriver/controller/authcontroller.dart';
 import 'package:tricycleappdriver/controller/drivercontroller.dart';
 import 'package:tricycleappdriver/controller/mapcontroller.dart';
 import 'package:tricycleappdriver/controller/pageindexcontroller.dart';
-import 'package:tricycleappdriver/controller/requestcontroller.dart';
 import 'package:tricycleappdriver/controller/requestdatacontroller.dart';
 import 'package:tricycleappdriver/dialog/collectionofdialog.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
@@ -76,8 +75,7 @@ Future.delayed(Duration.zero).then((value){
       cloudMessagingSetup();
       authxcontroller.checkIfAcountDetailsIsNull();   
       getCurrentStatusOfDriver();
-      //driverxcontroller.listenToAcountUser();
-        requestxcontroller.monitorOngingTrip();
+      requestxcontroller.monitorunacceptedrequest();
 
    
 
@@ -113,17 +111,19 @@ void statusSetter(bool value){
   });
 }
 void getCurrentStatusOfDriver()  async {
-  availabledriverrefference.doc(authinstance.currentUser!.uid).get().then((value) {
+  var status = false;
+  availabledriverrefference.doc(authinstance.currentUser!.uid).snapshots().listen((event) { 
+    
+    var data =  event.data() as Map<String, dynamic>;
 
-    var data =  value.data() as Map<String, dynamic>;
-  
     if(data['status']== 'online'){
-     statusSetter(true);
-    }else if(data['status']== 'offline'){
-     statusSetter(false);
-      
+       status = true;
+ 
+    }else{
+      status = false;
     }
-
+  driverxcontroller.isOnline.value = status;
+    
   });
 }
 @override
@@ -232,7 +232,12 @@ void getCurrentStatusOfDriver()  async {
       ),
 
   //     floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: requestxcontroller.monitorrequestdetails.value.drop_location_id == null ?  GFFloatingWidget(
+      floatingActionButton: Obx((){
+
+        if(requestxcontroller.hasacceptedrequest.value){
+          return Container(height: 0,);
+        }
+        return GFFloatingWidget(
        
        child: GFIconBadge(
               
@@ -243,7 +248,7 @@ void getCurrentStatusOfDriver()  async {
            height: 55.0,
             valueFontSize: 16.0,
             toggleSize: 60.0,
-            value: status,
+            value: driverxcontroller.isOnline.value,
             borderRadius: 30.0,
             padding: 0,
             activeToggleColor: ELSA_TEXT_WHITE,
@@ -282,7 +287,10 @@ void getCurrentStatusOfDriver()  async {
    
     verticalPosition: MediaQuery.of(context).size.height * 0.88,
     horizontalPosition: MediaQuery.of(context).size.width / 2.933333333 ,
-  ) : Container(),
+   );
+   
+      }),  
+       
 
         body:Container(
           decoration: BoxDecoration(

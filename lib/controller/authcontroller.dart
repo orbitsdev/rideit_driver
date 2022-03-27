@@ -267,9 +267,10 @@ class Authcontroller extends GetxController {
           .get()
           .then((querySnapshot) async {
         if (querySnapshot.data() != null) {
-         
-        useracountdetails(Users.fromJson(querySnapshot.data() as Map<String, dynamic>));
-        useracountdetails.value.id = authinstance.currentUser!.uid;
+        var data =  querySnapshot.data() as Map<String,dynamic>;
+        data['id'] = authinstance.currentUser!.uid;
+        useracountdetails(Users.fromJson(data));
+        print(useracountdetails.toJson());
           
           
 

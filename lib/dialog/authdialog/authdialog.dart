@@ -12,6 +12,7 @@ class Authdialog {
   static void showAuthProGress(BuildContext context, String message) {
 
   Get.defaultDialog(
+    barrierDismissible: false,
     backgroundColor: Colors.transparent,
   title: '',
   content:Container(

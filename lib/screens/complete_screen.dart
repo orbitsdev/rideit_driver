@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:tricycleappdriver/controller/requestcontroller.dart';
+
+import 'package:tricycleappdriver/controller/requestdatacontroller.dart';
 
 class CompleteScreen extends StatefulWidget {
   const CompleteScreen({ Key? key }) : super(key: key);
@@ -12,7 +13,7 @@ class CompleteScreen extends StatefulWidget {
 
 class _CompleteScreenState extends State<CompleteScreen> {
 
-  var requestxcontroller = Get.find<Requestcontroller>();
+  var requestxcontroller = Get.find<Requestdatacontroller>();
 
   @override
   Widget build(BuildContext context) {

@@ -87,6 +87,10 @@ class _OngoingtripState extends State<Ongoingtrip> {
    setSuccesMap();
    setMarker();
    setPolyline();
+    if(requestxcontroller.ongoingtrip.value.tripstatus == "coming" || requestxcontroller.ongoingtrip.value.tripstatus == "travelling"){
+           await updatePolyline();
+           getLiveLocationUpdate();
+        }
     } else {
      setFailedMap();
     }
@@ -194,11 +198,12 @@ int _polylincecounter = 1;
     var response = await requestxcontroller.updateTripStaus(context);
       if(response != "check"){
         
+        /// If coming and travelling upte driver location live so that passenger will know where is the driver is
         if(response == "coming" || response == "travelling"){
            await updatePolyline();
            getLiveLocationUpdate();
         }
-
+        /// show payment 
          if (requestxcontroller.ongoingtrip.value.tripstatus == 'complete' &&
           requestxcontroller.ongoingtrip.value.payed == false) {
             DialogCollection.showpaymentToCollect(context);
@@ -206,6 +211,7 @@ int _polylincecounter = 1;
 
 
       }else{
+         /// incase the app close and passenger not payed show payment againg
         if (requestxcontroller.ongoingtrip.value.tripstatus == 'complete' &&
           requestxcontroller.ongoingtrip.value.payed == false) {
             DialogCollection.showpaymentToCollect(context);
@@ -498,29 +504,7 @@ void createCustomDriverMarker() {
                                           },  
                                         ),
                                       ),
-                                // GestureDetector(
-                                //   onTap: (){
-                                //     requestxcontroller.cancelOngoingTrip(requestxcontroller.ongoingtrip.value.request_id as String, context);
-                                //   },
-                                //   child: Container(
-                                //     width: 120,
-                                //     padding: EdgeInsets.all(8),
-                                //     decoration: BoxDecoration(
-                                //       color: ELSA_PINK,
-                                //       borderRadius:
-                                //           BorderRadius.all(Radius.circular(8)),
-                                //     ),
-                                //     child: Center(
-                                //       child: Text(
-                                //          'CANCEL'
-                                            
-                                //            ,
-                                //         style: TextStyle(
-                                //             color: Colors.white, fontSize: 20),
-                                //       ),
-                                //     ),
-                                //   ),
-                                // ),
+                                
                                 if(requestxcontroller.ongoingtrip.value.tripstatus != "complete")
                                 Horizontalspace(24),
                               

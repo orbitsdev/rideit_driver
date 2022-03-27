@@ -2,7 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:tricycleappdriver/controller/requestcontroller.dart';
+import 'package:tricycleappdriver/controller/requestdatacontroller.dart';
+
 
 
 void showEarningDialog(BuildContext context){
@@ -16,7 +17,7 @@ void showEarningDialog(BuildContext context){
 }
 class Completetripdialog extends StatelessWidget {
   static const screenName = '/completedialog';
-  var requestxcontroller = Get.put(Requestcontroller());
+  var requestxcontroller = Get.put(Requestdatacontroller());
   @override
   Widget build(BuildContext context) {
     return Container(

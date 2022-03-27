@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/controller/authcontroller.dart';
+import 'package:tricycleappdriver/controller/requestdatacontroller.dart';
 import 'package:tricycleappdriver/dialog/authdialog/authdialog.dart';
 import 'package:tricycleappdriver/dialog/infodialog/infodialog.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
@@ -29,8 +30,9 @@ class Drivercontroller extends GetxController {
   var canceledtrip = 0.obs;
   var totalearning = 0.obs;
   var authxcontroller = Get.find<Authcontroller>();
-
   var listofRatings = <Rating>[].obs;
+  
+ 
 
   //GeoFirestore geoFirestore =GeoFirestore(firestore.collection('availableDrivers'));
 
@@ -74,7 +76,7 @@ class Drivercontroller extends GetxController {
     super.dispose();
   }
 
-  void makeDriverOnline(BuildContext context) async {
+  Future<void> makeDriverOnline(BuildContext context) async {
     try {
       isOnlineLoading(true);
       Authdialog.showAuthProGress(context, 'Loading...');
@@ -223,6 +225,7 @@ class Drivercontroller extends GetxController {
 
   void deleteAcceptedRequest(String requestid) async {
     await drivercurrentrequestaccepted.doc(requestid).delete().then((value) {
+      Get.find<Requestdatacontroller>().hasacceptedrequest(false);
       Fluttertoast.showToast(
           msg: "Has accepted request but request found",
           toastLength: Toast.LENGTH_SHORT,

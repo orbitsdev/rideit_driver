@@ -4,7 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:slide_to_confirm/slide_to_confirm.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
-import 'package:tricycleappdriver/controller/requestcontroller.dart';
+
 import 'package:tricycleappdriver/controller/requestdatacontroller.dart';
 import 'package:tricycleappdriver/model/ongoing_trip_details.dart';
 import 'package:tricycleappdriver/widgets/horizontalspace.dart';
@@ -112,7 +112,7 @@ class DialogCollection {
                           onPressed: () async {
 
                             
-                              Get.find<Requestcontroller>().cancelOngoingTrip(context);
+                              Get.find<Requestdatacontroller>().cancelOngoingTrip(requestcontroller.ongoingtrip.value.request_id as String, context);
                           },
                         ),
                       ),

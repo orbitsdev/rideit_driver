@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart' as lottie;
+import 'package:tricycleappdriver/controller/requestdatacontroller.dart';
 
-import 'package:tricycleappdriver/controller/requestcontroller.dart';
+
 import 'package:tricycleappdriver/globaldata/globaldata.dart';
 import 'package:tricycleappdriver/model/request_details.dart';
 
@@ -21,7 +22,7 @@ class Requestdialogcontent extends StatelessWidget {
   @override
   Widget build(BuildContext context){
 
-  var requestxcontroller = Get.put(Requestcontroller());
+  var requestxcontroller = Get.put(Requestdatacontroller());
 
 
     return Padding(

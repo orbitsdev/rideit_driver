@@ -6,7 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:lottie/lottie.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/controller/authcontroller.dart';
-import 'package:tricycleappdriver/controller/requestcontroller.dart';
+
 import 'package:tricycleappdriver/controller/requestdatacontroller.dart';
 import 'package:tricycleappdriver/dialog/infodialog.dart/info_dialog.dart';
 import 'package:tricycleappdriver/dialog/infodialog/infodialog.dart';
@@ -53,7 +53,8 @@ class _ListOfRequestState extends State<ListOfRequest> {
       }).toList());
       
       if(querySnapShot.docs.length == 0  && requestxcontroller.ongoingtrip.value.drop_location_id ==  null){
-        Get.back();
+          
+          Get.off(()=>HomeScreenManager());
 
       }
       
@@ -70,7 +71,7 @@ class _ListOfRequestState extends State<ListOfRequest> {
     if (request.drop_location_id ==  mapxcontroller.requestdroplocatioinid) {
       Get.to(() => RequestMapScreen(request: request,), fullscreenDialog: true);
     } else {
-      var response = await mapxcontroller.getDirection(
+      var response = await mapxcontroller.getDirection(context,
           request.pick_location_id
               as String,
           request.drop_location_id
@@ -238,11 +239,11 @@ class _ListOfRequestState extends State<ListOfRequest> {
                                   ),
                                   onPressed: () {
                                     if(authxcontroller.hasinternet.value){
-                                       if(requestxcontroller.ongoingtrip.value.drop_location_id == null){
+                                       if(requestxcontroller.hasacceptedrequest.value == false){
 
                                         requestxcontroller.confirmRequest(context, requestxcontroller.lisofunacceptedrequest[0].request_id);
                                     }else{
-                                        Infodialog.showInfoToastCenter('You can oly accep request once at a time');
+                                        Infodialog.showInfoToastCenter('You can oly accept request once at a time');
                                     }
                                     }else{
                                       Infodialog.showInfoToastCenter('No internet');
