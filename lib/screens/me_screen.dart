@@ -20,6 +20,7 @@ import 'package:tricycleappdriver/model/rating.dart';
 import 'package:tricycleappdriver/screens/editprofile_screen.dart';
 import 'package:tricycleappdriver/services/firebase_api.dart';
 import 'package:tricycleappdriver/widgets/horizontalspace.dart';
+import 'package:tricycleappdriver/widgets/rating_builder.dart';
 import 'package:tricycleappdriver/widgets/verticalspace.dart';
 import 'dart:math';
 import 'package:path_provider/path_provider.dart' as pathprovider;
@@ -37,22 +38,11 @@ class _MeScreenState extends State<MeScreen> {
   File? myimage;
   UploadTask? task;
   String? filnametext;
-  List<Color> listofcolors = [
-    ELSA_ORANGE,
-    ELSA_BLUE_2_,
-    ELSA_GREEN,
-    ELSA_PINK,
-    ELSA_BLUE,
-    DARK_GREEN,
-    ELSA_YELLOW_TEXT,
-    ELSA_PINK_TEXT,
-    ELSA_BLUE_1_,
-    iconcolorsecondary,
-  ];
+
   var authxcontroller = Get.find<Authcontroller>();
   var driverxcontroller = Get.find<Drivercontroller>();
 
-  Random random = Random();
+
   @override
   void initState() {
     super.initState();
@@ -108,7 +98,7 @@ class _MeScreenState extends State<MeScreen> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
-          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 40),
+          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
           child: Obx(() {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -257,8 +247,21 @@ class _MeScreenState extends State<MeScreen> {
                     FontAwesomeIcons.envelope,
                     '${authxcontroller.useracountdetails.value.email}',
                     ELSA_PINK),
+                    Verticalspace(8),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children:[
+                      Container(
+                        width: double.infinity,
+                      ), 
+                      Verticalspace(12),
+
+                      Text('Ratings & Comments'.toUpperCase()),
+                      Verticalspace(8),
+                  ] 
+                  ),
                 Container(
-                  height: 270,
+                  height:370,
                   child: AnimationLimiter(
                     child: ListView.builder(
                         shrinkWrap: true,
@@ -272,8 +275,7 @@ class _MeScreenState extends State<MeScreen> {
                                 child: ScaleAnimation(
                                   child: Material(
                                     color: Colors.transparent,
-                                    child: ratingBuilder(
-                                        driverxcontroller.listofRatings[index]),
+                                    child: RatingBuilder(rating:  driverxcontroller.listofRatings[index]),
                                   ),
                                 ),
                               ));
@@ -291,100 +293,7 @@ class _MeScreenState extends State<MeScreen> {
     );
   }
 
-  Widget ratingBuilder(Rating rating) {
-    return Container(
-      margin: EdgeInsets.symmetric(
-        vertical: 10,
-      ),
-      padding: EdgeInsets.all(8),
-      decoration: BoxDecoration(
-          color: BACKGROUND_BLACK,
-          borderRadius: BorderRadius.circular(containerRadius)),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              ClipOval(
-                child: Container(
-                  color: ELSA_TEXT_WHITE,
-                  padding: EdgeInsets.all(1),
-                  child: ClipOval(
-                    child: Container(
-                      height: 50,
-                      width: 50,
-                      color: listofcolors[random.nextInt(listofcolors.length)],
-                      padding: EdgeInsets.all(2),
-                      child: Center(
-                        child: Text(
-                          rating.passenger_name == null
-                              ? 'K'
-                              : rating.passenger_name![0].toUpperCase(),
-                          style: Get.textTheme.headline1!.copyWith(),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 12,
-              ),
-              Flexible(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${rating.passenger_name} ',
-                      style: Get.textTheme.bodyText1,
-                    ),
-                    SizedBox(
-                      height: 4,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        RatingBar.builder(
-                          initialRating: 5,
-                          minRating: 5,
-                          direction: Axis.horizontal,
-                          allowHalfRating: true,
-                          itemCount: 5,
-                          itemSize: 20,
-                          itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                          itemBuilder: (context, _) => Icon(
-                            Icons.star,
-                            color: Colors.amber,
-                          ),
-                          onRatingUpdate: (rating) {},
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Text(
-                          '${rating.rate} ',
-                          style: Get.textTheme.bodyText1,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 8,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text('${rating.comment} '),
-          ),
-        ],
-      ),
-    );
-  }
+ 
 
   Widget infoBuilder(IconData icon, String label, Color color) {
     return Column(

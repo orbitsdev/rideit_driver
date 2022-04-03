@@ -29,6 +29,7 @@ import 'package:tricycleappdriver/screens/home_screen.dart';
 import 'package:tricycleappdriver/screens/list_of_request.dart';
 import 'package:tricycleappdriver/screens/list_screen.dart';
 import 'package:tricycleappdriver/screens/me_screen.dart';
+import 'package:tricycleappdriver/screens/onboard_screen.dart';
 import 'package:tricycleappdriver/screens/ongoingtrip.dart';
 import 'package:tricycleappdriver/screens/map/request_map_screen.dart';
 import 'package:tricycleappdriver/screens/tripdetails_screen.dart';
@@ -134,6 +135,7 @@ class _TricycleappDriverState extends State<TricycleappDriver> {
   void initState() {
     super.initState();
     Get.put(Permissioncontroller());
+    Get.put(Authcontroller());
     
 
 
@@ -213,7 +215,9 @@ class _TricycleappDriverState extends State<TricycleappDriver> {
               ? SigninScreen()
               : FirebaseAuth.instance.currentUser!.emailVerified == false
                   ? VerifyingemailScreen()
-                  : 
+                  :   Get.find<Authcontroller>().useracountdetails.value.new_acount == true
+                  ?OnboardScreen() 
+                  :
                   //Ongoingtrip(),
                  HomeScreenManager(),
       getPages: [
@@ -269,6 +273,7 @@ class _TricycleappDriverState extends State<TricycleappDriver> {
             GetPage(name: TripdetailsScreen.screenName, page: ()=> TripdetailsScreen()),
             GetPage(name: ListScreen.screenName, page: ()=> ListScreen()),
             GetPage(name: EditprofileScreen.screenName, page: ()=> EditprofileScreen()),
+            GetPage(name: OnboardScreen.screenName, page: ()=> OnboardScreen()),
       ],
       debugShowCheckedModeBanner: false,
     );

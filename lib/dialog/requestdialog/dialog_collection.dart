@@ -39,7 +39,7 @@ class DialogCollection {
                   ),
                   Text('Total amount to collect'.toUpperCase(), style: Get.textTheme.bodyText1!.copyWith(color: ELSA_TEXT_WHITE, fontSize: 14, fontWeight: FontWeight.w100)),
                   Verticalspace(6),
-                  Text('${requestcontroller.ongoingtrip.value.fee}', style: Get.textTheme.headline1!.copyWith(color: ELSA_TEXT_WHITE, fontSize: 34),),
+                  Text('₱ ${requestcontroller.ongoingtrip.value.fee}', style: Get.textTheme.headline1!.copyWith(color: ELSA_TEXT_WHITE, fontSize: 34),),
                   Verticalspace(16),
                  // FaIcon(FontAwesomeIcons.moneyBill, color: Colors.amber[400], size: 34,),
               
@@ -116,6 +116,8 @@ class DialogCollection {
                           },
                         ),
                       ),
+                    
+
                       Horizontalspace(10),
                       Container(
                         height: 50,

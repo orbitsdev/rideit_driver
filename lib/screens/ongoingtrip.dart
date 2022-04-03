@@ -454,9 +454,9 @@ void createCustomDriverMarker() {
                                 requestxcontroller.ongoingtrip.value.tripstatus == "prepairing"
                                           ? 'Click the button if you are ready'.toUpperCase()
                                           :requestxcontroller.ongoingtrip.value.tripstatus == "coming"
-                                          ?'Arrived'.toUpperCase()
+                                          ?'Click the button if you arrived'.toUpperCase()
                                           :requestxcontroller.ongoingtrip.value.tripstatus == "arrived"
-                                          ? 'Click the button if you arrived'.toUpperCase()
+                                          ? 'Click the button to start trip'.toUpperCase()
                                           :requestxcontroller.ongoingtrip.value.tripstatus == "travelling"
                               
                                           ?'Click the button to end trip'.toUpperCase()
@@ -477,7 +477,7 @@ void createCustomDriverMarker() {
                               Container(
                                       
 
-                                            height: 60,
+                                            height: 50,
                                         decoration: const ShapeDecoration(
                                           shape: StadiumBorder(),
                                           gradient: LinearGradient(
@@ -518,7 +518,7 @@ void createCustomDriverMarker() {
                                   ) : Container(
                                         
                                        
-                                            height: 60,
+                                            height: 50,
                                         decoration: const ShapeDecoration(
                                           shape: StadiumBorder(),
                                           gradient: LinearGradient(

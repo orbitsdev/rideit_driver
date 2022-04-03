@@ -130,7 +130,13 @@ class _VerifyingemailScreenState extends State<VerifyingemailScreen>
 
     if (mailverified) {
       time!.cancel();
-      Get.offAllNamed(HomeScreenManager.screenName);
+
+        if(authxcontroller.useracountdetails.value.new_acount == true){
+          
+        }else{
+           Get.offAllNamed(HomeScreenManager.screenName);
+
+        }
     }
   }
 

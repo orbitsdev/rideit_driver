@@ -13,6 +13,7 @@ import 'package:tricycleappdriver/dialog/infodialog/infodialog.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/home_screen_manager.dart';
 import 'package:tricycleappdriver/model/users.dart';
+import 'package:tricycleappdriver/screens/onboard_screen.dart';
 import 'package:tricycleappdriver/verifyingemail_screen.dart';
 import 'package:twilio_phone_verify/twilio_phone_verify.dart';
 
@@ -117,8 +118,12 @@ class Authcontroller extends GetxController {
             Get.back();
          
             Future.delayed(Duration(seconds: 1), () {
-             
-              Get.offAndToNamed(HomeScreenManager.screenName);
+              if(useracountdetails.value.new_acount == true){
+                Get.offAndToNamed(OnboardScreen.screenName);
+              }else{
+                Get.offAndToNamed(HomeScreenManager.screenName);
+
+              }
             });
           }
 
@@ -219,7 +224,13 @@ class Authcontroller extends GetxController {
             Future.delayed(Duration(seconds: 1), () {
            
             Get.back();
-              Get.offAndToNamed(HomeScreenManager.screenName);
+            
+             if(useracountdetails.value.new_acount == true){
+                Get.offAndToNamed(OnboardScreen.screenName);
+              }else{
+                Get.offAndToNamed(HomeScreenManager.screenName);
+
+              }
             });
           }
 
@@ -270,7 +281,13 @@ class Authcontroller extends GetxController {
         var data =  querySnapshot.data() as Map<String,dynamic>;
         data['id'] = authinstance.currentUser!.uid;
         useracountdetails(Users.fromJson(data));
-        print(useracountdetails.toJson());
+        print(useracountdetails.toJson()); 
+
+        if(useracountdetails.value.new_acount == true){
+          Get.off(()=> OnboardScreen());
+        }
+
+
           
           
 
@@ -311,6 +328,22 @@ class Authcontroller extends GetxController {
       "device_token": devicetoken
     });
    
+  }
+
+
+  var gettingstartedload = false.obs;
+  Future<void> updateToOld() async{
+    gettingstartedload(true);
+    await driversusers.doc(authinstance.currentUser!.uid).update({
+      'new_acount': false,
+    }).then((value) {
+           gettingstartedload(false);
+        Get.offAndToNamed(HomeScreenManager.screenName);
+    }).catchError((e){
+       gettingstartedload(false);
+       Infodialog.showInfoToastCenter(e.toString());
+    });
+
   }
   
 

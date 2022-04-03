@@ -210,13 +210,19 @@ class Drivercontroller extends GetxController {
         .collection('ratings')
         .snapshots()
         .listen((event) {
-      listofRatings(event.docs.map((e) {
+          listofRatings.clear();
+         if(event.docs.length > 0){
+            listofRatings(event.docs.map((e) {
         var data = e.data() as Map<String, dynamic>;
         print(data);
         data['passenger_id'] = e.id;
         print(data);
         return Rating.fromJson(data);
       }).toList());
+         }else{
+           listofRatings.clear();
+         } 
+       
 
       print('_LENGHT OF RATINGS');
       print(listofRatings.length);

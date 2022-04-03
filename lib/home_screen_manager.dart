@@ -73,6 +73,7 @@ Future.delayed(Duration.zero).then((value){
     );
   
       cloudMessagingSetup();
+
       authxcontroller.checkIfAcountDetailsIsNull();   
       getCurrentStatusOfDriver();
       requestxcontroller.monitorunacceptedrequest();

@@ -301,13 +301,14 @@ class Requestdatacontroller extends GetxController {
     //return true;
   }
 
-  void deleteAcceptedRequest(String acceptedrequestid) async {
+  Future<void> deleteAcceptedRequest(String acceptedrequestid) async {
       await drivercurrentrequestaccepted
         .doc(acceptedrequestid)
         .delete()
-        .then((value) {
+        .then((value)async {
+          hasacceptedrequest(false);
             Infodialog.showToastCenter(Colors.red, ELSA_TEXT_WHITE,'Accepted request deleteted because no data found');
-            clearLocalData();
+           await clearLocalData();
         });
         
   }
@@ -454,7 +455,7 @@ class Requestdatacontroller extends GetxController {
                  Get.back();
                  await driverxcontroller.makeDriverOnline(context);
                   /// clear local data;
-                 clearLocalData();
+                await clearLocalData();
                  pageindexcontroller.updateIndex(0);
 
                 Future.delayed(Duration(milliseconds: 300), () {
@@ -510,7 +511,7 @@ class Requestdatacontroller extends GetxController {
             await driverxcontroller.makeDriverOnline(context);
 
             //clear local data
-            clearLocalData();
+           await clearLocalData();
 
             pageindexcontroller.updateIndex(0);
 
@@ -705,7 +706,8 @@ class Requestdatacontroller extends GetxController {
   void monitorunacceptedrequest() async {
       
       if(ongoingtrip.value.driver_id == null){
-        await drivercurrentrequestaccepted.get().then((value){
+
+        await drivercurrentrequestaccepted.get().then((value) async{
           if(value.docs.length > 0){
               value.docs.forEach((element) { 
                 acceptedrequest_id  = element.id;
@@ -715,26 +717,25 @@ class Requestdatacontroller extends GetxController {
           
             acceptedrequest_id = null;
           /// clear local data to make sure no data is save
-            clearLocalData();
+            await clearLocalData();
           }
         });
 
         if(acceptedrequest_id != null){
              requestcollecctionrefference.doc(acceptedrequest_id).snapshots().listen((event) { 
                   if(event.exists){
-                    monitorrequestdetails(RequestDetails.fromJson(event.data() as Map<String, dynamic>));
+                   monitorrequestdetails(RequestDetails.fromJson(event.data() as Map<String, dynamic>));
                    hasacceptedrequest(true);
                   }else{
                     if(acceptedrequest_id != null){
-
                     deleteAcceptedRequest(acceptedrequest_id as String);
-                    hasacceptedrequest(false);
+                    
                     }
                   }
             });
         }else{
           
-          clearLocalData();
+         await clearLocalData();
         }
 
       }else{
@@ -750,11 +751,12 @@ class Requestdatacontroller extends GetxController {
                   }
             });
       }
-      print('______________');
+      print('______DATA____');
       print(hasacceptedrequest);
   }
 
- void clearLocalData(){
+ Future<void> clearLocalData() async{
+
      hasacceptedrequest(false);
      directiondetails = Directiondetails().obs;
      requestdetails = RequestDetails().obs;
@@ -762,4 +764,6 @@ class Requestdatacontroller extends GetxController {
      ongoingtrip = OngoingTripDetails().obs;
      ongoingtripmonitor = OngoingTripDetails().obs;
  }
+
+ 
 }

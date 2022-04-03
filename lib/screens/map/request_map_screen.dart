@@ -150,7 +150,7 @@ void setPolylines() async {
   }
 void _caneraBoundRoute(LatLng bound_sw, LatLng bound_ne) {
     newgooglemapcontroller!.animateCamera(CameraUpdate.newLatLngBounds(
-        LatLngBounds(southwest: bound_sw, northeast: bound_ne), 50));
+        LatLngBounds(southwest: bound_sw, northeast: bound_ne), 80));
   }
 
 

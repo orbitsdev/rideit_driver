@@ -46,11 +46,26 @@ class _ListOfRequestState extends State<ListOfRequest> {
 
       
 
-      requestxcontroller.lisofunacceptedrequest(querySnapShot.docs.map((e) {
-        var request = RequestDetails.fromJson(e.data() as Map<String, dynamic>);
-        request.request_id = e.id;
-        return request;
-      }).toList());
+      // requestxcontroller.lisofunacceptedrequest(
+        
+      //   querySnapShot.docs.map((e) {
+      //   var request = RequestDetails.fromJson(e.data() as Map<String, dynamic>);
+      //   request.request_id = e.id;
+      //   return request;
+      // }).toList());
+           requestxcontroller.lisofunacceptedrequest().clear();
+      querySnapShot.docs.forEach((element) { 
+               
+             var request = RequestDetails.fromJson(element.data() as Map<String, dynamic>);
+             request.request_id = element.id;
+             if(requestxcontroller.lisofunacceptedrequest.length == 0){
+               requestxcontroller.lisofunacceptedrequest.add(request);
+             }else{
+               requestxcontroller.lisofunacceptedrequest.insert(requestxcontroller.lisofunacceptedrequest.length -1 , request);
+
+             }
+           
+      });
       
       if(querySnapShot.docs.length == 0  && requestxcontroller.ongoingtrip.value.drop_location_id ==  null){
           
@@ -276,11 +291,12 @@ class _ListOfRequestState extends State<ListOfRequest> {
                       ),
                       child: AnimationLimiter(
                         child: ListView.builder(
+                        
                             shrinkWrap: true,
                             itemCount: requestxcontroller
                                 .lisofunacceptedrequest.length,
                             itemBuilder: (context, index) {
-                              if (index < 0) {
+                              if (requestxcontroller.lisofunacceptedrequest[0].drop_location_id == requestxcontroller.lisofunacceptedrequest[index].drop_location_id) {
                                 return Container(
                                   height: 0,
                                 );
@@ -310,7 +326,7 @@ class _ListOfRequestState extends State<ListOfRequest> {
                               child: Container(
                                 height: 50,
                                 width: 50,
-                                child: Image.network('${requestxcontroller.lisofunacceptedrequest[0].passenger_image_url}', fit: BoxFit.cover,),
+                                child: Image.network('${requestxcontroller.lisofunacceptedrequest[index].passenger_image_url}', fit: BoxFit.cover,),
                               ),
                             ),Horizontalspace(8),
                                                   Flexible(

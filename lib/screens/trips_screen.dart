@@ -215,7 +215,7 @@ class _TripsScreenState extends State<TripsScreen>
                           droplocation:
                               '${driverxcontroller.lisoftriprecord[index].dropddress_name}',
                           date:
-                              '${driverxcontroller.lisoftriprecord[index].created_at}')));
+                                '${driverxcontroller.lisoftriprecord[index].created_at}')));
             }),
          );
        
