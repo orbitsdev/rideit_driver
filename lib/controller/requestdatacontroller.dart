@@ -427,9 +427,11 @@ class Requestdatacontroller extends GetxController {
 
     await requestcollecctionrefference.doc(requestid).collection('ongoingtrip').doc(requestid).update({
       'payed': true,
+      'created_at': DateTime.now().toString(),
     });
 
     ongoingtrip.value.payed = true;
+    ongoingtrip.value.created_at = DateTime.now().toString();
     Map<String, dynamic> triphistorydata = ongoingtrip.value.toJson();
     
     /// save to driver

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 
 import 'package:tricycleappdriver/UI/constant.dart';
@@ -131,7 +132,10 @@ class Listcontainer extends StatelessWidget {
                           children: [
                             FaIcon(FontAwesomeIcons.calendarAlt,size: 20, color: Colors.amber[400],),
                             Horizontalspace(4),
-                            Text('${date}', style: TextStyle(fontWeight: FontWeight.w100),)
+                            Text(
+                                 DateFormat('EEEE MMMM d, y h:m a ').format(DateTime.parse('${date}'))
+                              //'${date}'
+                              , style: TextStyle(fontWeight: FontWeight.w100),)
                           ],
                         )
                       ],

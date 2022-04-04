@@ -52,7 +52,11 @@ class TripdetailsScreen extends StatelessWidget {
              Verticalspace(12),
              columnBuilder('Trip Status', '${trip!.tripstatus}'),
              Verticalspace(12),
-             columnBuilder('Date',  DateFormat.yMMMMd().format(DateTime.parse('${trip!.created_at}'))),
+             columnBuilder('Date',
+              // DateFormat.yMMMMd().format(DateTime.parse('${trip!.created_at}'))
+                 DateFormat('EEEE MMMM d, y h:m a ').format(DateTime.parse('${trip!.created_at}'))
+              
+             ),
              Verticalspace(12),
              
             ],
