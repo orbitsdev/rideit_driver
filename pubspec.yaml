@@ -92,11 +92,13 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^1.0.0
 
+
+flutter_native_splash:
+  color: "#0D101A"
+  image: assets/images/group1.png
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
-flutter_icons:
-  image_path: "assets/images/icon.png"
-  android: true
+
 # The following section is specific to Flutter.
 flutter:
 

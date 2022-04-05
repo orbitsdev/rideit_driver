@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/UI/uicolor.dart';
+import 'package:tricycleappdriver/controller/drivercontroller.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/signin_screen.dart';
 import 'package:tricycleappdriver/widgets/horizontalspace.dart';
@@ -10,7 +11,7 @@ import 'package:tricycleappdriver/widgets/verticalspace.dart';
 
 class Authdialog {
   static void showAuthProGress(BuildContext context, String message) {
-
+  
   Get.defaultDialog(
     barrierDismissible: false,
     backgroundColor: Colors.transparent,
@@ -79,6 +80,7 @@ class Authdialog {
   }
 
   static void shouwLogoutDialog(BuildContext context) {
+    var drivercontroller = Get.find<Drivercontroller>();
     showDialog(
         barrierDismissible: false,
         context: context,
@@ -128,9 +130,11 @@ class Authdialog {
                               style: Get.textTheme.bodyText1!
                                   .copyWith(fontWeight: FontWeight.w400)),
                           onPressed: () async {
-
-                               authinstance.signOut();
-                            Get.offAll(()=> SigninScreen());
+                              if(drivercontroller.isOnline.value){
+                               await drivercontroller.makeDriverOffline(context);  
+                              }
+                                authinstance.signOut();
+                                Get.offAll(()=> SigninScreen());
 
                           },
                         ),

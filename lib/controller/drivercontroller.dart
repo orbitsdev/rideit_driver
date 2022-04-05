@@ -132,7 +132,7 @@ class Drivercontroller extends GetxController {
     });
   }
 
-  void makeDriverOffline(BuildContext context) async {
+  Future<void> makeDriverOffline(BuildContext context) async {
     Authdialog.showAuthProGress(context, 'Loading...');
 
     await availabledriverrefference.doc(authinstance.currentUser!.uid).update({

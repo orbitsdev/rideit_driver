@@ -8,6 +8,7 @@ import 'package:tricycleappdriver/UI/uicolor.dart';
 import 'package:tricycleappdriver/controller/authcontroller.dart';
 import 'package:tricycleappdriver/dialog/Failuredialog/failuredialog.dart';
 import 'package:tricycleappdriver/signup_screen.dart';
+import 'package:tricycleappdriver/widgets/verticalspace.dart';
 
 
 class SigninScreen extends StatefulWidget {
@@ -73,18 +74,19 @@ class _SigninScreenState extends State<SigninScreen> {
               ),
               child: Column(
 
-                
 
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
                   
+                mainAxisSize: MainAxisSize.max,
+
+                children: [ 
+
+                Verticalspace(MediaQuery.of(context).size.height * 0.1),
                 SizedBox(
                   height: 24
                 ),
                   Container(
-                  child: Image.asset('assets/images/Isulan.png', fit: BoxFit.cover,),
-                  height: 180,
+                  child: Image.asset('assets/images/group1.png', fit: BoxFit.cover,),
+                  height: 200,
                 ),
                 SizedBox(
                   height: 34

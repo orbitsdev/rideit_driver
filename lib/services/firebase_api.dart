@@ -12,7 +12,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:tricycleappdriver/model/users.dart';
 
 class FirebaseApi {
-  static Future<UploadTask?> uploadFile(String destionation, File file) async {
+  static Future<UploadTask?>  uploadFile(String destionation, File file) async {
 
     try {
       final ref = storage.ref(destionation);

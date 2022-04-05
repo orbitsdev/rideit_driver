@@ -106,12 +106,12 @@ class _SignupScreenState extends State<SignupScreen> {
                 SizedBox(height: 24),
                 Container(
                   child: Image.asset(
-                    'assets/images/Isulan.png',
+                    'assets/images/group1.png',
                     fit: BoxFit.cover,
                   ),
                   height: 180,
                 ),
-                SizedBox(height: 34),
+                SizedBox(height: 16),
                 // ElevatedButton(onPressed: (){
                 //   //Failuredialog.showErrorDialog(context, 'OPS', 'ERROR');
                 //      Authdialog.showAuthProGress(context, "Checking...");
