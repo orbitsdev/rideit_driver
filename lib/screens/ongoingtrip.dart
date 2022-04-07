@@ -8,11 +8,14 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/assistant/mapkitassistant.dart';
+import 'package:tricycleappdriver/controller/authcontroller.dart';
 import 'package:tricycleappdriver/controller/requestdatacontroller.dart';
 import 'package:tricycleappdriver/dialog/authdialog/authdialog.dart';
+import 'package:tricycleappdriver/dialog/mapdialog/map_dialog.dart';
 import 'package:tricycleappdriver/dialog/requestdialog/dialog_collection.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/home_screen_manager.dart';
+import 'package:tricycleappdriver/screens/map/request_map_screen.dart';
 import 'package:tricycleappdriver/widgets/horizontalspace.dart';
 import 'package:tricycleappdriver/widgets/verticalspace.dart';
 
@@ -24,6 +27,81 @@ class Ongoingtrip extends StatefulWidget {
 }
 
 class _OngoingtripState extends State<Ongoingtrip> {
+
+    var authcontroller = Get.find<Authcontroller>();
+
+  MapMode mapmode = MapMode.hybrid;
+  MapType maptype = MapType.hybrid;
+
+void getCurrenMaptyoe() {
+    print(authcontroller.useracountdetails.value.map_mode);
+    print('_______________|||||||||');
+    print('_______________|||||||||asdasd');
+    print('_______________|||||||||dasdas');
+
+    if (authcontroller.useracountdetails.value.map_mode == "normal") {
+      setState(() {
+        maptype = MapType.normal;
+        mapmode = MapMode.normal;
+        newgooglemapcontroller!.setMapStyle(null);
+      });
+    }
+    if (authcontroller.useracountdetails.value.map_mode == "satelite") {
+      setState(() {
+        maptype = MapType.satellite;
+        mapmode = MapMode.satelite;
+      });
+    }
+    if (authcontroller.useracountdetails.value.map_mode == "darkmode") {
+      setState(() {
+        maptype = MapType.normal;
+        mapmode = MapMode.darkmode;
+        newgooglemapcontroller!.setMapStyle(mapdarktheme);
+      });
+      print("DARKMODE");
+    }
+    if (authcontroller.useracountdetails.value.map_mode == "hybrid") {
+      setState(() {
+        maptype = MapType.hybrid;
+        mapmode = MapMode.hybrid;
+      });
+    }
+  }
+
+  void mapTypeChange(MapMode value) async {
+    print('MAP MODE');
+    print(value);
+
+    if (value == MapMode.normal) {
+      setState(() {
+        mapmode = value;
+        maptype = MapType.normal;
+        newgooglemapcontroller!.setMapStyle(null);
+      });
+    }
+    if (value == MapMode.darkmode) {
+      setState(() {
+        mapmode = value;
+        maptype = MapType.normal;
+        newgooglemapcontroller!.setMapStyle(mapdarktheme);
+      });
+    }
+    if (value == MapMode.satelite) {
+      setState(() {
+        mapmode = value;
+        maptype = MapType.satellite;
+      });
+    }
+    if (value == MapMode.hybrid) {
+      setState(() {
+        mapmode = value;
+        maptype = MapType.hybrid;
+      });
+    }
+
+    await authcontroller.updateMapOfUser(value.name);
+  }
+
   var requestxcontroller = Get.find<Requestdatacontroller>();
   Completer<GoogleMapController> _controller = Completer();
   GoogleMapController? newgooglemapcontroller;
@@ -233,6 +311,8 @@ int _polylincecounter = 1;
     }
   }
 
+  
+
 void createCustomDriverMarker() {
     ImageConfiguration imageconfiguation =
         createLocalImageConfiguration(context, size: Size(2, 2));
@@ -323,6 +403,32 @@ void createCustomDriverMarker() {
             IconButton(onPressed: () {
               Get.off(()=> HomeScreenManager());
             }, icon: FaIcon(FontAwesomeIcons.times)),
+            actions: [
+          GestureDetector(
+            onTap: () {
+              MapDialog.showMapOption(context, mapTypeChange);
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomLeft,
+                    colors: [
+                      LIGHT_CONTAINER,
+                      LIGHT_CONTAINER2,
+                    ],
+                  )),
+              margin: EdgeInsets.all(10),
+              width: 35,
+              child: Center(
+                  child: FaIcon(
+                FontAwesomeIcons.satellite,
+                size: 20,
+              )),
+            ),
+          ),
+        ],
       ),
       body: isMapReady == false
           ? Container(
@@ -345,7 +451,7 @@ void createCustomDriverMarker() {
                         fit: StackFit.expand,
                         children: [
                           GoogleMap(
-                            mapType: MapType.normal,
+                            mapType: maptype,
                             initialCameraPosition: _kGooglePlex,
                             myLocationButtonEnabled: true,
                             myLocationEnabled: true,
@@ -355,12 +461,15 @@ void createCustomDriverMarker() {
                             polylines: polylineSet,
                             circles: circleSet,
                             onMapCreated: (GoogleMapController controller) {
-                              if (!_controller.isCompleted)
+                              if (!_controller.isCompleted){
+
                                 _controller.complete(controller);
                               newgooglemapcontroller = controller;
                               newgooglemapcontroller!.setMapStyle(mapdarktheme);
                                _caneraBoundRoute(requestxcontroller.directiondetails.value.bound_sw,
                                  requestxcontroller.directiondetails.value.bound_ne);
+                              }
+                              getCurrenMaptyoe();
                             },
                           ),
                         ],

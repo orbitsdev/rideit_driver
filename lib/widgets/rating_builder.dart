@@ -105,10 +105,10 @@ class RatingBuilder extends StatelessWidget {
                       children: [
                         RatingBar(
                           initialRating: rating.rate!.toDouble(),
-                          minRating: 3,
+                          minRating: 1,
                           direction: Axis.horizontal,
-                          allowHalfRating: true,
-                          itemCount: 3,
+                          allowHalfRating: false,
+                          itemCount: 5,
                           itemSize: 20,
                           itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
                           ratingWidget: RatingWidget(

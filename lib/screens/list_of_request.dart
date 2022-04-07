@@ -110,7 +110,7 @@ class _ListOfRequestState extends State<ListOfRequest> {
         IconButton(onPressed: (){
 
                InfoDialog.noDataDialog(context,'You can only access this screen when there is a new request from the passenger. So dont close it. If you dont want to accept any request. Then make sure your acount is offline. ☺️');
-        }, icon: FaIcon(FontAwesomeIcons.exclamationCircle, color: ELSA_BLUE,))
+        }, icon: FaIcon(FontAwesomeIcons.exclamationCircle, color: ELSA_BLUE_2_,))
       ],
         leading:
             IconButton(onPressed: () {

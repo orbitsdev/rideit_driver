@@ -78,6 +78,7 @@ class Authcontroller extends GetxController {
           "image_url": defaultimage,
            "image_file": null,
           'device_token': devicetoken,
+          'map_mode':  null,
 
         };
 
@@ -345,6 +346,17 @@ class Authcontroller extends GetxController {
     });
 
   }
-  
+  Future<void> updateMapOfUser(String mapmode) async{  
+
+      
+    await driversusers.doc(authinstance.currentUser!.uid).update({
+       'map_mode': mapmode,
+     }).then((value) {
+       useracountdetails.value.map_mode =mapmode;
+     }).catchError((e){
+       
+       Infodialog.showInfoToastCenter(e.toString());  
+     });
+   }
 
 }
