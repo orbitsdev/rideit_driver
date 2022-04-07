@@ -351,7 +351,7 @@ void createCustomDriverMarker() {
              CameraPosition camerapostion =
             CameraPosition(target: driverpositionlat, zoom: 17);  newgooglemapcontroller!
             .animateCamera(CameraUpdate.newCameraPosition(camerapostion));
-        // newgooglemapcontroller! .moveCamera(CameraUpdate.newCameraPosition(camerapostion));
+
         markerSet .removeWhere((marker) => marker.markerId.value == "drivermarker");
         markerSet.add(movingDriverMarker);
         });
@@ -360,36 +360,7 @@ void createCustomDriverMarker() {
         oldpostion = driverpositionlat;
           requestxcontroller.updateDriverTripPosition(driverpositionlat, requestxcontroller.ongoingtrip.value.request_id as String);
 
-      // driverposition = position;
-      // LatLng latlingpostion =  LatLng(driverposition!.latitude, driverposition!.longitude);
-
-      // var rot = Mapkitassistant.getMarkerRotation(
-      //     oldpostion.latitude,
-      //     oldpostion.longitude,
-      //     latlingpostion.latitude,
-      //     latlingpostion.longitude);
-
-      // Marker movingDriverMarker = Marker(
-      //   markerId: MarkerId("drivermarker"),
-      //   position: latlingpostion,
-      //   rotation: rot,
-      //   anchor: Offset(0.5, 0.5),
-      //   icon: drivermarkericon as BitmapDescriptor,
-      //   infoWindow: InfoWindow(title: "current Location"),
-      // );
-
-      // setState(() {
-      //   CameraPosition camerapostion =
-      //       CameraPosition(target: latlingpostion, zoom: 17);  newgooglemapcontroller!
-      //       .animateCamera(CameraUpdate.newCameraPosition(camerapostion));
-      //   // newgooglemapcontroller! .moveCamera(CameraUpdate.newCameraPosition(camerapostion));
-      //   markerSet .removeWhere((marker) => marker.markerId.value == "drivermarker");
-      //   markerSet.add(movingDriverMarker);
-      // });
-
-      // requestxconroller.getNewTripDirectionforLive( latlingpostion,  requestxconroller.ongoingtrip.value.drop_location as LatLng);
-      // oldpostion = latlingpostion;
-      // requestxconroller.updateDriverTripPosition(latlingpostion, requestxconroller.ongoingtrip.value.request_id as String);
+      
 
     });
   }
