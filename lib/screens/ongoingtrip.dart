@@ -34,10 +34,7 @@ class _OngoingtripState extends State<Ongoingtrip> {
   MapType maptype = MapType.hybrid;
 
 void getCurrenMaptyoe() {
-    print(authcontroller.useracountdetails.value.map_mode);
-    print('_______________|||||||||');
-    print('_______________|||||||||asdasd');
-    print('_______________|||||||||dasdas');
+   
 
     if (authcontroller.useracountdetails.value.map_mode == "normal") {
       setState(() {
@@ -58,7 +55,7 @@ void getCurrenMaptyoe() {
         mapmode = MapMode.darkmode;
         newgooglemapcontroller!.setMapStyle(mapdarktheme);
       });
-      print("DARKMODE");
+   
     }
     if (authcontroller.useracountdetails.value.map_mode == "hybrid") {
       setState(() {
@@ -69,8 +66,7 @@ void getCurrenMaptyoe() {
   }
 
   void mapTypeChange(MapMode value) async {
-    print('MAP MODE');
-    print(value);
+    
 
     if (value == MapMode.normal) {
       setState(() {
@@ -159,7 +155,6 @@ void getCurrenMaptyoe() {
 
   void listenToOngoingTrip(BuildContext context) async {
     var response = await requestxcontroller.checkOngoingTripDetails(context);
-    print(response);
 
     if (response) {
    setSuccesMap();
@@ -176,9 +171,6 @@ void getCurrenMaptyoe() {
 
 
   void setMarker(){
-   // print(requestxcontroller.ongoingtrip.value.pick_location);
-    print(requestxcontroller.ongoingtrip.value.drop_location);
-    print(requestxcontroller.ongoingtrip.value.dropddress_name);
 
   startingMrker = Marker(
     markerId: MarkerId('startingmarker'),
@@ -196,7 +188,7 @@ void getCurrenMaptyoe() {
         fillColor: Colors.purpleAccent.withOpacity(0.5),
         center: requestxcontroller.ongoingtrip.value.pick_location as LatLng,
         strokeWidth: 1,
-        radius: 26,
+        radius: 15,
         strokeColor: Colors.purpleAccent,
         circleId: CircleId("startingcircle"));
 
@@ -207,7 +199,7 @@ void getCurrenMaptyoe() {
         fillColor: Colors.redAccent.withOpacity(0.5),
         center:   requestxcontroller.ongoingtrip.value.actualmarker_position as LatLng,
         strokeWidth: 1,
-        radius: 26,
+        radius: 15,
         strokeColor: Colors.redAccent,
         circleId: CircleId("destination"));
 
@@ -229,8 +221,6 @@ int _polylincecounter = 1;
   void setPolyline(){
     if (requestxcontroller.directiondetails.value.polylines_encoded != null) {
 
-      print('_WAZAP DJDJS Jo');
-      print( requestxcontroller.directiondetails.value.polylines_encoded);
       String polylineIdVal = "polyline_id${_polylincecounter}";
       setState(() {
         
@@ -256,9 +246,6 @@ int _polylincecounter = 1;
 
   void _caneraBoundRoute(LatLng? bound_sw, LatLng? bound_ne) {
 
-    print('bound');
-    print(bound_sw);
-    print(bound_ne);
    
     try {
       newgooglemapcontroller!.animateCamera(CameraUpdate.newLatLngBounds(
@@ -266,7 +253,6 @@ int _polylincecounter = 1;
               southwest: bound_sw as LatLng, northeast: bound_ne as LatLng),
           80));
     } catch (e) {
-      print(e);
     }
   }
 
@@ -296,8 +282,6 @@ int _polylincecounter = 1;
         }
 
       }
-    print('UPDATE RESPONSE');
-    print(response);
   }
 
   Future<void> updatePolyline() async{
@@ -352,7 +336,7 @@ void createCustomDriverMarker() {
             CameraPosition(target: driverpositionlat, zoom: 17);  newgooglemapcontroller!
             .animateCamera(CameraUpdate.newCameraPosition(camerapostion));
 
-        markerSet .removeWhere((marker) => marker.markerId.value == "drivermarker");
+        markerSet.removeWhere((marker) => marker.markerId.value == "drivermarker");
         markerSet.add(movingDriverMarker);
         });
 

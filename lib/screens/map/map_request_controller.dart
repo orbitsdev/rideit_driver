@@ -17,7 +17,7 @@ class MapRequestController extends GetxController {
  Future<bool> getDirection(BuildContext context, String pickuplocationid, String droplocationid,
       LatLng actularmarkerpostion) async {
      
-        Authdialog.showAuthProGress(context, 'Getting Direction');
+        Authdialog.showAuthProGress( 'Getting Direction');
     String url =
         "https://maps.googleapis.com/maps/api/directions/json?origin=place_id:${pickuplocationid}&destination=${actularmarkerpostion.latitude},${actularmarkerpostion.longitude}&mode=walking&key=${Mapconfig.GOOGLEMAP_API_KEY}";
     //   String url =  "https://maps.googleapis.com/maps/api/directions/json?origin=place_id:${pickuplocationid}&destination=place_id:${droplocationid}&mode=walking&key=${Mapconfig.GOOGLEMAP_API_KEY}";

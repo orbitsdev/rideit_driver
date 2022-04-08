@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_geofire/flutter_geofire.dart';
+
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -29,7 +29,7 @@ class Drivercontroller extends GetxController {
   var totalsuccestrip = 0.obs;
   var canceledtrip = 0.obs;
   var totalearning = 0.obs;
-  var authxcontroller = Get.find<Authcontroller>();
+  var authxcontroller = Get.put(Authcontroller());
   var listofRatings = <Rating>[].obs;
   
  
@@ -63,9 +63,6 @@ class Drivercontroller extends GetxController {
       totalsuccestrip(listofsuccesstrip.length);
       canceledtrip(listofcanceledtrip.length);
 
-      // print('mylist PRINTINg');
-      // print(listofsuccesstrip.length);
-      // print(listofcanceledtrip.length);
     });
   }
 
@@ -79,7 +76,7 @@ class Drivercontroller extends GetxController {
   Future<void> makeDriverOnline(BuildContext context) async {
     try {
       isOnlineLoading(true);
-      Authdialog.showAuthProGress(context, 'Loading...');
+      Authdialog.showAuthProGress('Loading...');
       if (currentposition == null) {
         await getCurentDirection();
       }
@@ -109,7 +106,6 @@ class Drivercontroller extends GetxController {
               fontSize: 16.0);
         });
       } on PlatformException catch (e) {
-        print('MAKE DJD DSDSDDSD');
         Infodialog.showInfoToastCenter(e.toString());
       }
       Get.back();
@@ -123,17 +119,10 @@ class Drivercontroller extends GetxController {
     }
   }
 
-  void liveUpdateLocation() async {
-    driverslocationstream =
-        Geolocator.getPositionStream().listen((position) async {
-      currentposition = position;
-      Geofire.setLocation(authinstance.currentUser!.uid,
-          currentposition!.latitude, currentposition!.longitude);
-    });
-  }
+ 
 
   Future<void> makeDriverOffline(BuildContext context) async {
-    Authdialog.showAuthProGress(context, 'Loading...');
+    Authdialog.showAuthProGress( 'Loading...');
 
     await availabledriverrefference.doc(authinstance.currentUser!.uid).update({
       "status": "offline",
@@ -152,11 +141,7 @@ class Drivercontroller extends GetxController {
     });
   }
 
-  void disableLiveLocationUpdate() async {
-    Geofire.initialize("availableDrivers");
-    driverslocationstream!.pause();
-    Geofire.removeLocation(authinstance.currentUser!.uid);
-  }
+  
 
   Future<bool> updateProfile(String imageurl) async {
     bool isupdate = false;
@@ -204,7 +189,6 @@ class Drivercontroller extends GetxController {
   }
 
   void listenToRatings() async {
-    print('ratings listening');
     ratingsreferrence
         .doc(authinstance.currentUser!.uid)
         .collection('ratings')
@@ -214,9 +198,7 @@ class Drivercontroller extends GetxController {
          if(event.docs.length > 0){
             listofRatings(event.docs.map((e) {
         var data = e.data() as Map<String, dynamic>;
-        print(data);
         data['passenger_id'] = e.id;
-        print(data);
         return Rating.fromJson(data);
       }).toList());
          }else{
@@ -224,14 +206,12 @@ class Drivercontroller extends GetxController {
          } 
        
 
-      print('_LENGHT OF RATINGS');
-      print(listofRatings.length);
     });
   }
 
   void deleteAcceptedRequest(String requestid) async {
     await drivercurrentrequestaccepted.doc(requestid).delete().then((value) {
-      Get.find<Requestdatacontroller>().hasacceptedrequest(false);
+
       Fluttertoast.showToast(
           msg: "Has accepted request but request found",
           toastLength: Toast.LENGTH_SHORT,
@@ -240,7 +220,9 @@ class Drivercontroller extends GetxController {
           backgroundColor: Colors.redAccent,
           textColor: Colors.grey[400],
           fontSize: 16.0);
+          
     });
+    
   }
 
   Future<void> getCurentDirection() async {

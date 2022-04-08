@@ -37,12 +37,14 @@ class _ListOfRequestState extends State<ListOfRequest> {
     listenToUnAccepteRequest();
   }
 
+
+
   void listenToUnAccepteRequest() async {
-    
+  
     requestcollecctionrefference
         .where('status', isEqualTo: 'pending')
         .snapshots()
-        .listen((querySnapShot) {
+        .listen((querySnapShot)async {
 
       
 
@@ -66,13 +68,26 @@ class _ListOfRequestState extends State<ListOfRequest> {
              }
            
       });
+
+          // if(requestxcontroller.lisofunacceptedrequest.isEmpty ){
+          //   requestxcontroller.lisofunacceptedrequest.clear();
+          //   Get.back(result: requestxcontroller.hasacceptedrequest.value == true);
+          // }
+
+      /// close the list of screen if no request and accepted requestt because the get baack is conflicting to the progress indicatior of confirmation
       
-      if(querySnapShot.docs.length == 0  && requestxcontroller.ongoingtrip.value.drop_location_id ==  null){
-          
-          Get.off(()=>HomeScreenManager());
+    
+    
+      if(requestxcontroller.lisofunacceptedrequest.isEmpty){
+      
+              
+         Get.back();
 
       }
       
+
+      // }
+  
       print('lenght of of unaccepred rtequest');
       print(requestxcontroller.lisofunacceptedrequest.length);
     });
@@ -254,12 +269,10 @@ class _ListOfRequestState extends State<ListOfRequest> {
                                   ),
                                   onPressed: () {
                                     if(authxcontroller.hasinternet.value){
-                                       if(requestxcontroller.hasacceptedrequest.value == false){
+                                      
 
                                         requestxcontroller.confirmRequest(context, requestxcontroller.lisofunacceptedrequest[0].request_id);
-                                    }else{
-                                        Infodialog.showInfoToastCenter('You can oly accept request once at a time');
-                                    }
+                                  
                                     }else{
                                       Infodialog.showInfoToastCenter('No internet');
                                     }

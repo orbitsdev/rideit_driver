@@ -42,12 +42,14 @@ class Requestdatacontroller extends GetxController {
   String? acceptedrequest_id;
 
   var hasacceptedrequest = false.obs;
+
+
   var isDirectiionReady = false.obs;
   Position? currentpostion;
   void confirmRequest(BuildContext context, String? requestid) async {
-    Get.off(()=>HomeScreenManager());
-    Authdialog.showAuthProGress(context, 'Please wait...');
-    if (requestid != null) {
+   Get.back();
+    Authdialog.showAuthProGress( 'Please wait...');
+  
       await requestcollecctionrefference
           .doc(requestid)
           .get()
@@ -87,27 +89,27 @@ class Requestdatacontroller extends GetxController {
               /// This will be use to retrive data when the app installed or open again
               await drivercurrentrequestaccepted.doc(requestid).set({'status': 'accepted'}).then((_) async {
                
-                hasacceptedrequest(true);
+                    hasacceptedrequest(true);
               
               /// Create trip and prepair direction
-                var iscreated = await getDirectionAndCreateOngoingTrip(context, requestid);
+                var iscreated = await getDirectionAndCreateOngoingTrip( requestid!);
 
                 if (iscreated) {
                   await requestcollecctionrefference.doc(requestid).update({
                     'tripstatus': 'ready',
                   }).then((value) async {
-                  
+                 
                   /// make driver offline
-                    driverxcontroller.makeDriverOffline(context);
-
+                   await driverxcontroller.makeDriverOffline(context);
+                    
                   /// close loading screen
 
                    /// update page to trip para pag back mo malakat ka sa trip screen
                     pageindexcontroller.updateIndex(1);
-                       Get.back();
-                    Future.delayed(Duration(seconds: 1), () {
-                      Get.off(() => Ongoingtrip());
-                    });
+                      
+             
+                      Get.offAll(Ongoingtrip());
+               
 
                   });
                 } else {
@@ -118,20 +120,20 @@ class Requestdatacontroller extends GetxController {
               });
             });
           } else {
+            //close progress
             Get.back();
-
             infoDialog('Request already accepted by other driver');
           }
         } else {
+              //close progress
           Get.back();
           infoDialog('Request Has been canceled');
         }
       });
-    }
+    
   }
 
-  Future<bool> getDirectionAndCreateOngoingTrip(
-    BuildContext context, String requestid) async {
+  Future<bool> getDirectionAndCreateOngoingTrip( String requestid) async {
     bool issucces = false;
     
 
@@ -148,7 +150,7 @@ class Requestdatacontroller extends GetxController {
         
         /// get deriction details
         var isrouteready = await getDirection(
-            context,
+          
             newongoingtripdetails.pick_location_id as String,
             newongoingtripdetails.drop_location_id as String,
             newongoingtripdetails.actualmarker_position as LatLng);
@@ -179,10 +181,9 @@ class Requestdatacontroller extends GetxController {
     return issucces;
   }
 
-  Future<bool> getDirection(BuildContext context, String pickuplocationid,
+  Future<bool> getDirection( String pickuplocationid,
       String droplocationid, LatLng actularmarkerpostion) async {
-    String url =
-        "https://maps.googleapis.com/maps/api/directions/json?origin=place_id:${pickuplocationid}&destination=${actularmarkerpostion.latitude},${actularmarkerpostion.longitude}&mode=walking&key=${Mapconfig.GOOGLEMAP_API_KEY}";
+    String url =  "https://maps.googleapis.com/maps/api/directions/json?origin=place_id:${pickuplocationid}&destination=${actularmarkerpostion.latitude},${actularmarkerpostion.longitude}&mode=walking&key=${Mapconfig.GOOGLEMAP_API_KEY}";
     //   String url =  "https://maps.googleapis.com/maps/api/directions/json?origin=place_id:${pickuplocationid}&destination=place_id:${droplocationid}&mode=walking&key=${Mapconfig.GOOGLEMAP_API_KEY}";
     //  var url = "https://maps.googleapis.com/maps/api/directions/json?origin=place_id=${pickuplocationid}&destinaion=place_id:${droplocationid}&mode=waking&key=${Mapconfig.GOOGLEMAP_API_KEY}";
 
@@ -204,7 +205,6 @@ class Requestdatacontroller extends GetxController {
       }
     } catch (e) {
       isDirectiionReady(false);
-      print('DIRECT ERROR');
       Infodialog.showInfoToastCenter(e.toString());
       return false;
     }
@@ -214,8 +214,6 @@ class Requestdatacontroller extends GetxController {
     bool iscreated = false;
 
       
-    // print('Request id');
-    // print(ongoingtripdata['request_id']);
     try {
       await requestcollecctionrefference.doc(ongoingtripdata['request_id']).collection('ongoingtrip').doc(ongoingtripdata['request_id']).set(ongoingtripdata).then((_){
        
@@ -248,7 +246,7 @@ class Requestdatacontroller extends GetxController {
 
             //get direction again
             var response = await getDirection(
-                context,
+               
                 ongoingtrip.value.pick_location_id as String,
                 ongoingtrip.value.drop_location_id as String,
                 ongoingtrip.value.actualmarker_position as LatLng);
@@ -267,19 +265,16 @@ class Requestdatacontroller extends GetxController {
 
   Future<bool> changeRouteDirection(BuildContext context,
       LatLng startinglocation, LatLng endinglocation) async {
-    // print(startinglocation);
-    // print(endinglocation);
     String url =
         "https://maps.googleapis.com/maps/api/directions/json?origin=${startinglocation.latitude},${startinglocation.longitude}&destination=${endinglocation.latitude},${endinglocation.longitude}&mode=walking&key=${Mapconfig.GOOGLEMAP_API_KEY}";
 
     try {
-      Authdialog.showAuthProGress(context, 'Changing Route');
+      Authdialog.showAuthProGress( 'Changing Route');
       var response = await Mapservices.mapRequest(url);
 
       if (response != 'failed') {
         var newdirectiondetails = Directiondetails.fromJason(response);
         directiondetails(newdirectiondetails);
-        print(directiondetails.value.polylines_encoded);
         Get.back();
         isDirectiionReady(true);
 
@@ -291,8 +286,6 @@ class Requestdatacontroller extends GetxController {
         return false;
       }
     } catch (e) {
-      print('_______________________');
-      print(e);
       Infodialog.showInfoToastCenter(e.toString());
       isDirectiionReady(false);
       Get.back();
@@ -306,9 +299,10 @@ class Requestdatacontroller extends GetxController {
         .doc(acceptedrequestid)
         .delete()
         .then((value)async {
-          hasacceptedrequest(false);
+            hasacceptedrequest();
             Infodialog.showToastCenter(Colors.red, ELSA_TEXT_WHITE,'Accepted request deleteted because no data found');
            await clearLocalData();
+
         });
         
   }
@@ -423,7 +417,7 @@ class Requestdatacontroller extends GetxController {
   void endTrip(String requestid, BuildContext context) async {
     collecting(true);
 
-    Authdialog.showAuthProGress(context, 'Please wait...');
+    Authdialog.showAuthProGress( 'Please wait...');
 
     await requestcollecctionrefference.doc(requestid).collection('ongoingtrip').doc(requestid).update({
       'payed': true,
@@ -457,7 +451,10 @@ class Requestdatacontroller extends GetxController {
                  Get.back();
                  await driverxcontroller.makeDriverOnline(context);
                   /// clear local data;
+                  
+                  hasacceptedrequest(false);
                 await clearLocalData();
+              
                  pageindexcontroller.updateIndex(0);
 
                 Future.delayed(Duration(milliseconds: 300), () {
@@ -477,7 +474,7 @@ class Requestdatacontroller extends GetxController {
     await cancelDriverLiveLocation();
     collecting(true);
     
-    Authdialog.showAuthProGress(context, 'Please wait...');
+    Authdialog.showAuthProGress('Please wait...');
     await requestcollecctionrefference.doc(requestid).collection('ongoingtrip').doc(requestid).update({'fee': 0, 'payed': true, 'tripstatus': 'canceled'});
     
 
@@ -511,13 +508,13 @@ class Requestdatacontroller extends GetxController {
             collecting(false);
             Get.back();
             await driverxcontroller.makeDriverOnline(context);
-
+                                  hasacceptedrequest(false);
             //clear local data
            await clearLocalData();
-
+    
             pageindexcontroller.updateIndex(0);
 
-            Future.delayed(Duration(milliseconds: 300), () {
+              Future.delayed(Duration(milliseconds: 300), () {
               Get.offNamedUntil(HomeScreenManager.screenName, (route) => false);
               
             });
@@ -539,7 +536,6 @@ class Requestdatacontroller extends GetxController {
   }
 
   Future<void> cancelDriverLiveLocation()  async{
-    print('cancel live');
     if (driverlocationstream != null) {
       driverlocationstream!.cancel();
     }
@@ -636,11 +632,9 @@ class Requestdatacontroller extends GetxController {
           context, 'Ops', 'NO Enternet Connecttion');
       ready = false;
     } on HttpException catch (e) {
-      print('a');
       Failuredialog.showErrorDialog(context, 'Ops', e.toString());
       ready = false;
     } on FormatException catch (e) {
-      print('b');
       Failuredialog.showErrorDialog(context, 'Ops', e.toString());
       ready = false;
     }
@@ -659,16 +653,12 @@ class Requestdatacontroller extends GetxController {
         });
       }
     });
-    print('____________________________');
-    print(requestid);
-    print('_________');
 
     if (requestid != null) {
       await ongointripreferrence.doc(requestid).get().then((value) {
         if (value.exists) {
           ongoingtrip(OngoingTripDetails.fromJson(
               value.data() as Map<String, dynamic>));
-          print(ongoingtrip.toJson());
         }
       });
     }
@@ -693,7 +683,6 @@ class Requestdatacontroller extends GetxController {
           if (event.exists) {
             monitorrequestdetails(
                 RequestDetails.fromJson(event.data() as Map<String, dynamic>));
-            print(monitorrequestdetails.toJson());
           } else {
             deleteAcceptedRequest(acceptedrequest_id as String);
           }
@@ -706,60 +695,94 @@ class Requestdatacontroller extends GetxController {
 
 
   void monitorunacceptedrequest() async {
-      
-      if(ongoingtrip.value.driver_id == null){
 
-        await drivercurrentrequestaccepted.get().then((value) async{
-          if(value.docs.length > 0){
-              value.docs.forEach((element) { 
+
+       drivercurrentrequestaccepted.snapshots().listen((event)  async{
+            
+
+            if(event.docs.length > 0){
+
+           
+              event.docs.forEach((element) { 
                 acceptedrequest_id  = element.id;
               });
+
+              await requestcollecctionrefference.doc(acceptedrequest_id).get().then((value) {
+                if(value.exists){
+                     hasacceptedrequest(true);
+                }else{ 
+
+                   deleteAcceptedRequest(acceptedrequest_id as String);
+                }
+              });
+               
+              
+            }else{
+              hasacceptedrequest(false);
+
+              if(requestdetails.value.drop_location_id !=  null)
+              {
+                  await clearLocalData();
+                  Get.off(HomeScreenManager());
+
+              }
+            }
+          
+         });
+        
+      
+      // if(ongoingtrip.value.driver_id == null){
+
+      //   await drivercurrentrequestaccepted.get().then((value) async{
+      //     if(value.docs.length > 0){
+      //         value.docs.forEach((element) { 
+      //           acceptedrequest_id  = element.id;
+      //         });
             
-          }else{
+      //     }else{
           
-            acceptedrequest_id = null;
-          /// clear local data to make sure no data is save
-            await clearLocalData();
-          }
-        });
+      //       acceptedrequest_id = null;
+      //     /// clear local data to make sure no data is save
+      //       await clearLocalData();
+      //     }
+      //   });
 
-        if(acceptedrequest_id != null){
-             requestcollecctionrefference.doc(acceptedrequest_id).snapshots().listen((event) { 
-                  if(event.exists){
-                   monitorrequestdetails(RequestDetails.fromJson(event.data() as Map<String, dynamic>));
-                   hasacceptedrequest(true);
-                  }else{
-                    if(acceptedrequest_id != null){
-                    deleteAcceptedRequest(acceptedrequest_id as String);
+      //   if(acceptedrequest_id != null){
+      //        requestcollecctionrefference.doc(acceptedrequest_id).snapshots().listen((event) { 
+      //             if(event.exists){
+      //              monitorrequestdetails(RequestDetails.fromJson(event.data() as Map<String, dynamic>));
+               
+      //             }else{
+      //               if(acceptedrequest_id != null){
+      //               deleteAcceptedRequest(acceptedrequest_id as String);
                     
-                    }
-                  }
-            });
-        }else{
+      //               }
+      //             }
+      //       });
+      //   }else{
           
-         await clearLocalData();
-        }
+      //    await clearLocalData();
+      //   }
 
-      }else{
-          requestcollecctionrefference.doc(ongoingtrip.value.request_id).snapshots().listen((event) { 
-                  if(event.exists){
+      // }else{
+      //     requestcollecctionrefference.doc(ongoingtrip.value.request_id).snapshots().listen((event) { 
+      //             if(event.exists){
                    
-                   hasacceptedrequest(true);
-                  }else{
-                    if(ongoingtrip.value.request_id != null){
-                    deleteAcceptedRequest(ongoingtrip.value.request_id as String);
-                    hasacceptedrequest(false);
-                    }
-                  }
-            });
-      }
-      print('______DATA____');
-      print(hasacceptedrequest);
+     
+      //             }else{
+      //               if(ongoingtrip.value.request_id != null){
+      //               deleteAcceptedRequest(ongoingtrip.value.request_id as String);
+                   
+      //               }
+      //             }
+      //       });
+      // }
+
   }
 
  Future<void> clearLocalData() async{
 
-     hasacceptedrequest(false);
+     
      directiondetails = Directiondetails().obs;
      requestdetails = RequestDetails().obs;
      monitorrequestdetails = RequestDetails().obs;
@@ -767,5 +790,13 @@ class Requestdatacontroller extends GetxController {
      ongoingtripmonitor = OngoingTripDetails().obs;
  }
 
+Future<bool> checkAcceptedRequest() async{
  
+   if(hasacceptedrequest.value){
+     return true;
+   }else{
+     return false;
+   }
+ }
+
 }

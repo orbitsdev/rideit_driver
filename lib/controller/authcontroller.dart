@@ -13,6 +13,7 @@ import 'package:tricycleappdriver/dialog/infodialog/infodialog.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/home_screen_manager.dart';
 import 'package:tricycleappdriver/model/users.dart';
+import 'package:tricycleappdriver/screens/block_account_screen.dart';
 import 'package:tricycleappdriver/screens/onboard_screen.dart';
 import 'package:tricycleappdriver/verifyingemail_screen.dart';
 import 'package:twilio_phone_verify/twilio_phone_verify.dart';
@@ -62,7 +63,7 @@ class Authcontroller extends GetxController {
 
     try {
       isSignUpLoading(true);
-       Authdialog.showAuthProGress(context, "Creating account...");
+       Authdialog.showAuthProGress( "Creating account...");
       await authinstance
           .createUserWithEmailAndPassword(
               email: gemail as String, password: gpassword as String)
@@ -78,14 +79,15 @@ class Authcontroller extends GetxController {
           "image_url": defaultimage,
            "image_file": null,
           'device_token': devicetoken,
-          'map_mode':  null,
+           'map_mode':  null,
+           'authorize':  true,
 
         };
 
 
         await firestore.collection('drivers').doc(credential.user!.uid).set(userdetailsdata).then((_) async {
           Get.back();
-           Authdialog.showAuthProGress(context, "Please Wait...");
+           Authdialog.showAuthProGress( "Please Wait...");
           useracountdetails(Users.fromJson(userdetailsdata));
           useracountdetails.value.id = credential.user!.uid;
           isSignUpLoading(false);
@@ -165,7 +167,6 @@ class Authcontroller extends GetxController {
 
     if (twilioResponse.successful as bool) {
       if (twilioResponse.verification!.status == VerificationStatus.approved) {
-        //print('Phone number is approved');
         isVerifying(false);
         progressDialog('Authenticating...');
         Future.delayed(Duration(seconds: 1), () {
@@ -175,19 +176,17 @@ class Authcontroller extends GetxController {
         });
       } else {
         isVerifying(false);
-        //print('Invalid code');
         notificationDialog(context, 'Inavlid Code');
       }
     } else {
       isVerifying(false);
       notificationDialog(context, twilioResponse.errorMessage.toString());
-      //print(twilioResponse.errorMessage);
     }
   }
 
   void logInUser(String email, String password, BuildContext context) async {
     try {
-      Authdialog.showAuthProGress(context, 'Please wait...');
+      Authdialog.showAuthProGress('Please wait...');
       var authuser = await authinstance.signInWithEmailAndPassword(
           email: email.trim(), password: password.trim());
 
@@ -282,8 +281,8 @@ class Authcontroller extends GetxController {
         var data =  querySnapshot.data() as Map<String,dynamic>;
         data['id'] = authinstance.currentUser!.uid;
         useracountdetails(Users.fromJson(data));
-        print(useracountdetails.toJson()); 
-
+          print(useracountdetails.toJson());
+       
         if(useracountdetails.value.new_acount == true){
           Get.off(()=> OnboardScreen());
         }

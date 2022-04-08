@@ -22,6 +22,7 @@ import 'package:tricycleappdriver/dialog/requestdialog/completetripdialog.dart';
 import 'package:tricycleappdriver/geotest.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/home_screen_manager.dart';
+import 'package:tricycleappdriver/screens/block_account_screen.dart';
 import 'package:tricycleappdriver/screens/complete_screen.dart';
 import 'package:tricycleappdriver/screens/earnings_screen.dart';
 import 'package:tricycleappdriver/screens/editprofile_screen.dart';
@@ -206,10 +207,7 @@ class _TricycleappDriverState extends State<TricycleappDriver> {
         primarySwatch: Palette.generateMaterialColor(0xFF151147),
       ),
       home: 
-      //ListOfRequest(),
-
-          //Testdialog(),
-          // Ongoingtrip(),
+     
 
           FirebaseAuth.instance.currentUser == null
               ? SigninScreen()
@@ -220,6 +218,7 @@ class _TricycleappDriverState extends State<TricycleappDriver> {
                   :
                   //Ongoingtrip(),
                  HomeScreenManager(),
+               // BlockAccountScreen(),
       getPages: [
         GetPage(
             name: SigninScreen.screenName,
@@ -274,6 +273,10 @@ class _TricycleappDriverState extends State<TricycleappDriver> {
             GetPage(name: ListScreen.screenName, page: ()=> ListScreen()),
             GetPage(name: EditprofileScreen.screenName, page: ()=> EditprofileScreen()),
             GetPage(name: OnboardScreen.screenName, page: ()=> OnboardScreen()),
+        GetPage(
+            name: BlockAccountScreen.screenName,
+            page: () => BlockAccountScreen(),
+            binding: Getxbinding()),
       ],
       debugShowCheckedModeBanner: false,
     );

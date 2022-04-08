@@ -10,7 +10,7 @@ import 'package:tricycleappdriver/widgets/horizontalspace.dart';
 import 'package:tricycleappdriver/widgets/verticalspace.dart';
 
 class Authdialog {
-  static void showAuthProGress(BuildContext context, String message) {
+  static void showAuthProGress( String message) {
   
   Get.defaultDialog(
     barrierDismissible: false,

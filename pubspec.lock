@@ -328,13 +328,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.2.0"
-  flutter_geofire:
-    dependency: "direct main"
-    description:
-      name: flutter_geofire
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.1"
   flutter_launcher_icons:
     dependency: "direct main"
     description:
@@ -450,13 +443,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "9.2.0"
-  geo_firestore_flutter:
-    dependency: "direct main"
-    description:
-      name: geo_firestore_flutter
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.1.4"
   geolocator:
     dependency: "direct main"
     description:

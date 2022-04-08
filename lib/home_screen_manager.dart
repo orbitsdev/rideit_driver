@@ -73,7 +73,6 @@ Future.delayed(Duration.zero).then((value){
     );
   
       cloudMessagingSetup();
-
       authxcontroller.checkIfAcountDetailsIsNull();   
       getCurrentStatusOfDriver();
       requestxcontroller.monitorunacceptedrequest();
@@ -234,10 +233,10 @@ void getCurrentStatusOfDriver()  async {
 
   //     floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Obx((){
+          if(requestxcontroller.hasacceptedrequest.value){
+            return Container(height: 0,);
 
-        if(requestxcontroller.hasacceptedrequest.value){
-          return Container(height: 0,);
-        }
+          }
         return GFFloatingWidget(
        
        child: GFIconBadge(

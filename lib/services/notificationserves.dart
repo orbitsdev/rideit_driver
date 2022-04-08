@@ -9,6 +9,7 @@ import 'package:tricycleappdriver/controller/drivercontroller.dart';
 import 'package:tricycleappdriver/controller/mapcontroller.dart';
 
 import 'package:tricycleappdriver/controller/requestdatacontroller.dart';
+import 'package:tricycleappdriver/dialog/infodialog.dart/info_dialog.dart';
 import 'package:tricycleappdriver/dialog/infodialog/infodialog.dart';
 import 'package:tricycleappdriver/dialog/requestdialog/requestdialog.dart';
 import 'package:tricycleappdriver/model/un_accepted_request.dart';
@@ -26,7 +27,7 @@ class Notificationserves {
 
         print(message.data);
         print(message.data["recieve_request"]);
-        print(requestcontroller.hasacceptedrequest.value);
+       
         //(jsonDecode(message.data["recieve_request"]));
 
         //showRequestDialog(message.data['recieve_request']);
@@ -61,19 +62,18 @@ class Notificationserves {
 
   void gotoScreenOfunacceptedRequest(Map<String, dynamic> recieverequest) {
 
-      print(driverxcontroller.isOnline.value);
-    if(driverxcontroller.isOnline.value){
+     if(driverxcontroller.isOnline.value){
 
-    if (requestcontroller.hasacceptedrequest.value == false) {
-      UnAcceptedRequest unacceptedrequest =  UnAcceptedRequest.fromJson(recieverequest);
-      Get.to(() => ListOfRequest());
-    } else {
- //    requestcontroller.monitorunacceptedrequest();
-      Infodialog.showInfoToastCenter( 'New request coming');
-    }
+    //IF HAS ACCEPTD REQUEST PREVENT FROM SHOWING LIST OF SCREEN
+        if(requestcontroller.hasacceptedrequest.value == false){
+           UnAcceptedRequest unacceptedrequest =  UnAcceptedRequest.fromJson(recieverequest);
+             Get.to(() => ListOfRequest());
+        }else{
 
-    }else{
-      Infodialog.showInfoToastCenter(driverxcontroller.isOnline.value.toString());
+            Infodialog.showInfoToastCenter('New Request is Comings');
+        }
+     
+    
 
     }
    
