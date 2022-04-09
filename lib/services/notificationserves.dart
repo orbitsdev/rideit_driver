@@ -68,9 +68,6 @@ class Notificationserves {
         if(requestcontroller.hasacceptedrequest.value == false){
            UnAcceptedRequest unacceptedrequest =  UnAcceptedRequest.fromJson(recieverequest);
              Get.to(() => ListOfRequest());
-        }else{
-
-            Infodialog.showInfoToastCenter('New Request is Comings');
         }
      
     

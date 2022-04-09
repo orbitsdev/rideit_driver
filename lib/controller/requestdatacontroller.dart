@@ -368,8 +368,8 @@ class Requestdatacontroller extends GetxController {
           
           sendNotification(
               ongoingtrip.value.device_token as String,
-              'Driver is ready to pick up you\n. Your address is ${ongoingtrip.value.pickaddress_name}',
-              'Driver has arrive',
+              'For Your request trip From: ${ongoingtrip.value.pickaddress_name}\nTo: ${ongoingtrip.value.dropddress_name}',
+              'Driver Has Arrived',
               'ongoingtrip');
 
           /// stop updating driver location 

@@ -376,7 +376,7 @@ class Authcontroller extends GetxController {
                   
                 }else{
                   isscreenshowed(true);
-                    Get.offAll(()=> BlockAccountScreen());
+                  Get.offAll(()=> BlockAccountScreen());
                 }
           });
         }else{

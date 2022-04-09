@@ -47,14 +47,6 @@ class _ListOfRequestState extends State<ListOfRequest> {
         .listen((querySnapShot)async {
 
       
-
-      // requestxcontroller.lisofunacceptedrequest(
-        
-      //   querySnapShot.docs.map((e) {
-      //   var request = RequestDetails.fromJson(e.data() as Map<String, dynamic>);
-      //   request.request_id = e.id;
-      //   return request;
-      // }).toList());
            requestxcontroller.lisofunacceptedrequest().clear();
       querySnapShot.docs.forEach((element) { 
                
