@@ -17,7 +17,7 @@ class Mapcontroller extends GetxController {
   var isOnlineLoading = false.obs;
   var isonlinelastime = false.obs;
   Position? currentposition;
-  var authxcontroller = Get.find<Authcontroller>();
+  var authxcontroller = Get.put(Authcontroller());
 
   
 

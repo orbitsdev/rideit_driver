@@ -27,9 +27,9 @@ import 'package:tricycleappdriver/services/mapservices.dart';
 import 'package:http/http.dart' as http;
 
 class Requestdatacontroller extends GetxController {
-  var driverxcontroller = Get.find<Drivercontroller>();
-  var authxcontroller = Get.find<Authcontroller>();
-  var pageindexcontroller = Get.find<Pageindexcontroller>();
+  var driverxcontroller = Get.put(Drivercontroller());
+  var authxcontroller = Get.put(Authcontroller());
+  var pageindexcontroller = Get.put(Pageindexcontroller());
   CameraPosition? cameraposition;
 
   var lisofunacceptedrequest = <RequestDetails>[].obs;

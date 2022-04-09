@@ -340,7 +340,7 @@ class _RequestMapScreenState extends State<RequestMapScreen> {
                             Horizontalspace(2),
                             Expanded(
                               child: Text(
-                                '${widget.request!.pickaddress_name}',
+                                '${widget.request!.dropddress_name}',
                                 style: Get.theme.textTheme.bodyText1!.copyWith(
                                   color: ELSA_TEXT_WHITE,
                                   fontWeight: FontWeight.w100,
