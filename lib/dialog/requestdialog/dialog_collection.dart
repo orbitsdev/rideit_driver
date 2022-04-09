@@ -13,7 +13,7 @@ import 'package:tricycleappdriver/widgets/verticalspace.dart';
 class DialogCollection {
   static var requestcontroller = Get.find<Requestdatacontroller>();
 
-  static void showpaymentToCollect(BuildContext context) {
+  static void showpaymentToCollect(BuildContext context, String? payment) {
     showDialog(
     
         barrierDismissible: false,
@@ -39,7 +39,7 @@ class DialogCollection {
                   ),
                   Text('Total amount to collect'.toUpperCase(), style: Get.textTheme.bodyText1!.copyWith(color: ELSA_TEXT_WHITE, fontSize: 14, fontWeight: FontWeight.w100)),
                   Verticalspace(6),
-                  Text('₱ ${requestcontroller.ongoingtrip.value.fee}.00', style: Get.textTheme.headline1!.copyWith(color: ELSA_TEXT_WHITE, fontSize: 34),),
+                  Text('₱ ${payment}.00', style: Get.textTheme.headline1!.copyWith(color: ELSA_TEXT_WHITE, fontSize: 34),),
                   Verticalspace(16),
                  // FaIcon(FontAwesomeIcons.moneyBill, color: Colors.amber[400], size: 34,),
               

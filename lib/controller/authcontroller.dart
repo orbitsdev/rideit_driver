@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:tricycleappdriver/config/twilioconfig.dart';
 import 'package:tricycleappdriver/controller/permissioncontroller.dart';
 import 'package:tricycleappdriver/constant.dart';
+import 'package:tricycleappdriver/controller/requestdatacontroller.dart';
 import 'package:tricycleappdriver/dialog/Failuredialog/failuredialog.dart';
 import 'package:tricycleappdriver/dialog/authdialog/authdialog.dart';
 import 'package:tricycleappdriver/dialog/authdialog/authenticating.dart';
@@ -21,6 +22,8 @@ import 'package:twilio_phone_verify/twilio_phone_verify.dart';
 class Authcontroller extends GetxController {
   var hasinternet = false.obs;
   var useracountdetails = Users().obs;
+  var monitoraccountuser = Users().obs;
+  var isscreenshowed =false.obs;
   late TwilioPhoneVerify _twilioPhoneVerify;
   var isSignUpLoading = false.obs;
   var isCodeSent = false.obs;
@@ -281,8 +284,10 @@ class Authcontroller extends GetxController {
         var data =  querySnapshot.data() as Map<String,dynamic>;
         data['id'] = authinstance.currentUser!.uid;
         useracountdetails(Users.fromJson(data));
-          print(useracountdetails.toJson());
-       
+        
+        
+        
+
         if(useracountdetails.value.new_acount == true){
           Get.off(()=> OnboardScreen());
         }
@@ -356,6 +361,35 @@ class Authcontroller extends GetxController {
        
        Infodialog.showInfoToastCenter(e.toString());  
      });
+   }
+
+
+   void monitorAccountifblock() async{
+      driversusers.doc(authinstance.currentUser!.uid).snapshots().listen((event) async{
+        if(event.exists){
+             monitoraccountuser(Users.fromJson(event.data() as Map<String, dynamic>));
+
+             if(monitoraccountuser.value.authorize == false){ 
+                await drivercurrentrequestaccepted.get().then((value) {
+                if(value.docs.isNotEmpty){
+                  
+                  
+                }else{
+                  isscreenshowed(true);
+                    Get.offAll(()=> BlockAccountScreen());
+                }
+          });
+        }else{
+          if(isscreenshowed.value){
+            Get.off(HomeScreenManager());
+          }
+        }
+             
+        }else{
+           monitoraccountuser(Users());
+        }
+      });
+    
    }
 
 }

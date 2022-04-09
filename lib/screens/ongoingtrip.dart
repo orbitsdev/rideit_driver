@@ -270,7 +270,7 @@ int _polylincecounter = 1;
         /// show payment 
          if (requestxcontroller.ongoingtrip.value.tripstatus == 'complete' &&
           requestxcontroller.ongoingtrip.value.payed == false) {
-            DialogCollection.showpaymentToCollect(context);
+            DialogCollection.showpaymentToCollect(context, requestxcontroller.ongoingtrip.value.fee.toString());
           }
 
 
@@ -278,7 +278,7 @@ int _polylincecounter = 1;
          /// incase the app close and passenger not payed show payment againg
         if (requestxcontroller.ongoingtrip.value.tripstatus == 'complete' &&
           requestxcontroller.ongoingtrip.value.payed == false) {
-            DialogCollection.showpaymentToCollect(context);
+            DialogCollection.showpaymentToCollect(context,requestxcontroller.ongoingtrip.value.fee.toString());
         }
 
       }

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/UI/uicolor.dart';
 import 'package:tricycleappdriver/controller/drivercontroller.dart';
+import 'package:tricycleappdriver/controller/requestdatacontroller.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/signin_screen.dart';
 import 'package:tricycleappdriver/widgets/horizontalspace.dart';
@@ -81,6 +82,7 @@ class Authdialog {
 
   static void shouwLogoutDialog(BuildContext context) {
     var drivercontroller = Get.find<Drivercontroller>();
+    var requestatacontroller = Get.find<Requestdatacontroller>();
     showDialog(
         barrierDismissible: false,
         context: context,
@@ -133,8 +135,13 @@ class Authdialog {
                               if(drivercontroller.isOnline.value){
                                await drivercontroller.makeDriverOffline(context);  
                               }
+
+                              if(requestatacontroller.ongoingtrip.value.drop_location_id != null){
+                                await requestatacontroller.clearLocalData();
+                              }
                                 authinstance.signOut();
                                 Get.offAll(()=> SigninScreen());
+                              
 
                           },
                         ),

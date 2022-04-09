@@ -782,12 +782,14 @@ class Requestdatacontroller extends GetxController {
 
  Future<void> clearLocalData() async{
 
-     
+    acceptedrequest_id= null;
+   hasacceptedrequest(false);
      directiondetails = Directiondetails().obs;
      requestdetails = RequestDetails().obs;
      monitorrequestdetails = RequestDetails().obs;
      ongoingtrip = OngoingTripDetails().obs;
      ongoingtripmonitor = OngoingTripDetails().obs;
+      pageindexcontroller.updateIndex(0);
  }
 
 Future<bool> checkAcceptedRequest() async{

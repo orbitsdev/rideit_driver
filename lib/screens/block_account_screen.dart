@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/controller/drivercontroller.dart';
+import 'package:tricycleappdriver/controller/requestdatacontroller.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/signin_screen.dart';
 import 'package:tricycleappdriver/verifyingemail_screen.dart';
@@ -19,6 +20,7 @@ class BlockAccountScreen extends StatefulWidget {
 
 class _BlockAccountScreenState extends State<BlockAccountScreen> {
   var drivercontroller =  Get.put(Drivercontroller());
+  var requescontroller =  Get.put(Requestdatacontroller());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,7 +39,7 @@ class _BlockAccountScreenState extends State<BlockAccountScreen> {
               Container(
            
         
-                child:Text('Account temporary block'.toUpperCase(), style: TextStyle(
+                child:Text('Temporary Banned'.toUpperCase(), style: TextStyle(
                   color: BACKGROUND_BLACK,
                   fontSize: 20,
                   fontWeight: FontWeight.w900,
@@ -47,17 +49,28 @@ class _BlockAccountScreenState extends State<BlockAccountScreen> {
               
               ),
               Verticalspace(8),
-              Text('Please Contact the authorize person', style: TextStyle(
+              Text('Your temporary banned from rideit because you may have violated our terms of service. Please Contact The administration if you have concern.', style: TextStyle(
                 fontSize: 16,
-              ),textAlign: TextAlign.center,),
+                color: Colors.grey[700]
+              ),),
               
-              ElevatedButton(onPressed: () async{
-                     if(drivercontroller.isOnline.value){
-                               await drivercontroller.makeDriverOffline(context);  
-                              }
-                                authinstance.signOut();
-                                Get.offAll(()=> SigninScreen());
-              }, child: Text('OK'))
+              Verticalspace(8),
+              SizedBox(
+                width:double.infinity,
+                child: ElevatedButton(onPressed: () async{
+                       if(drivercontroller.isOnline.value){
+                                 await drivercontroller.makeDriverOffline(context);  
+                                }
+                       if(requescontroller.ongoingtrip.value.drop_location_id != null){
+                                 await requescontroller.clearLocalData();
+                                }
+                                  authinstance.signOut();
+                                  Get.offAll(()=> SigninScreen());
+              
+                }, child: Text('OK', style: TextStyle(
+                  fontSize: 20
+                ),)),
+              )
         ],),
       ),
     );

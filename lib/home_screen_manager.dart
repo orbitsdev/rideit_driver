@@ -63,6 +63,7 @@ class _HomeScreenManagerState extends State<HomeScreenManager>  with SingleTicke
       super.initState();
 Future.delayed(Duration.zero).then((value){
     requestxcontroller.checkOngoingTripDetails(context);
+     
   
 });
  WidgetsBinding.instance!.addObserver(this);
@@ -73,10 +74,10 @@ Future.delayed(Duration.zero).then((value){
     );
   
       cloudMessagingSetup();
-      authxcontroller.checkIfAcountDetailsIsNull();   
       getCurrentStatusOfDriver();
       requestxcontroller.monitorunacceptedrequest();
-
+       authxcontroller.checkIfAcountDetailsIsNull();   
+        authxcontroller.monitorAccountifblock();
    
 
   }

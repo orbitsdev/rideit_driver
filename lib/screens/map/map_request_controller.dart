@@ -30,6 +30,8 @@ class MapRequestController extends GetxController {
         var newdirectiondetails = Directiondetails.fromJason(response);
         requestmapdetails(newdirectiondetails);
         requestdroplocatioinid = droplocationid;
+
+        
     
    
 
