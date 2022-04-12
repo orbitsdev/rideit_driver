@@ -236,79 +236,98 @@ class Requestdatacontroller extends GetxController {
   }
 
   Future<bool> checkOngoingTripDetails(BuildContext context) async {
-   
-      if(ongoingtrip.value.request_id != null){
-        return true;
-      }else{
-        acceptedrequest_id = await getAccepteRequetId();
-        if(acceptedrequest_id !=  null){
+  
+    if (ongoingtrip.value.request_id != null) {
+
+
+      return true;
+    } else {
+      //checkdatabase
+
+      acceptedrequest_id = await getAcceptedRequestId();
+      if (acceptedrequest_id != null) {
+        try {
           await requestcollecctionrefference
               .doc(acceptedrequest_id).collection('ongoingtrip').doc(acceptedrequest_id)
               .get()
               .then((value) async {
-                if(value.exists){
-                  var data = value.data() as Map<String, dynamic>;
-                  if(data['driver_id'] == authinstance.currentUser!.uid){
-                      ongoingtrip(OngoingTripDetails.fromJson(data));
-                  }else{
-                    ongoingtrip(OngoingTripDetails());
-                    await deleteAcceptedRequest(acceptedrequest_id as String);
-                  }
-                  
-                }else{
-                  ongoingtrip(OngoingTripDetails());
-                }
+                ongoingtrip(OngoingTripDetails.fromJson(
+                value.data() as Map<String, dynamic>));
 
-              });
+            //get direction again
+            var response = await getDirection(
+               
+                ongoingtrip.value.pick_location_id as String,
+                ongoingtrip.value.drop_location_id as String,
+                ongoingtrip.value.actualmarker_position as LatLng);
+            // getRouteDirection(requestid as String);
+          });
 
-              if(ongoingtrip.value.request_id != null){
-                return true;
-              }else{
-                return false;
-              }
-        }else{
+          return true;
+        } catch (e) {
           return false;
         }
+      } else {
+        return false;
       }
-
-
+    }
+  }
+  Future<bool> checkOngoingTripDetailsOngoingTrip(BuildContext context) async {
     
-    // if (ongoingtrip.value.request_id != null) {
-    //   return true;
-    // } else {
-    //   //checkdatabase
+    if (ongoingtrip.value.request_id != null) {
+      bool check = false;
+        await requestcollecctionrefference
+              .doc(acceptedrequest_id).collection('ongoingtrip').doc(acceptedrequest_id)
+              .get().then((value) async{
+                if(value.exists){
+                    check = true;
+                }else{
+                  await deleteAcceptedRequest(acceptedrequest_id as String);
+                  Get.offAll(HomeScreenManager());
+                  check = false;
+                }
+              });
 
-    //   acceptedrequest_id = await getAcceptedRequestId();
-    //   if (acceptedrequest_id != null) {
-       
-    //     try {
-    //       await requestcollecctionrefference
-    //           .doc(acceptedrequest_id).collection('ongoingtrip').doc(acceptedrequest_id)
-    //           .get()
-    //           .then((value) async {
+      return check;
+    } else {
+      //checkdatabase
 
-    //             if(value.exists){
-                   
-    //             }else{
-    //                 ongoingtrip(OngoingTripDetails());
-    //             print('ONGOINF TRIP OPENING ONGOING SCREEN');
-    //            print(ongoingtrip.toJson());
-    //              await clearLocalData();
-    //              Get.offAll(HomeScreenManager());
-    //             }
+      acceptedrequest_id = await getAcceptedRequestId();
+      if (acceptedrequest_id != null) {
+        try {
+          await requestcollecctionrefference
+              .doc(acceptedrequest_id).collection('ongoingtrip').doc(acceptedrequest_id)
+              .get()
+              .then((value) async {
+
+                if(value.exists){
+                    ongoingtrip(OngoingTripDetails.fromJson(
+                value.data() as Map<String, dynamic>));
+
+            //get direction again
+            var response = await getDirection(
                
-    //         // getRouteDirection(requestid as String);
-    //       });
+                ongoingtrip.value.pick_location_id as String,
+                ongoingtrip.value.drop_location_id as String,
+                ongoingtrip.value.actualmarker_position as LatLng);
+                }else{
+                  deleteAcceptedRequest(acceptedrequest_id as String);
+                }
 
-    //       return true;
-    //     } catch (e) {
-    //       return false;
-    //     }
-    //   } else {
+
+                
+            // getRouteDirection(requestid as String);
+          });
+
+          return true;
+        } catch (e) {
+          return false;
+        }
+      } else {
       
-    //     return false;
-    //   }
-    // }
+        return false;
+      }
+    }
   }
 
   Future<bool> changeRouteDirection(BuildContext context,
@@ -346,7 +365,7 @@ class Requestdatacontroller extends GetxController {
         .doc(acceptedrequestid)
         .delete()
         .then((value)async {
-            hasacceptedrequest();
+            hasacceptedrequest(false);
             Infodialog.showToastCenter(Colors.red, ELSA_TEXT_WHITE,'Accepted request deleteted because no data found');
            await clearLocalData();
 
@@ -465,8 +484,9 @@ class Requestdatacontroller extends GetxController {
   void endTrip(String requestid, BuildContext context) async {
     collecting(true);
 
-    print('FROM COMPLETING TRIP');
-    print(ongoingtrip.toJson());
+
+    print('END TRIP');
+    print(ongoingtripmonitor.value.request_id);
     Authdialog.showAuthProGress( 'Please wait...');
   
     await requestcollecctionrefference.doc(requestid).collection('ongoingtrip').doc(ongoingtrip.value.request_id).update({
@@ -761,8 +781,9 @@ class Requestdatacontroller extends GetxController {
            
               event.docs.forEach((element) { 
                 acceptedrequest_id  = element.id;
+               
               });
-
+             
               await requestcollecctionrefference.doc(acceptedrequest_id).get().then((value) {
                 if(value.exists){
                      hasacceptedrequest(true);
@@ -855,6 +876,10 @@ Future<bool> checkAcceptedRequest() async{
    }else{
      return false;
    }
+ }
+
+ void monitorongoingtripifaccted() async{
+   print(hasacceptedrequest);
  }
 
 }

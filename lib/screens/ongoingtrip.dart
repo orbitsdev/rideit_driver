@@ -98,7 +98,7 @@ void getCurrenMaptyoe() {
     await authcontroller.updateMapOfUser(value.name);
   }
 
-  var requestxcontroller = Get.find<Requestdatacontroller>();
+  var requestxcontroller = Get.put(Requestdatacontroller());
   Completer<GoogleMapController> _controller = Completer();
   GoogleMapController? newgooglemapcontroller;
   
@@ -151,11 +151,10 @@ void getCurrenMaptyoe() {
   }
 
   void listenToOngoingTrip() async {
-    var response = await requestxcontroller.checkOngoingTripDetails(context);
+    var response = await requestxcontroller.checkOngoingTripDetailsOngoingTrip(context);
 
     if (response) {
-      print('FROM INITSTATE');
-      print(requestxcontroller.ongoingtrip.value.tripstatus);
+      
    setSuccesMap();
    setMarker();
    setPolyline();
@@ -165,6 +164,7 @@ void getCurrenMaptyoe() {
         }
     } else {
      setFailedMap();
+
     }
   }
 
