@@ -25,7 +25,7 @@ class VerifyingemailScreen extends StatefulWidget {
 
 class _VerifyingemailScreenState extends State<VerifyingemailScreen>
     with WidgetsBindingObserver {
-  var authxcontroller = Get.find<Authcontroller>();
+  var authxcontroller = Get.put(Authcontroller());
 
   bool mailverified = false;
   Timer? time;
@@ -85,7 +85,7 @@ class _VerifyingemailScreenState extends State<VerifyingemailScreen>
       _start = 60;
       canreSendEmail = false;
     });
-    //await authxcontroller.sendVerification();
+    await authxcontroller.sendVerification();
 
     startTimer();
   }

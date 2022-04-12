@@ -147,7 +147,7 @@ class Requestdatacontroller extends GetxController {
         
         requestdetails( RequestDetails.fromJson(snapshot.data() as Map<String, dynamic>));
         OngoingTripDetails  newongoingtripdetails =  OngoingTripDetails.fromJson(snapshot.data() as Map<String, dynamic>);
-        
+       
         /// get deriction details
         var isrouteready = await getDirection(
           
@@ -216,7 +216,7 @@ class Requestdatacontroller extends GetxController {
       
     try {
       await requestcollecctionrefference.doc(ongoingtripdata['request_id']).collection('ongoingtrip').doc(ongoingtripdata['request_id']).set(ongoingtripdata).then((_){
-       
+        ongoingtrip( OngoingTripDetails.fromJson(ongoingtripdata));
          iscreated = true;
       });
   
@@ -229,7 +229,7 @@ class Requestdatacontroller extends GetxController {
   }
 
   Future<bool> checkOngoingTripDetails(BuildContext context) async {
-    if (ongoingtrip.value.drop_location_id != null) {
+    if (ongoingtrip.value.request_id != null) {
       return true;
     } else {
       //checkdatabase
@@ -265,11 +265,10 @@ class Requestdatacontroller extends GetxController {
 
   Future<bool> changeRouteDirection(BuildContext context,
       LatLng startinglocation, LatLng endinglocation) async {
-    String url =
-        "https://maps.googleapis.com/maps/api/directions/json?origin=${startinglocation.latitude},${startinglocation.longitude}&destination=${endinglocation.latitude},${endinglocation.longitude}&mode=walking&key=${Mapconfig.GOOGLEMAP_API_KEY}";
+    String url =  "https://maps.googleapis.com/maps/api/directions/json?origin=${startinglocation.latitude},${startinglocation.longitude}&destination=${endinglocation.latitude},${endinglocation.longitude}&mode=walking&key=${Mapconfig.GOOGLEMAP_API_KEY}";
 
     try {
-      Authdialog.showAuthProGress( 'Changing Route');
+      Authdialog.showAuthProGress( 'Changing Route...');
       var response = await Mapservices.mapRequest(url);
 
       if (response != 'failed') {
@@ -356,12 +355,13 @@ class Requestdatacontroller extends GetxController {
             await driverxcontroller.getCurentDirection();
 
             /// change direction of polylines  to current location of driver to pickup location of passenger
-            await changeRouteDirection(
+           
+          }
+           await changeRouteDirection(
                 context,
                 driverxcontroller.latcurrentposition as LatLng,
                 ongoingtrip.value.pick_location as LatLng);
             updating(false);
-          }
         } else if (text == "arrived") {
 
           /// send notification to passenger incase the app close or the app minimize the passenger get notified 
@@ -417,16 +417,16 @@ class Requestdatacontroller extends GetxController {
   void endTrip(String requestid, BuildContext context) async {
     collecting(true);
 
+    print(ongoingtrip.value.request_id);
     Authdialog.showAuthProGress( 'Please wait...');
-
-    await requestcollecctionrefference.doc(requestid).collection('ongoingtrip').doc(requestid).update({
+  
+    await requestcollecctionrefference.doc(requestid).collection('ongoingtrip').doc(ongoingtrip.value.request_id).update({
       'payed': true,
       'created_at': DateTime.now().toString(),
-    });
-
-    ongoingtrip.value.payed = true;
+    }).then((value)async {
+      ongoingtrip.value.payed = true;
     ongoingtrip.value.created_at = DateTime.now().toString();
-    Map<String, dynamic> triphistorydata = ongoingtrip.value.toJson();
+    Map<String, dynamic> triphistorydata = ongoingtrip.toJson();
     
     /// save to driver
     await drivertriphistoryreferrence
@@ -465,6 +465,13 @@ class Requestdatacontroller extends GetxController {
         
       });
     });
+    }).catchError((e){
+      Get.back();
+      Infodialog.showInfoToastCenter(e.toString());
+
+    });
+    
+    
   }
 
   var cancelling = false.obs;

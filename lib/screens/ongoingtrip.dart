@@ -128,10 +128,7 @@ void getCurrenMaptyoe() {
   @override
   void initState() {
     Future.delayed(Duration.zero).then((value){
-      SchedulerBinding.instance!.addPostFrameCallback((_){
-
-        listenToOngoingTrip(context);
-      });
+      listenToOngoingTrip();
     });
     super.initState();
 
@@ -153,10 +150,12 @@ void getCurrenMaptyoe() {
     });
   }
 
-  void listenToOngoingTrip(BuildContext context) async {
+  void listenToOngoingTrip() async {
     var response = await requestxcontroller.checkOngoingTripDetails(context);
 
     if (response) {
+      print('FROM INITSTATE');
+      print(requestxcontroller.ongoingtrip.value.tripstatus);
    setSuccesMap();
    setMarker();
    setPolyline();
@@ -261,7 +260,10 @@ int _polylincecounter = 1;
 
     var response = await requestxcontroller.updateTripStaus(context);
       if(response != "check"){
-        
+        print('______________________________hdhashdhasdas');
+        print(requestxcontroller.ongoingtrip.value.tripstatus);
+        print('_______________________');
+        print(requestxcontroller.ongoingtrip.value.tripstatus);
         /// If coming and travelling upte driver location live so that passenger will know where is the driver is
         if(response == "coming" || response == "travelling"){
            await updatePolyline();
@@ -272,6 +274,7 @@ int _polylincecounter = 1;
           requestxcontroller.ongoingtrip.value.payed == false) {
             DialogCollection.showpaymentToCollect(context, requestxcontroller.ongoingtrip.value.fee.toString(),requestxcontroller.ongoingtrip.value.request_id);
           }
+        
 
 
       }else{
@@ -280,6 +283,13 @@ int _polylincecounter = 1;
           requestxcontroller.ongoingtrip.value.payed == false) {
             DialogCollection.showpaymentToCollect(context,requestxcontroller.ongoingtrip.value.fee.toString(),requestxcontroller.ongoingtrip.value.request_id);
         }
+         if (requestxcontroller.ongoingtrip.value.tripstatus == 'complete' &&
+          requestxcontroller.ongoingtrip.value.payed == true) {
+            Authdialog.showAuthProGress('Please wait...');
+            await requestxcontroller.deleteAcceptedRequest(requestxcontroller.ongoingtrip.value.request_id as String);
+            Get.back();
+            Get.offAll(HomeScreenManager());
+          }
 
       }
   }
@@ -471,7 +481,7 @@ void createCustomDriverMarker() {
                                 ),
                                 Horizontalspace(8),
                                 Flexible(
-                                    child: Text(
+                                    child: Text(requestxcontroller.ongoingtrip.value.tripstatus == 'coming'? 'Your Current Location ' :
                                   '${requestxcontroller.ongoingtrip.value.pickaddress_name}',
                                   textAlign: TextAlign.right,
                                 )),
@@ -500,7 +510,7 @@ void createCustomDriverMarker() {
                                 ),
                                 Horizontalspace(8),
                                 Flexible(
-                                    child: Text(
+                                    child: Text(requestxcontroller.ongoingtrip.value.tripstatus == 'coming'? '${requestxcontroller.ongoingtrip.value.pickaddress_name}' :
                                   '${requestxcontroller.ongoingtrip.value.dropddress_name}',
                                   textAlign: TextAlign.right,
                                 )),

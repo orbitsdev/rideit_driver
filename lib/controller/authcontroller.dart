@@ -84,6 +84,7 @@ class Authcontroller extends GetxController {
           'device_token': devicetoken,
            'map_mode':  null,
            'authorize':  true,
+           'new_acount': true
 
         };
 
