@@ -92,7 +92,7 @@ class Requestdatacontroller extends GetxController {
                     hasacceptedrequest(true);
               
               /// Create trip and prepair direction
-                var iscreated = await getDirectionAndCreateOngoingTrip( requestid!);
+                var iscreated = await getDirectionAndCreateOngoingTrip(requestid!);
 
                 if (iscreated) {
                   await requestcollecctionrefference.doc(requestid).update({
@@ -147,7 +147,10 @@ class Requestdatacontroller extends GetxController {
         
         requestdetails( RequestDetails.fromJson(snapshot.data() as Map<String, dynamic>));
         OngoingTripDetails  newongoingtripdetails =  OngoingTripDetails.fromJson(snapshot.data() as Map<String, dynamic>);
-       
+
+        ongoingtrip( OngoingTripDetails.fromJson(snapshot.data() as Map<String, dynamic>));
+        print('ONGOING TRIP AFTER CONFIRMING');
+        print(ongoingtrip.toJson());
         /// get deriction details
         var isrouteready = await getDirection(
           
@@ -156,7 +159,9 @@ class Requestdatacontroller extends GetxController {
             newongoingtripdetails.actualmarker_position as LatLng);
 
           Map<String, dynamic> ongoingtripdata = newongoingtripdetails.toJson();
+    
           ongoingtripdata['tripstatus'] = 'prepairing';
+           
        
 
         /// is route ready it will retrun
@@ -217,6 +222,8 @@ class Requestdatacontroller extends GetxController {
     try {
       await requestcollecctionrefference.doc(ongoingtripdata['request_id']).collection('ongoingtrip').doc(ongoingtripdata['request_id']).set(ongoingtripdata).then((_){
         ongoingtrip( OngoingTripDetails.fromJson(ongoingtripdata));
+          print('ONGOING TRIP AFTER CREATING');
+        print(ongoingtrip.toJson());
          iscreated = true;
       });
   
@@ -229,38 +236,79 @@ class Requestdatacontroller extends GetxController {
   }
 
   Future<bool> checkOngoingTripDetails(BuildContext context) async {
-    if (ongoingtrip.value.request_id != null) {
-      return true;
-    } else {
-      //checkdatabase
-
-      acceptedrequest_id = await getAcceptedRequestId();
-      if (acceptedrequest_id != null) {
-        try {
+   
+      if(ongoingtrip.value.request_id != null){
+        return true;
+      }else{
+        acceptedrequest_id = await getAccepteRequetId();
+        if(acceptedrequest_id !=  null){
           await requestcollecctionrefference
               .doc(acceptedrequest_id).collection('ongoingtrip').doc(acceptedrequest_id)
               .get()
               .then((value) async {
-                ongoingtrip(OngoingTripDetails.fromJson(
-                value.data() as Map<String, dynamic>));
+                if(value.exists){
+                  var data = value.data() as Map<String, dynamic>;
+                  if(data['driver_id'] == authinstance.currentUser!.uid){
+                      ongoingtrip(OngoingTripDetails.fromJson(data));
+                  }else{
+                    ongoingtrip(OngoingTripDetails());
+                    await deleteAcceptedRequest(acceptedrequest_id as String);
+                  }
+                  
+                }else{
+                  ongoingtrip(OngoingTripDetails());
+                }
 
-            //get direction again
-            var response = await getDirection(
-               
-                ongoingtrip.value.pick_location_id as String,
-                ongoingtrip.value.drop_location_id as String,
-                ongoingtrip.value.actualmarker_position as LatLng);
-            // getRouteDirection(requestid as String);
-          });
+              });
 
-          return true;
-        } catch (e) {
+              if(ongoingtrip.value.request_id != null){
+                return true;
+              }else{
+                return false;
+              }
+        }else{
           return false;
         }
-      } else {
-        return false;
       }
-    }
+
+
+    
+    // if (ongoingtrip.value.request_id != null) {
+    //   return true;
+    // } else {
+    //   //checkdatabase
+
+    //   acceptedrequest_id = await getAcceptedRequestId();
+    //   if (acceptedrequest_id != null) {
+       
+    //     try {
+    //       await requestcollecctionrefference
+    //           .doc(acceptedrequest_id).collection('ongoingtrip').doc(acceptedrequest_id)
+    //           .get()
+    //           .then((value) async {
+
+    //             if(value.exists){
+                   
+    //             }else{
+    //                 ongoingtrip(OngoingTripDetails());
+    //             print('ONGOINF TRIP OPENING ONGOING SCREEN');
+    //            print(ongoingtrip.toJson());
+    //              await clearLocalData();
+    //              Get.offAll(HomeScreenManager());
+    //             }
+               
+    //         // getRouteDirection(requestid as String);
+    //       });
+
+    //       return true;
+    //     } catch (e) {
+    //       return false;
+    //     }
+    //   } else {
+      
+    //     return false;
+    //   }
+    // }
   }
 
   Future<bool> changeRouteDirection(BuildContext context,
@@ -417,7 +465,8 @@ class Requestdatacontroller extends GetxController {
   void endTrip(String requestid, BuildContext context) async {
     collecting(true);
 
-    print(ongoingtrip.value.request_id);
+    print('FROM COMPLETING TRIP');
+    print(ongoingtrip.toJson());
     Authdialog.showAuthProGress( 'Please wait...');
   
     await requestcollecctionrefference.doc(requestid).collection('ongoingtrip').doc(ongoingtrip.value.request_id).update({

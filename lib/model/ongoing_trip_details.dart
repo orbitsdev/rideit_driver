@@ -155,4 +155,6 @@ class OngoingTripDetails {
       return value;
     }
   }
+
+  
 }
