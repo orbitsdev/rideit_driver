@@ -20,6 +20,7 @@ import 'package:tricycleappdriver/verifyingemail_screen.dart';
 import 'package:twilio_phone_verify/twilio_phone_verify.dart';
 
 class Authcontroller extends GetxController {
+   var pirmissioncontroller = Get.put(Permissioncontroller());
   var hasinternet = false.obs;
   var useracountdetails = Users().obs;
   var monitoraccountuser = Users().obs;
@@ -95,13 +96,25 @@ class Authcontroller extends GetxController {
           useracountdetails(Users.fromJson(userdetailsdata));
           useracountdetails.value.id = credential.user!.uid;
           isSignUpLoading(false);
+          await  pirmissioncontroller.geolocationServicePermission();
           
-          Position position =  await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-          
-          Map<String, dynamic> driverposition = {
+          Position position =  await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high).catchError((e){
+            
+          });
+              Map<String, dynamic> driverposition;
+          if(position == null){
+                         driverposition = {
+            "latitude": 0.0,
+            "longitude":0.0,
+          };
+          }else{
+                           driverposition = {
             "latitude": position.latitude,
             "longitude":position.longitude
           };
+
+          }
+
           Map<String, dynamic> availabilitydata = {
               "device_token" : devicetoken,
               "status" : "offline",

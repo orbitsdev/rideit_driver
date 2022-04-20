@@ -135,12 +135,14 @@ class _TricycleappDriverState extends State<TricycleappDriver> {
   @override
   void initState() {
     super.initState();
-    Get.put(Permissioncontroller());
+
+    
     Get.put(Authcontroller());
     
 
 
 
+    Get.put(Permissioncontroller());
     pirmissioncontroller.geolocationServicePermission();
 
     user = FirebaseAuth.instance.authStateChanges().listen((user) {

@@ -2,14 +2,17 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:path/path.dart';
 import 'package:tricycleappdriver/UI/constant.dart';
 import 'package:tricycleappdriver/UI/uicolor.dart';
 import 'package:tricycleappdriver/controller/authcontroller.dart';
+import 'package:tricycleappdriver/dialog/requestdialog/dialog_collection.dart';
 import 'package:tricycleappdriver/helper/firebasehelper.dart';
 import 'package:tricycleappdriver/home_screen_manager.dart';
+import 'package:tricycleappdriver/screens/onboard_screen.dart';
 import 'package:tricycleappdriver/signin_screen.dart';
 import 'package:url_launcher/link.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -53,6 +56,46 @@ class _VerifyingemailScreenState extends State<VerifyingemailScreen>
     );
   }
 
+void askPermission() async{
+
+  bool serviceEnabled;
+  LocationPermission permission;
+
+  
+  serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    
+     DialogCollection.showInfo('Location services are disabled. Please Enable the location'); 
+    return Future.error('Location services are disabled.');
+  }
+
+  permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      // Permissions are denied, next time you could try
+      // requesting permissions again (this is also where
+      // Android's shouldShowRequestPermissionRationale 
+      // returned true. According to Android guidelines
+      // your App should show an explanatory UI now.
+      
+          DialogCollection.showInfo('Dinied Permission you cannot use the if you dont allow permission');  
+      return Future.error('Location permissions are denied');
+    }
+  }
+  
+  if (permission == LocationPermission.deniedForever) {
+    // Permissions are denied forever, handle appropriately. 
+    DialogCollection.showInfo('since you denied location permission Twice we could not send request permission again but you can clear app caches to refresh the app');
+    return Future.error(
+      'Location permissions are permanently denied, we cannot request permissions.');
+  } 
+
+    
+
+}
+
+
   @override
   void setState(VoidCallback fn) {
     if (mounted) {
@@ -62,8 +105,9 @@ class _VerifyingemailScreenState extends State<VerifyingemailScreen>
 
   @override
   void initState() {
+        
+    //askPermission();
     startTimer();
-
     WidgetsBinding.instance!.addObserver(this);
     checkIfEmailIsNotVerified();
     super.initState();
@@ -132,7 +176,7 @@ class _VerifyingemailScreenState extends State<VerifyingemailScreen>
       time!.cancel();
 
         if(authxcontroller.useracountdetails.value.new_acount == true){
-          
+             Get.offAllNamed(OnboardScreen.screenName);
         }else{
            Get.offAllNamed(HomeScreenManager.screenName);
 
